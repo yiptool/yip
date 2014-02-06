@@ -14,6 +14,8 @@ ADD_LIBRARY(xcode STATIC
 	xcode_project.h
 	xcode_unique_id.cpp
 	xcode_unique_id.h
+	xcode_variant_group.cpp
+	xcode_variant_group.h
 )
 
 SET(BUILD_TEST_APP NO CACHE BOOLEAN "Build the test app")

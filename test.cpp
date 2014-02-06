@@ -105,6 +105,13 @@ int main()
 	ref_xctest->setPath("Library/Frameworks/XCTest.framework");
 	ref_xctest->setSourceTree("DEVELOPER_DIR");
 
+	// Variant groups
+
+	XCodeVariantGroup * varGroup = project.addVariantGroup();
+	varGroup->setUniqueID("A38BD25518A3044000AD1F3F");
+	varGroup->setName("InfoPlist.strings");
+	varGroup->addChild(ref_plist_en);
+
 	// Groups
 
 	XCodeGroup * mainGroup = project.addGroup();
@@ -136,6 +143,7 @@ int main()
 	supportingFilesGroup->setName("Supporting Files");
 	supportingFilesGroup->setUniqueID("A38BD25318A3044000AD1F3F");
 	supportingFilesGroup->addChild(ref_plist);
+	supportingFilesGroup->addChild(varGroup);
 	supportingFilesGroup->addChild(ref_main_m);
 	supportingFilesGroup->addChild(ref_prefix_pch);
 

@@ -38,6 +38,9 @@ XCodeProject::~XCodeProject()
 	for (std::vector<XCodeGroup *>::const_iterator it = m_Groups.begin(); it != m_Groups.end(); ++it)
 		delete *it;
 
+	for (std::vector<XCodeVariantGroup *>::const_iterator it = m_VarGroups.begin(); it != m_VarGroups.end(); ++it)
+		delete *it;
+
 	for (std::vector<XCodeFileReference *>::const_iterator it = m_FileRefs.begin(); it != m_FileRefs.end(); ++it)
 		delete *it;
 
@@ -50,6 +53,13 @@ XCodeGroup * XCodeProject::addGroup()
 {
 	XCodeGroup * group = new XCodeGroup;
 	m_Groups.push_back(group);
+	return group;
+}
+
+XCodeVariantGroup * XCodeProject::addVariantGroup()
+{
+	XCodeVariantGroup * group = new XCodeVariantGroup;
+	m_VarGroups.push_back(group);
 	return group;
 }
 
@@ -109,6 +119,11 @@ std::string XCodeProject::toString() const
 	ss << "\t\t\t);\n";
 	ss << "\t\t};\n";
 	ss << "/* End PBXProject section */\n";
+
+	ss << "/* Begin PBXVariantGroup section */\n";
+	for (std::vector<XCodeVariantGroup *>::const_iterator it = m_VarGroups.begin(); it != m_VarGroups.end(); ++it)
+		ss << (*it)->toString();
+	ss << "/* End PBXVariantGroup section */\n";
 
 	ss << "\t};\n";
 	ss << "\trootObject = " << uniqueID().toString() << " /* Project object */;\n";
