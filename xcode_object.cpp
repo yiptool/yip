@@ -35,7 +35,7 @@ XCodeObject::~XCodeObject()
 
 std::string XCodeObject::stringLiteral(const std::string & str)
 {
-	const char * allowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+	const char * allowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_./";
 	bool shortForm = true;
 
 	if (str.length() == 0)

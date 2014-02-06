@@ -38,6 +38,9 @@ XCodeProject::~XCodeProject()
 	for (std::vector<XCodeGroup *>::const_iterator it = m_Groups.begin(); it != m_Groups.end(); ++it)
 		delete *it;
 
+	for (std::vector<XCodeFileReference *>::const_iterator it = m_FileRefs.begin(); it != m_FileRefs.end(); ++it)
+		delete *it;
+
 	for (std::vector<XCodeNativeTarget *>::const_iterator
 			it = m_NativeTargets.begin(); it != m_NativeTargets.end(); ++it)
 		delete *it;
@@ -48,6 +51,13 @@ XCodeGroup * XCodeProject::addGroup()
 	XCodeGroup * group = new XCodeGroup;
 	m_Groups.push_back(group);
 	return group;
+}
+
+XCodeFileReference * XCodeProject::addFileReference()
+{
+	XCodeFileReference * ref = new XCodeFileReference;
+	m_FileRefs.push_back(ref);
+	return ref;
 }
 
 std::string XCodeProject::toString() const
@@ -61,10 +71,17 @@ std::string XCodeProject::toString() const
 	ss << "\tobjectVersion = 46;\n";
 	ss << "\tobjects = {\n";
 
+	ss << "/* Begin PBXFileReference section */\n";
+	for (std::vector<XCodeFileReference *>::const_iterator it = m_FileRefs.begin(); it != m_FileRefs.end(); ++it)
+		ss << "\t\t" << (*it)->toString() << '\n';
+	ss << "/* End PBXFileReference section */\n";
+	ss << '\n';
+
 	ss << "/* Begin PBXGroup section */\n";
 	for (std::vector<XCodeGroup *>::const_iterator it = m_Groups.begin(); it != m_Groups.end(); ++it)
 		ss << (*it)->toString();
 	ss << "/* End PBXGroup section */\n";
+	ss << '\n';
 
 	ss << "/* Begin PBXProject section */\n";
 	ss << "\t\t" << objectID(this) << " = {\n";

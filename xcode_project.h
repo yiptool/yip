@@ -25,6 +25,7 @@
 
 #include "xcode_object.h"
 #include "xcode_group.h"
+#include "xcode_file_reference.h"
 #include "xcode_native_target.h"
 #include <set>
 #include <string>
@@ -61,6 +62,8 @@ public:
 	inline XCodeGroup * productRefGroup() const { return m_ProductRefGroup; }
 	inline void setProductRefGroup(XCodeGroup * group) { m_ProductRefGroup = group; }
 
+	XCodeFileReference * addFileReference();
+
 	std::string toString() const;
 
 private:
@@ -72,6 +75,7 @@ private:
 	XCodeGroup * m_MainGroup;
 	XCodeGroup * m_ProductRefGroup;
 	std::vector<XCodeGroup *> m_Groups;
+	std::vector<XCodeFileReference *> m_FileRefs;
 	std::vector<XCodeNativeTarget *> m_NativeTargets;
 };
 

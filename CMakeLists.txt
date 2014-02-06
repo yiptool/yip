@@ -2,6 +2,8 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 ADD_LIBRARY(xcode STATIC
+	xcode_file_reference.cpp
+	xcode_file_reference.h
 	xcode_group.cpp
 	xcode_group.h
 	xcode_native_target.cpp

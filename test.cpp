@@ -32,6 +32,81 @@ int main()
 	project.setUniqueID("A38BD24118A3044000AD1F3F");
 	project.setOrganizationName("FriedCroc");
 
+	// File references
+
+	XCodeFileReference * ref_app = project.addFileReference();
+	ref_app->setUniqueID("A38BD24918A3044000AD1F3F");
+	ref_app->setExplicitFileType(FILETYPE_WRAPPER_APPLICATION);
+	ref_app->setIncludeInIndex(false);
+	ref_app->setPath("PRODPROD.app");
+	ref_app->setSourceTree("BUILT_PRODUCTS_DIR");
+
+	XCodeFileReference * ref_foundation = project.addFileReference();
+	ref_foundation->setUniqueID("A38BD24C18A3044000AD1F3F");
+	ref_foundation->setLastKnownFileType(FILETYPE_WRAPPER_FRAMEWORK);
+	ref_foundation->setName("Foundation.framework");
+	ref_foundation->setPath("System/Library/Frameworks/Foundation.framework");
+	ref_foundation->setSourceTree("SDKROOT");
+
+	XCodeFileReference * ref_coreGraphics = project.addFileReference();
+	ref_coreGraphics->setUniqueID("A38BD24E18A3044000AD1F3F");
+	ref_coreGraphics->setLastKnownFileType(FILETYPE_WRAPPER_FRAMEWORK);
+	ref_coreGraphics->setName("CoreGraphics.framework");
+	ref_coreGraphics->setPath("System/Library/Frameworks/CoreGraphics.framework");
+	ref_coreGraphics->setSourceTree("SDKROOT");
+
+	XCodeFileReference * ref_uikit = project.addFileReference();
+	ref_uikit->setUniqueID("A38BD25018A3044000AD1F3F");
+	ref_uikit->setLastKnownFileType(FILETYPE_WRAPPER_FRAMEWORK);
+	ref_uikit->setName("UIKit.framework");
+	ref_uikit->setPath("System/Library/Frameworks/UIKit.framework");
+	ref_uikit->setSourceTree("SDKROOT");
+
+	XCodeFileReference * ref_plist = project.addFileReference();
+	ref_plist->setUniqueID("A38BD25418A3044000AD1F3F");
+	ref_plist->setLastKnownFileType(FILETYPE_TEXT_PLIST_XML);
+	ref_plist->setPath("PRODPROD-Info.plist");
+
+	XCodeFileReference * ref_plist_en = project.addFileReference();
+	ref_plist_en->setUniqueID("A38BD25618A3044000AD1F3F");
+	ref_plist_en->setLastKnownFileType(FILETYPE_TEXT_PLIST_STRINGS);
+	ref_plist_en->setName("en");
+	ref_plist_en->setPath("en.lproj/InfoPlist.strings");
+
+	XCodeFileReference * ref_main_m = project.addFileReference();
+	ref_main_m->setUniqueID("A38BD25818A3044000AD1F3F");
+	ref_main_m->setLastKnownFileType(FILETYPE_SOURCECODE_C_OBJC);
+	ref_main_m->setPath("main.m");
+
+	XCodeFileReference * ref_prefix_pch = project.addFileReference();
+	ref_prefix_pch->setUniqueID("A38BD25A18A3044000AD1F3F");
+	ref_prefix_pch->setLastKnownFileType(FILETYPE_SOURCECODE_C_H);
+	ref_prefix_pch->setPath("PRODPROD-Prefix.pch");
+
+	XCodeFileReference * ref_appdelegate_h = project.addFileReference();
+	ref_appdelegate_h->setUniqueID("A38BD25B18A3044000AD1F3F");
+	ref_appdelegate_h->setLastKnownFileType(FILETYPE_SOURCECODE_C_H);
+	ref_appdelegate_h->setPath("AppDelegate.h");
+
+	XCodeFileReference * ref_appdelegate_m = project.addFileReference();
+	ref_appdelegate_m->setUniqueID("A38BD25C18A3044000AD1F3F");
+	ref_appdelegate_m->setLastKnownFileType(FILETYPE_SOURCECODE_C_OBJC);
+	ref_appdelegate_m->setPath("AppDelegate.m");
+
+	XCodeFileReference * ref_images_xcassets = project.addFileReference();
+	ref_images_xcassets->setUniqueID("A38BD25E18A3044000AD1F3F");
+	ref_images_xcassets->setLastKnownFileType(FILETYPE_FOLDER_ASSETCATALOG);
+	ref_images_xcassets->setPath("Images.xcassets");
+
+	XCodeFileReference * ref_xctest = project.addFileReference();
+	ref_xctest->setUniqueID("A38BD26518A3044000AD1F3F");
+	ref_xctest->setLastKnownFileType(FILETYPE_WRAPPER_FRAMEWORK);
+	ref_xctest->setName("XCTest.framework");
+	ref_xctest->setPath("Library/Frameworks/XCTest.framework");
+	ref_xctest->setSourceTree("DEVELOPER_DIR");
+
+	// Groups
+
 	XCodeGroup * mainGroup = project.addGroup();
 	project.setMainGroup(mainGroup);
 	mainGroup->setUniqueID("A38BD24018A3044000AD1F3F");
@@ -40,18 +115,29 @@ int main()
 	project.setProductRefGroup(productsGroup);
 	productsGroup->setName("Products");
 	productsGroup->setUniqueID("A38BD24A18A3044000AD1F3F");
+	productsGroup->addChild(ref_app);
 
 	XCodeGroup * frameworksGroup = project.addGroup();
 	frameworksGroup->setName("Frameworks");
 	frameworksGroup->setUniqueID("A38BD24B18A3044000AD1F3F");
+	frameworksGroup->addChild(ref_foundation);
+	frameworksGroup->addChild(ref_coreGraphics);
+	frameworksGroup->addChild(ref_uikit);
+	frameworksGroup->addChild(ref_xctest);
 
 	XCodeGroup * sourcesGroup = project.addGroup();
 	sourcesGroup->setPath("PRODPROD");
 	sourcesGroup->setUniqueID("A38BD25218A3044000AD1F3F");
+	sourcesGroup->addChild(ref_appdelegate_h);
+	sourcesGroup->addChild(ref_appdelegate_m);
+	sourcesGroup->addChild(ref_images_xcassets);
 
 	XCodeGroup * supportingFilesGroup = project.addGroup();
 	supportingFilesGroup->setName("Supporting Files");
 	supportingFilesGroup->setUniqueID("A38BD25318A3044000AD1F3F");
+	supportingFilesGroup->addChild(ref_plist);
+	supportingFilesGroup->addChild(ref_main_m);
+	supportingFilesGroup->addChild(ref_prefix_pch);
 
 	mainGroup->addChild(sourcesGroup);
 	mainGroup->addChild(frameworksGroup);
