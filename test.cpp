@@ -186,6 +186,36 @@ int main()
 	targetCfgList->addConfiguration(cfgTargetDebug);
 	targetCfgList->addConfiguration(cfgTargetRelease);
 
+	// Build files
+
+	XCodeBuildFile * file_foundation = project.addBuildFile();
+	file_foundation->setUniqueID("A38BD24D18A3044000AD1F3F");
+	file_foundation->setFileRef(ref_foundation);
+
+	XCodeBuildFile * file_coreGraphics = project.addBuildFile();
+	file_coreGraphics->setUniqueID("A38BD24F18A3044000AD1F3F");
+	file_coreGraphics->setFileRef(ref_coreGraphics);
+
+	XCodeBuildFile * file_uikit = project.addBuildFile();
+	file_uikit->setUniqueID("A38BD25118A3044000AD1F3F");
+	file_uikit->setFileRef(ref_uikit);
+
+	XCodeBuildFile * file_infoplist = project.addBuildFile();
+	file_infoplist->setUniqueID("A38BD25718A3044000AD1F3F");
+	file_infoplist->setFileRef(varGroup);
+
+	XCodeBuildFile * file_main_m = project.addBuildFile();
+	file_main_m->setUniqueID("A38BD25918A3044000AD1F3F");
+	file_main_m->setFileRef(ref_main_m);
+
+	XCodeBuildFile * file_appdelegate_m = project.addBuildFile();
+	file_appdelegate_m->setUniqueID("A38BD25D18A3044000AD1F3F");
+	file_appdelegate_m->setFileRef(ref_appdelegate_m);
+
+	XCodeBuildFile * file_images_xcassets = project.addBuildFile();
+	file_images_xcassets->setUniqueID("A38BD25F18A3044000AD1F3F");
+	file_images_xcassets->setFileRef(ref_images_xcassets);
+
 	// --- Generate
 
 	std::string data = project.toString();

@@ -29,6 +29,7 @@
 #include "xcode_file_reference.h"
 #include "xcode_build_configuration.h"
 #include "xcode_configuration_list.h"
+#include "xcode_build_file.h"
 #include "xcode_native_target.h"
 #include <set>
 #include <string>
@@ -75,6 +76,8 @@ public:
 	inline XCodeConfigurationList * buildConfigurationList() const { return m_BuildConfigurationList; }
 	inline void setBuildConfigurationList(XCodeConfigurationList * cfg) { m_BuildConfigurationList = cfg; }
 
+	XCodeBuildFile * addBuildFile();
+
 	std::string toString() const;
 
 private:
@@ -92,6 +95,7 @@ private:
 	std::vector<XCodeNativeTarget *> m_NativeTargets;
 	std::vector<XCodeBuildConfiguration *> m_Cfgs;
 	std::vector<XCodeConfigurationList *> m_CfgLists;
+	std::vector<XCodeBuildFile *> m_BuildFiles;
 };
 
 #endif

@@ -51,6 +51,9 @@ XCodeProject::~XCodeProject()
 	for (std::vector<XCodeConfigurationList *>::const_iterator it = m_CfgLists.begin(); it != m_CfgLists.end(); ++it)
 		delete *it;
 
+	for (std::vector<XCodeBuildFile *>::const_iterator it = m_BuildFiles.begin(); it != m_BuildFiles.end(); ++it)
+		delete *it;
+
 	for (std::vector<XCodeNativeTarget *>::const_iterator
 			it = m_NativeTargets.begin(); it != m_NativeTargets.end(); ++it)
 		delete *it;
@@ -91,6 +94,13 @@ XCodeConfigurationList * XCodeProject::addConfigurationList()
 	return list;
 }
 
+XCodeBuildFile * XCodeProject::addBuildFile()
+{
+	XCodeBuildFile * file = new XCodeBuildFile;
+	m_BuildFiles.push_back(file);
+	return file;
+}
+
 std::string XCodeProject::toString() const
 {
 	std::stringstream ss;
@@ -101,6 +111,12 @@ std::string XCodeProject::toString() const
 	ss << "\t};\n";
 	ss << "\tobjectVersion = 46;\n";
 	ss << "\tobjects = {\n";
+
+	ss << "/* Begin PBXBuildFile section */\n";
+	for (std::vector<XCodeBuildFile *>::const_iterator it = m_BuildFiles.begin(); it != m_BuildFiles.end(); ++it)
+		ss << "\t\t" << (*it)->toString() << '\n';
+	ss << "/* End PBXBuildFile section */\n";
+	ss << '\n';
 
 	ss << "/* Begin PBXFileReference section */\n";
 	for (std::vector<XCodeFileReference *>::const_iterator it = m_FileRefs.begin(); it != m_FileRefs.end(); ++it)
