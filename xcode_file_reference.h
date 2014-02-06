@@ -33,7 +33,7 @@ extern const std::string FILETYPE_COMPILED_MACHO_EXECUTABLE;
 extern const std::string FILETYPE_TEXT;
 extern const std::string FILETYPE_TEXT_PLIST_XML;
 extern const std::string FILETYPE_TEXT_PLIST_STRINGS;
-extern const std::string FILETYPE_SOURCECODE_C;
+extern const std::string FILETYPE_SOURCECODE_C_C;
 extern const std::string FILETYPE_SOURCECODE_C_H;
 extern const std::string FILETYPE_SOURCECODE_CPP_CPP;
 extern const std::string FILETYPE_SOURCECODE_CPP_H;
