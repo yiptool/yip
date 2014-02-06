@@ -24,17 +24,162 @@
 #define __c7386a7c1f865726067bebd964f4a475__
 
 #include "xcode_build_configuration.h"
+#include <vector>
+#include <string>
 
 class XCodeProject;
 
+enum XCodeWarnFlag
+{
+	XCodeDisableWarning = 0,
+	XCodeEnableWarning,
+	XCodeWarningAsError
+};
+
 class XCodeProjectBuildConfiguration : public XCodeBuildConfiguration
 {
+public:
+	inline bool alwaysSearchUserPaths() const { return m_AlwaysSearchUserPaths; }
+	inline void setAlwaysSearchUserPaths(bool flag) { m_AlwaysSearchUserPaths = flag; }
+
+	inline const std::string & archs() const { return m_Archs; }
+	inline void setArchs(const std::string & archs) { m_Archs = archs; }
+
+	inline const std::string & clangCxxLanguageStandard() const { return m_ClangCxxLanguageStandard; }
+	inline void setClangCxxLanguageStandard(const std::string & std) { m_ClangCxxLanguageStandard = std; }
+
+	inline const std::string & clangCxxLibrary() const { return m_ClangCxxLibrary; }
+	inline void setClangCxxLibrary(const std::string & std) { m_ClangCxxLibrary = std; }
+
+	inline bool clangEnableModules() const { return m_ClangEnableModules; }
+	inline void setClangEnableModules(bool flag) { m_ClangEnableModules = flag; }
+
+	inline bool clangEnableObjCARC() const { return m_ClangEnableObjCARC; }
+	inline void setClangEnableObjCARC(bool flag) { m_ClangEnableObjCARC = flag; }
+
+	inline XCodeWarnFlag clangWarnBoolConversion() const { return m_ClangWarnBoolConversion; }
+	inline void setClangWarnBoolConversion(XCodeWarnFlag flag) { m_ClangWarnBoolConversion = flag; }
+
+	inline XCodeWarnFlag clangWarnConstantConversion() const { return m_ClangWarnConstantConversion; }
+	inline void setClangWarnConstantConversion(XCodeWarnFlag flag) { m_ClangWarnConstantConversion = flag; }
+
+	inline XCodeWarnFlag clangWarnDirectObjCIsAUsage() const { return m_ClangWarnDirectObjCIsAUsage; }
+	inline void setClangWarnDirectObjCIsAUsage(XCodeWarnFlag flag) { m_ClangWarnDirectObjCIsAUsage = flag; }
+
+	inline XCodeWarnFlag clangWarnEmptyBody() const { return m_ClangWarnEmptyBody; }
+	inline void setClangWarnEmptyBody(XCodeWarnFlag flag) { m_ClangWarnEmptyBody = flag; }
+
+	inline XCodeWarnFlag clangWarnEnumConversion() const { return m_ClangWarnEnumConversion; }
+	inline void setClangWarnEnumConversion(XCodeWarnFlag flag) { m_ClangWarnEnumConversion = flag; }
+
+	inline XCodeWarnFlag clangWarnIntConversion() const { return m_ClangWarnIntConversion; }
+	inline void setClangWarnIntConversion(XCodeWarnFlag flag) { m_ClangWarnIntConversion = flag; }
+
+	inline XCodeWarnFlag clangWarnObjCRootClass() const { return m_ClangWarnObjCRootClass; }
+	inline void setClangWarnObjCRootClass(XCodeWarnFlag flag) { m_ClangWarnObjCRootClass = flag; }
+
+	inline XCodeWarnFlag clangWarnDuplicateMethodMatch() const { return m_ClangWarnDuplicateMethodMatch; }
+	inline void setClangWarnDuplicateMethodMatch(XCodeWarnFlag flag) { m_ClangWarnDuplicateMethodMatch = flag; }
+
+	inline bool copyPhaseStrip() const { return m_CopyPhaseStrip; }
+	inline void setCopyPhaseStrip(bool flag) { m_CopyPhaseStrip = flag; }
+
+	inline bool enableNSAssertions() const { return m_EnableNSAssertions; }
+	inline void setEnableNSAssertions(bool flag) { m_EnableNSAssertions = flag; }
+
+	inline const std::string & gnuCLanguageStandard() const { return m_GnuCLanguageStandard; }
+	inline void setGnuCLanguageStandard(const std::string & std) { m_GnuCLanguageStandard = std; }
+
+	inline bool gccDynamicNoPIC() const { return m_GccDynamicNoPIC; }
+	inline void setGccDynamicNoPIC(bool flag) { m_GccDynamicNoPIC = flag; }
+
+	inline const std::string & gccOptimizationLevel() const { return m_GccOptimizationLevel; }
+	inline void setGccOptimizationLevel(const std::string & level) { m_GccOptimizationLevel = level; }
+
+	inline bool gccSymbolsPrivateExtern() const { return m_GccSymbolsPrivateExtern; }
+	inline void setGccSymbolsPrivateExtern(bool flag) { m_GccSymbolsPrivateExtern = flag; }
+
+	inline XCodeWarnFlag gccWarn64To32BitConversion() const { return m_GccWarn64To32BitConversion; }
+	inline void setGccWarn64To32BitConversion(XCodeWarnFlag flag) { m_GccWarn64To32BitConversion = flag; }
+
+	inline XCodeWarnFlag gccWarnAboutReturnType() const { return m_GccWarnAboutReturnType; }
+	inline void setGccWarnAboutReturnType(XCodeWarnFlag flag) { m_GccWarnAboutReturnType = flag; }
+
+	inline XCodeWarnFlag gccWarnUndeclaredSelector() const { return m_GccWarnUndeclaredSelector; }
+	inline void setGccWarnUndeclaredSelector(XCodeWarnFlag flag) { m_GccWarnUndeclaredSelector = flag; }
+
+	inline XCodeWarnFlag gccWarnUninitializedAutos() const { return m_GccWarnUninitializedAutos; }
+	inline void setGccWarnUninitializedAutos(XCodeWarnFlag flag) { m_GccWarnUninitializedAutos = flag; }
+
+	inline XCodeWarnFlag gccWarnUnusedFunction() const { return m_GccWarnUnusedFunction; }
+	inline void setGccWarnUnusedFunction(XCodeWarnFlag flag) { m_GccWarnUnusedFunction = flag; }
+
+	inline XCodeWarnFlag gccWarnUnusedVariable() const { return m_GccWarnUnusedVariable; }
+	inline void setGccWarnUnusedVariable(XCodeWarnFlag flag) { m_GccWarnUnusedVariable = flag; }
+
+	inline const std::string & iphoneOSDeploymentTarget() const { return m_IPhoneOSDeploymentTarget; }
+	inline void setIPhoneOSDeploymentTarget(const std::string & tgt) { m_IPhoneOSDeploymentTarget = tgt; }
+
+	inline bool onlyActiveArch() const { return m_OnlyActiveArch; }
+	inline void setOnlyActiveArch(bool flag) { m_OnlyActiveArch = flag; }
+
+	inline const std::string & sdkRoot() const { return m_SDKRoot; }
+	inline void setSDKRoot(const std::string & root) { m_SDKRoot = root; }
+
+	inline const std::string & targetedDeviceFamily() const { return m_TargetedDeviceFamily; }
+	inline void setTargetedDeviceFamily(const std::string & family) { m_TargetedDeviceFamily = family; }
+
+	inline bool validateProduct() const { return m_ValidateProduct; }
+	inline void setValidateProduct(bool flag) { m_ValidateProduct = flag; }
+
+	inline void addPreprocessorDefinition(const std::string & def) { m_Defines.push_back(def); }
+
+	inline void setCodeSignIdentity(const std::string & sdk, const std::string & value)
+		{ m_CodeSignIdentitySDK = sdk; m_CodeSignIdentityValue = value; }
+
 protected:
 	void writeBuildSettings(std::stringstream & ss) const;
 
 private:
+	bool m_AlwaysSearchUserPaths;
+	std::string m_Archs;
+	std::string m_ClangCxxLanguageStandard;
+	std::string m_ClangCxxLibrary;
+	bool m_ClangEnableModules;
+	bool m_ClangEnableObjCARC;
+	XCodeWarnFlag m_ClangWarnBoolConversion;
+	XCodeWarnFlag m_ClangWarnConstantConversion;
+	XCodeWarnFlag m_ClangWarnDirectObjCIsAUsage;
+	XCodeWarnFlag m_ClangWarnEmptyBody;
+	XCodeWarnFlag m_ClangWarnEnumConversion;
+	XCodeWarnFlag m_ClangWarnIntConversion;
+	XCodeWarnFlag m_ClangWarnObjCRootClass;
+	XCodeWarnFlag m_ClangWarnDuplicateMethodMatch;
+	bool m_CopyPhaseStrip;
+	bool m_EnableNSAssertions;
+	std::string m_GnuCLanguageStandard;
+	bool m_GccDynamicNoPIC;
+	std::string m_GccOptimizationLevel;
+	bool m_GccSymbolsPrivateExtern;
+	XCodeWarnFlag m_GccWarn64To32BitConversion;
+	XCodeWarnFlag m_GccWarnAboutReturnType;
+	XCodeWarnFlag m_GccWarnUndeclaredSelector;
+	XCodeWarnFlag m_GccWarnUninitializedAutos;
+	XCodeWarnFlag m_GccWarnUnusedFunction;
+	XCodeWarnFlag m_GccWarnUnusedVariable;
+	std::string m_IPhoneOSDeploymentTarget;
+	bool m_OnlyActiveArch;
+	std::string m_SDKRoot;
+	std::string m_TargetedDeviceFamily;
+	bool m_ValidateProduct;
+	std::vector<std::string> m_Defines;
+	std::string m_CodeSignIdentitySDK;
+	std::string m_CodeSignIdentityValue;
+
 	XCodeProjectBuildConfiguration();
 	~XCodeProjectBuildConfiguration();
+
+	static std::string warnFlag(XCodeWarnFlag flag);
 
 	friend class XCodeProject;
 };

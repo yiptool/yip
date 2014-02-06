@@ -158,10 +158,26 @@ int main()
 	XCodeProjectBuildConfiguration * cfgProjectDebug = project.addProjectBuildConfiguration();
 	cfgProjectDebug->setUniqueID("A38BD27318A3044000AD1F3F");
 	cfgProjectDebug->setName("Debug");
+	cfgProjectDebug->setClangEnableObjCARC(true);
+	cfgProjectDebug->setGccOptimizationLevel("0");
+	cfgProjectDebug->setIPhoneOSDeploymentTarget("7.0");
+	cfgProjectDebug->setSDKRoot("iphoneos");
+	cfgProjectDebug->setTargetedDeviceFamily("1,2");
+	cfgProjectDebug->addPreprocessorDefinition("DEBUG=1");
+	cfgProjectDebug->setCodeSignIdentity("iphoneos*", "iPhone Developer");
 
 	XCodeProjectBuildConfiguration * cfgProjectRelease = project.addProjectBuildConfiguration();
 	cfgProjectRelease->setUniqueID("A38BD27418A3044000AD1F3F");
 	cfgProjectRelease->setName("Release");
+	cfgProjectRelease->setClangEnableObjCARC(true);
+	cfgProjectRelease->setCopyPhaseStrip(true);
+	cfgProjectRelease->setEnableNSAssertions(false);
+	cfgProjectRelease->setIPhoneOSDeploymentTarget("7.0");
+	cfgProjectRelease->setOnlyActiveArch(false);
+	cfgProjectRelease->setSDKRoot("iphoneos");
+	cfgProjectRelease->setTargetedDeviceFamily("1,2");
+	cfgProjectRelease->setValidateProduct(true);
+	cfgProjectRelease->setCodeSignIdentity("iphoneos*", "iPhone Developer");
 
 	XCodeTargetBuildConfiguration * cfgTargetDebug = project.addTargetBuildConfiguration();
 	cfgTargetDebug->setUniqueID("A38BD27618A3044000AD1F3F");
