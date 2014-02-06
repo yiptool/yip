@@ -29,6 +29,7 @@
 class XCodeProject;
 class XCodeConfigurationList;
 class XCodeBuildPhase;
+class XCodeTargetDependency;
 
 extern const std::string PRODUCTTYPE_APPLICATION;
 extern const std::string PRODUCTTYPE_TOOL;
@@ -54,6 +55,7 @@ public:
 	inline void setProductType(const std::string & type) { m_ProductType = type; }
 
 	inline void addBuildPhase(XCodeBuildPhase * phase) { m_Phases.push_back(phase); }
+	inline void addDependency(XCodeTargetDependency * dep) { m_Deps.push_back(dep); }
 
 	std::string toString() const;
 
@@ -64,6 +66,7 @@ private:
 	XCodeObject * m_ProductReference;
 	std::string m_ProductType;
 	std::vector<XCodeBuildPhase *> m_Phases;
+	std::vector<XCodeTargetDependency *> m_Deps;
 
 	XCodeNativeTarget();
 	~XCodeNativeTarget();

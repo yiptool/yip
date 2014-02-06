@@ -23,6 +23,7 @@
 #include "xcode_native_target.h"
 #include "xcode_configuration_list.h"
 #include "xcode_build_phase.h"
+#include "xcode_target_dependency.h"
 #include <sstream>
 
 const std::string PRODUCTTYPE_APPLICATION = "com.apple.product-type.application";
@@ -54,6 +55,8 @@ std::string XCodeNativeTarget::toString() const
 	ss << "\t\t\tbuildRules = (\n";
 	ss << "\t\t\t);\n";
 	ss << "\t\t\tdependencies = (\n";
+	for (std::vector<XCodeTargetDependency *>::const_iterator it = m_Deps.begin(); it != m_Deps.end(); ++it)
+		ss << "\t\t\t\t" << objectID(*it) << ",\n";
 	ss << "\t\t\t);\n";
 
 	if (m_Name.length() > 0)
