@@ -30,6 +30,8 @@
 #include "xcode_project_build_configuration.h"
 #include "xcode_target_build_configuration.h"
 #include "xcode_configuration_list.h"
+#include "xcode_container_item_proxy.h"
+#include "xcode_target_dependency.h"
 #include "xcode_build_file.h"
 #include "xcode_build_phase.h"
 #include "xcode_native_target.h"
@@ -85,6 +87,9 @@ public:
 
 	XCodeNativeTarget * addNativeTarget();
 
+	XCodeContainerItemProxy * addContainerItemProxy();
+	XCodeTargetDependency * addTargetDependency();
+
 	std::string toString() const;
 
 private:
@@ -106,6 +111,8 @@ private:
 	std::vector<XCodeBuildPhase *> m_FrameworksBuildPhase;
 	std::vector<XCodeBuildPhase *> m_SourcesBuildPhase;
 	std::vector<XCodeBuildPhase *> m_ResourcesBuildPhase;
+	std::vector<XCodeContainerItemProxy *> m_Proxies;
+	std::vector<XCodeTargetDependency *> m_Dependencies;
 
 	XCodeBuildFile * addBuildFile(XCodeBuildPhase * phase);
 

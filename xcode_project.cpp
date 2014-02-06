@@ -69,6 +69,14 @@ XCodeProject::~XCodeProject()
 	for (std::vector<XCodeNativeTarget *>::const_iterator
 			it = m_NativeTargets.begin(); it != m_NativeTargets.end(); ++it)
 		delete *it;
+
+	for (std::vector<XCodeContainerItemProxy *>::const_iterator
+			it = m_Proxies.begin(); it != m_Proxies.end(); ++it)
+		delete *it;
+
+	for (std::vector<XCodeTargetDependency *>::const_iterator
+			it = m_Dependencies.begin(); it != m_Dependencies.end(); ++it)
+		delete *it;
 }
 
 XCodeGroup * XCodeProject::addGroup()
@@ -141,6 +149,20 @@ XCodeNativeTarget * XCodeProject::addNativeTarget()
 	return target;
 }
 
+XCodeContainerItemProxy * XCodeProject::addContainerItemProxy()
+{
+	XCodeContainerItemProxy * proxy = new XCodeContainerItemProxy;
+	m_Proxies.push_back(proxy);
+	return proxy;
+}
+
+XCodeTargetDependency * XCodeProject::addTargetDependency()
+{
+	XCodeTargetDependency * dep = new XCodeTargetDependency;
+	m_Dependencies.push_back(dep);
+	return dep;
+}
+
 std::string XCodeProject::toString() const
 {
 	std::stringstream ss;
@@ -163,6 +185,13 @@ std::string XCodeProject::toString() const
 	for (std::vector<XCodeFileReference *>::const_iterator it = m_FileRefs.begin(); it != m_FileRefs.end(); ++it)
 		ss << "\t\t" << (*it)->toString() << '\n';
 	ss << "/* End PBXFileReference section */\n";
+	ss << '\n';
+
+	ss << "/* Begin PBXContainerItemProxy section */\n";
+	for (std::vector<XCodeContainerItemProxy *>::const_iterator
+			it = m_Proxies.begin(); it != m_Proxies.end(); ++it)
+		ss << (*it)->toString();
+	ss << "/* End PBXContainerItemProxy section */\n";
 	ss << '\n';
 
 	ss << "/* Begin PBXFrameworksBuildPhase section */\n";
@@ -228,6 +257,13 @@ std::string XCodeProject::toString() const
 			it = m_SourcesBuildPhase.begin(); it != m_SourcesBuildPhase.end(); ++it)
 		ss << (*it)->toString();
 	ss << "/* End PBXSourcesBuildPhase section */\n";
+	ss << '\n';
+
+	ss << "/* Begin PBXTargetDependency section */\n";
+	for (std::vector<XCodeTargetDependency *>::const_iterator
+			it = m_Dependencies.begin(); it != m_Dependencies.end(); ++it)
+		ss << (*it)->toString();
+	ss << "/* End PBXTargetDependency section */\n";
 	ss << '\n';
 
 	ss << "/* Begin PBXVariantGroup section */\n";
