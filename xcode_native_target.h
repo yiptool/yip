@@ -25,8 +25,15 @@
 
 #include "xcode_object.h"
 
+class XCodeProject;
+
 class XCodeNativeTarget : public XCodeObject
 {
+private:
+	XCodeNativeTarget();
+	~XCodeNativeTarget();
+
+	friend class XCodeProject;
 };
 
 #endif

@@ -44,6 +44,9 @@ XCodeProject::~XCodeProject()
 	for (std::vector<XCodeFileReference *>::const_iterator it = m_FileRefs.begin(); it != m_FileRefs.end(); ++it)
 		delete *it;
 
+	for (std::vector<XCodeBuildConfiguration *>::const_iterator it = m_Cfgs.begin(); it != m_Cfgs.end(); ++it)
+		delete *it;
+
 	for (std::vector<XCodeNativeTarget *>::const_iterator
 			it = m_NativeTargets.begin(); it != m_NativeTargets.end(); ++it)
 		delete *it;
@@ -68,6 +71,13 @@ XCodeFileReference * XCodeProject::addFileReference()
 	XCodeFileReference * ref = new XCodeFileReference;
 	m_FileRefs.push_back(ref);
 	return ref;
+}
+
+XCodeBuildConfiguration * XCodeProject::addBuildConfiguration()
+{
+	XCodeBuildConfiguration * config = new XCodeBuildConfiguration;
+	m_Cfgs.push_back(config);
+	return config;
 }
 
 std::string XCodeProject::toString() const
@@ -124,6 +134,13 @@ std::string XCodeProject::toString() const
 	for (std::vector<XCodeVariantGroup *>::const_iterator it = m_VarGroups.begin(); it != m_VarGroups.end(); ++it)
 		ss << (*it)->toString();
 	ss << "/* End PBXVariantGroup section */\n";
+	ss << '\n';
+
+	ss << "/* Begin XCBuildConfiguration section */\n";
+	for (std::vector<XCodeBuildConfiguration *>::const_iterator it = m_Cfgs.begin(); it != m_Cfgs.end(); ++it)
+		ss << (*it)->toString();
+	ss << "/* End XCBuildConfiguration section */\n";
+	ss << '\n';
 
 	ss << "\t};\n";
 	ss << "\trootObject = " << uniqueID().toString() << " /* Project object */;\n";

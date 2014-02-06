@@ -27,6 +27,7 @@
 #include "xcode_group.h"
 #include "xcode_variant_group.h"
 #include "xcode_file_reference.h"
+#include "xcode_build_configuration.h"
 #include "xcode_native_target.h"
 #include <set>
 #include <string>
@@ -67,6 +68,8 @@ public:
 
 	XCodeFileReference * addFileReference();
 
+	XCodeBuildConfiguration * addBuildConfiguration();
+
 	std::string toString() const;
 
 private:
@@ -81,6 +84,7 @@ private:
 	std::vector<XCodeVariantGroup *> m_VarGroups;
 	std::vector<XCodeFileReference *> m_FileRefs;
 	std::vector<XCodeNativeTarget *> m_NativeTargets;
+	std::vector<XCodeBuildConfiguration *> m_Cfgs;
 };
 
 #endif

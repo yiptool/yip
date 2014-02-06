@@ -153,6 +153,26 @@ int main()
 
 	sourcesGroup->addChild(supportingFilesGroup);
 
+	// Build configurations
+
+	XCodeBuildConfiguration * cfgProjectDebug = project.addBuildConfiguration();
+	cfgProjectDebug->setUniqueID("A38BD27318A3044000AD1F3F");
+	cfgProjectDebug->setName("Debug");
+
+	XCodeBuildConfiguration * cfgProjectRelease = project.addBuildConfiguration();
+	cfgProjectRelease->setUniqueID("A38BD27418A3044000AD1F3F");
+	cfgProjectRelease->setName("Release");
+
+	XCodeBuildConfiguration * cfgTargetDebug = project.addBuildConfiguration();
+	cfgTargetDebug->setUniqueID("A38BD27618A3044000AD1F3F");
+	cfgTargetDebug->setName("Debug");
+
+	XCodeBuildConfiguration * cfgTargetRelease = project.addBuildConfiguration();
+	cfgTargetRelease->setUniqueID("A38BD27718A3044000AD1F3F");
+	cfgTargetRelease->setName("Release");
+
+	// --- Generate
+
 	std::string data = project.toString();
 	FILE * f = fopen("project.pbxproj", "wb");
 	if (!f)

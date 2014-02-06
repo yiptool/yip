@@ -20,13 +20,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "xcode_native_target.h"
+#ifndef __34005306ac7d3391afe4aae2d0a45951__
+#define __34005306ac7d3391afe4aae2d0a45951__
 
-XCodeNativeTarget::XCodeNativeTarget()
-	: XCodeObject("PBXNativeTarget")
-{
-}
+#include "xcode_object.h"
 
-XCodeNativeTarget::~XCodeNativeTarget()
+class XCodeProject;
+
+class XCodeBuildConfiguration : public XCodeObject
 {
-}
+public:
+	std::string objectName() const { return m_Name; }
+
+	inline const std::string & name() const { return m_Name; }
+	inline void setName(const std::string & name) { m_Name = name; }
+
+	std::string toString() const;
+
+private:
+	std::string m_Name;
+
+	XCodeBuildConfiguration();
+	~XCodeBuildConfiguration();
+
+	friend class XCodeProject;
+};
+
+#endif
