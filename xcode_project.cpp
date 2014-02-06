@@ -66,6 +66,10 @@ XCodeProject::~XCodeProject()
 			it = m_ResourcesBuildPhase.begin(); it != m_ResourcesBuildPhase.end(); ++it)
 		delete *it;
 
+	for (std::vector<XCodeBuildPhase *>::const_iterator
+			it = m_ShellScriptBuildPhase.begin(); it != m_ShellScriptBuildPhase.end(); ++it)
+		delete *it;
+
 	for (std::vector<XCodeNativeTarget *>::const_iterator
 			it = m_NativeTargets.begin(); it != m_NativeTargets.end(); ++it)
 		delete *it;
@@ -139,6 +143,13 @@ XCodeBuildPhase * XCodeProject::addResourcesBuildPhase()
 {
 	XCodeBuildPhase * phase = new XCodeBuildPhase(this, XCodeBuildPhase::Resources);
 	m_ResourcesBuildPhase.push_back(phase);
+	return phase;
+}
+
+XCodeBuildPhase * XCodeProject::addShellScriptBuildPhase()
+{
+	XCodeBuildPhase * phase = new XCodeBuildPhase(this, XCodeBuildPhase::ShellScript);
+	m_ShellScriptBuildPhase.push_back(phase);
 	return phase;
 }
 
@@ -243,6 +254,13 @@ std::string XCodeProject::toString() const
 	ss << "\t\t\t);\n";
 	ss << "\t\t};\n";
 	ss << "/* End PBXProject section */\n";
+	ss << '\n';
+
+	ss << "/* Begin PBXShellScriptBuildPhase section */\n";
+	for (std::vector<XCodeBuildPhase *>::const_iterator
+			it = m_ShellScriptBuildPhase.begin(); it != m_ShellScriptBuildPhase.end(); ++it)
+		ss << (*it)->toString();
+	ss << "/* End PBXShellScriptBuildPhase section */\n";
 	ss << '\n';
 
 	ss << "/* Begin PBXResourcesBuildPhase section */\n";

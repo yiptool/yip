@@ -36,7 +36,8 @@ public:
 	{
 		Frameworks,
 		Sources,
-		Resources
+		Resources,
+		ShellScript
 	};
 
 	inline std::string objectName() const { return phaseName(m_Type); }
@@ -48,6 +49,15 @@ public:
 	inline bool runOnlyForDeploymentPostProcessing() const { return m_RunOnlyForDeploymentPostProcessing; }
 	inline void setRunOnlyForDeploymentPostProcessing(bool flag) { m_RunOnlyForDeploymentPostProcessing = flag; }
 
+	inline const std::string & shellPath() const { return m_ShellPath; }
+	inline void setShellPath(const std::string & path) { m_ShellPath = path; }
+
+	inline const std::string & shellScript() const { return m_ShellScript; }
+	inline void setShellScript(const std::string & script) { m_ShellScript = script; }
+
+	inline bool showEnvVarsInLog() const { return m_ShowEnvVarsInLog; }
+	inline void setShowEnvVarsInLog(bool flag) { m_ShowEnvVarsInLog = flag; }
+
 	XCodeBuildFile * addFile();
 
 	std::string toString() const;
@@ -58,6 +68,9 @@ private:
 	long m_BuildActionMask;
 	bool m_RunOnlyForDeploymentPostProcessing;
 	std::vector<XCodeBuildFile *> m_Files;
+	std::string m_ShellPath;
+	std::string m_ShellScript;
+	bool m_ShowEnvVarsInLog;
 
 	XCodeBuildPhase(XCodeProject * project, Type type);
 	~XCodeBuildPhase();

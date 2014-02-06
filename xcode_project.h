@@ -84,6 +84,7 @@ public:
 	XCodeBuildPhase * addFrameworksBuildPhase();
 	XCodeBuildPhase * addSourcesBuildPhase();
 	XCodeBuildPhase * addResourcesBuildPhase();
+	XCodeBuildPhase * addShellScriptBuildPhase();
 
 	XCodeNativeTarget * addNativeTarget();
 
@@ -111,6 +112,7 @@ private:
 	std::vector<XCodeBuildPhase *> m_FrameworksBuildPhase;
 	std::vector<XCodeBuildPhase *> m_SourcesBuildPhase;
 	std::vector<XCodeBuildPhase *> m_ResourcesBuildPhase;
+	std::vector<XCodeBuildPhase *> m_ShellScriptBuildPhase;
 	std::vector<XCodeContainerItemProxy *> m_Proxies;
 	std::vector<XCodeTargetDependency *> m_Dependencies;
 

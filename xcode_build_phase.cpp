@@ -30,7 +30,10 @@ XCodeBuildPhase::XCodeBuildPhase(XCodeProject * project, Type type)
 	  m_Project(project),
 	  m_Type(type),
 	  m_BuildActionMask(2147483647),
-	  m_RunOnlyForDeploymentPostProcessing(false)
+	  m_RunOnlyForDeploymentPostProcessing(false),
+	  m_ShellPath("/bin/sh"),
+	  m_ShellScript("exit 0"),
+	  m_ShowEnvVarsInLog(false)
 {
 }
 
@@ -56,7 +59,20 @@ std::string XCodeBuildPhase::toString() const
 	for (std::vector<XCodeBuildFile *>::const_iterator it = m_Files.begin(); it != m_Files.end(); ++it)
 		ss << "\t\t\t\t" << objectID(*it) << ",\n";
 	ss << "\t\t\t);\n";
+	if (m_Type == ShellScript)
+	{
+		ss << "\t\t\tinputPaths = (\n";
+		ss << "\t\t\t);\n";
+		ss << "\t\t\toutputPaths = (\n";
+		ss << "\t\t\t);\n";
+	}
 	ss << "\t\t\trunOnlyForDeploymentPostprocessing = " << (m_RunOnlyForDeploymentPostProcessing ? 1 : 0) << ";\n";
+	if (m_Type == ShellScript)
+	{
+		ss << "\t\t\tshellPath = " << stringLiteral(m_ShellPath) << ";\n";
+		ss << "\t\t\tshellScript = " << stringLiteral(m_ShellScript) << ";\n";
+		ss << "\t\t\tsnowEnvVarsInLog = " << (m_ShowEnvVarsInLog ? 1 : 0) << ";\n";
+	}
 	ss << "\t\t};\n";
 
 	return ss.str();
@@ -69,6 +85,7 @@ std::string XCodeBuildPhase::phaseName(Type type)
 	case Frameworks: return "Frameworks";
 	case Sources: return "Sources";
 	case Resources: return "Resources";
+	case ShellScript: return "Shell Scripts";
 	}
 	throw std::runtime_error("invalid build phase.");
 }
@@ -80,6 +97,7 @@ std::string XCodeBuildPhase::classNameForPhase(Type type)
 	case Frameworks: return "PBXFrameworksBuildPhase";
 	case Sources: return "PBXSourcesBuildPhase";
 	case Resources: return "PBXResourcesBuildPhase";
+	case ShellScript: return "PBXShellScriptBuildPhase";
 	}
 	throw std::runtime_error("invalid build phase.");
 }
