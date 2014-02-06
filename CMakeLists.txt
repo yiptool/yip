@@ -4,6 +4,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 ADD_LIBRARY(xcode STATIC
 	xcode_build_configuration.cpp
 	xcode_build_configuration.h
+	xcode_configuration_list.cpp
+	xcode_configuration_list.h
 	xcode_file_reference.cpp
 	xcode_file_reference.h
 	xcode_group.cpp

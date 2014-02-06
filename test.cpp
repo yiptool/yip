@@ -171,6 +171,21 @@ int main()
 	cfgTargetRelease->setUniqueID("A38BD27718A3044000AD1F3F");
 	cfgTargetRelease->setName("Release");
 
+	// Configuration lists
+
+	XCodeConfigurationList * projectCfgList = project.addConfigurationList();
+	projectCfgList->setUniqueID("A38BD24418A3044000AD1F3F");
+	projectCfgList->setDefaultConfigurationName("Release");
+	projectCfgList->addConfiguration(cfgProjectDebug);
+	projectCfgList->addConfiguration(cfgProjectRelease);
+	project.setBuildConfigurationList(projectCfgList);
+
+	XCodeConfigurationList * targetCfgList = project.addConfigurationList();
+	targetCfgList->setUniqueID("A38BD27518A3044000AD1F3F");
+	targetCfgList->setDefaultConfigurationName("Release");
+	targetCfgList->addConfiguration(cfgTargetDebug);
+	targetCfgList->addConfiguration(cfgTargetRelease);
+
 	// --- Generate
 
 	std::string data = project.toString();

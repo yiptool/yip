@@ -28,7 +28,8 @@ XCodeProject::XCodeProject()
 	  m_OrganizationName("Nikolay Zapolnov"),
 	  m_DevelopmentRegion("English"),
 	  m_MainGroup(NULL),
-	  m_ProductRefGroup(NULL)
+	  m_ProductRefGroup(NULL),
+	  m_BuildConfigurationList(NULL)
 {
 	m_KnownRegions.insert("en");
 }
@@ -45,6 +46,9 @@ XCodeProject::~XCodeProject()
 		delete *it;
 
 	for (std::vector<XCodeBuildConfiguration *>::const_iterator it = m_Cfgs.begin(); it != m_Cfgs.end(); ++it)
+		delete *it;
+
+	for (std::vector<XCodeConfigurationList *>::const_iterator it = m_CfgLists.begin(); it != m_CfgLists.end(); ++it)
 		delete *it;
 
 	for (std::vector<XCodeNativeTarget *>::const_iterator
@@ -80,6 +84,13 @@ XCodeBuildConfiguration * XCodeProject::addBuildConfiguration()
 	return config;
 }
 
+XCodeConfigurationList * XCodeProject::addConfigurationList()
+{
+	XCodeConfigurationList * list = new XCodeConfigurationList;
+	m_CfgLists.push_back(list);
+	return list;
+}
+
 std::string XCodeProject::toString() const
 {
 	std::stringstream ss;
@@ -110,7 +121,8 @@ std::string XCodeProject::toString() const
 	ss << "\t\t\t\tLastUpgradeCheck = 0500;\n";
 	ss << "\t\t\t\tORGANIZATIONNAME = " << stringLiteral(m_OrganizationName) << ";\n";
 	ss << "\t\t\t};\n";
-//	ss << "\t\t\tbuildConfigurationList = 0AB4FEFD17968C1B00105C66 /* Build configuration list for PBXProject \"Minesweeper\" */;\n"
+	if (m_BuildConfigurationList)
+		ss << "\t\t\tbuildConfigurationList = " << objectID(m_BuildConfigurationList) << ";\n";
 	ss << "\t\t\tcompatibilityVersion = \"Xcode 3.2\";\n";
 	ss << "\t\t\tdevelopmentRegion = " << stringLiteral(m_DevelopmentRegion) << ";\n";
 	ss << "\t\t\thasScannedForEncodings = 0;\n";
@@ -141,6 +153,11 @@ std::string XCodeProject::toString() const
 		ss << (*it)->toString();
 	ss << "/* End XCBuildConfiguration section */\n";
 	ss << '\n';
+
+	ss << "/* Begin XCConfigurationList section */\n";
+	for (std::vector<XCodeConfigurationList *>::const_iterator it = m_CfgLists.begin(); it != m_CfgLists.end(); ++it)
+		ss << (*it)->toString();
+	ss << "/* End XCConfigurationList section */\n";
 
 	ss << "\t};\n";
 	ss << "\trootObject = " << uniqueID().toString() << " /* Project object */;\n";

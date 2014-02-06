@@ -28,6 +28,7 @@
 #include "xcode_variant_group.h"
 #include "xcode_file_reference.h"
 #include "xcode_build_configuration.h"
+#include "xcode_configuration_list.h"
 #include "xcode_native_target.h"
 #include <set>
 #include <string>
@@ -69,6 +70,10 @@ public:
 	XCodeFileReference * addFileReference();
 
 	XCodeBuildConfiguration * addBuildConfiguration();
+	XCodeConfigurationList * addConfigurationList();
+
+	inline XCodeConfigurationList * buildConfigurationList() const { return m_BuildConfigurationList; }
+	inline void setBuildConfigurationList(XCodeConfigurationList * cfg) { m_BuildConfigurationList = cfg; }
 
 	std::string toString() const;
 
@@ -80,11 +85,13 @@ private:
 	std::set<std::string> m_KnownRegions;
 	XCodeGroup * m_MainGroup;
 	XCodeGroup * m_ProductRefGroup;
+	XCodeConfigurationList * m_BuildConfigurationList;
 	std::vector<XCodeGroup *> m_Groups;
 	std::vector<XCodeVariantGroup *> m_VarGroups;
 	std::vector<XCodeFileReference *> m_FileRefs;
 	std::vector<XCodeNativeTarget *> m_NativeTargets;
 	std::vector<XCodeBuildConfiguration *> m_Cfgs;
+	std::vector<XCodeConfigurationList *> m_CfgLists;
 };
 
 #endif
