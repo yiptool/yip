@@ -24,12 +24,44 @@
 #define __e7ffa55129417b512efd27d57612837d__
 
 #include "xcode_object.h"
+#include <vector>
 
 class XCodeProject;
+class XCodeConfigurationList;
+class XCodeBuildPhase;
 
 class XCodeNativeTarget : public XCodeObject
 {
+public:
+	inline std::string objectName() const { return m_Name; }
+
+	inline const std::string & name() const { return m_Name; }
+	inline void setName(const std::string & name) { m_Name = name; }
+
+	inline const std::string & productName() const { return m_ProductName; }
+	inline void setProductName(const std::string & name) { m_ProductName = name; }
+
+	inline XCodeConfigurationList * buildConfigurationList() const { return m_BuildConfigurationList; }
+	inline void setBuildConfigurationList(XCodeConfigurationList * cfg) { m_BuildConfigurationList = cfg; }
+
+	inline XCodeObject * productReference() const { return m_ProductReference; }
+	inline void setProductReference(XCodeObject * ref) { m_ProductReference = ref; }
+
+	inline const std::string & productType() const { return m_ProductType; }
+	inline void setProductType(const std::string & type) { m_ProductType = type; }
+
+	inline void addBuildPhase(XCodeBuildPhase * phase) { m_Phases.push_back(phase); }
+
+	std::string toString() const;
+
 private:
+	std::string m_Name;
+	std::string m_ProductName;
+	XCodeConfigurationList * m_BuildConfigurationList;
+	XCodeObject * m_ProductReference;
+	std::string m_ProductType;
+	std::vector<XCodeBuildPhase *> m_Phases;
+
 	XCodeNativeTarget();
 	~XCodeNativeTarget();
 

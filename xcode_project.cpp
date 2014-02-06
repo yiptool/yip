@@ -127,6 +127,13 @@ XCodeBuildPhase * XCodeProject::addResourcesBuildPhase()
 	return phase;
 }
 
+XCodeNativeTarget * XCodeProject::addNativeTarget()
+{
+	XCodeNativeTarget * target = new XCodeNativeTarget;
+	m_NativeTargets.push_back(target);
+	return target;
+}
+
 std::string XCodeProject::toString() const
 {
 	std::stringstream ss;
@@ -164,6 +171,13 @@ std::string XCodeProject::toString() const
 	ss << "/* End PBXGroup section */\n";
 	ss << '\n';
 
+	ss << "/* Begin PBXNativeTarget section */\n";
+	for (std::vector<XCodeNativeTarget *>::const_iterator
+			it = m_NativeTargets.begin(); it != m_NativeTargets.end(); ++it)
+		ss << (*it)->toString();
+	ss << "/* End PBXNativeTarget section */\n";
+	ss << '\n';
+
 	ss << "/* Begin PBXProject section */\n";
 	ss << "\t\t" << objectID(this) << " = {\n";
 	ss << "\t\t\tisa = " << className() << ";\n";
@@ -187,7 +201,9 @@ std::string XCodeProject::toString() const
 	ss << "\t\t\tprojectDirPath = " << stringLiteral(m_ProjectDirPath) << ";\n";
 	ss << "\t\t\tprojectRoot = " << stringLiteral(m_ProjectRoot) << ";\n";
 	ss << "\t\t\ttargets = (\n";
-//	ss << "\t\t\t\t0AB4FF0117968C1B00105C66 /* Minesweeper */,
+	for (std::vector<XCodeNativeTarget *>::const_iterator
+			it = m_NativeTargets.begin(); it != m_NativeTargets.end(); ++it)
+		ss << "\t\t\t\t" << objectID(*it) << ",\n";
 	ss << "\t\t\t);\n";
 	ss << "\t\t};\n";
 	ss << "/* End PBXProject section */\n";

@@ -81,6 +81,8 @@ public:
 	XCodeBuildPhase * addSourcesBuildPhase();
 	XCodeBuildPhase * addResourcesBuildPhase();
 
+	XCodeNativeTarget * addNativeTarget();
+
 	std::string toString() const;
 
 private:

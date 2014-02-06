@@ -21,12 +21,51 @@
 // THE SOFTWARE.
 //
 #include "xcode_native_target.h"
+#include "xcode_configuration_list.h"
+#include "xcode_build_phase.h"
+#include <sstream>
 
 XCodeNativeTarget::XCodeNativeTarget()
-	: XCodeObject("PBXNativeTarget")
+	: XCodeObject("PBXNativeTarget"),
+	  m_BuildConfigurationList(NULL),
+	  m_ProductReference(NULL),
+	  m_ProductType("com.apple.product-type.application")
 {
 }
 
 XCodeNativeTarget::~XCodeNativeTarget()
 {
+}
+
+std::string XCodeNativeTarget::toString() const
+{
+	std::stringstream ss;
+
+	ss << "\t\t" << objectID(this) << " = {\n";
+	ss << "\t\t\tisa = " << className() << ";\n";
+	ss << "\t\t\tbuildConfigurationList = " << objectID(m_BuildConfigurationList) << ";\n";
+	ss << "\t\t\tbuildPhases = (\n";
+	for (std::vector<XCodeBuildPhase *>::const_iterator it = m_Phases.begin(); it != m_Phases.end(); ++it)
+		ss << "\t\t\t\t" << objectID(*it) << ",\n";
+	ss << "\t\t\t);\n";
+	ss << "\t\t\tbuildRules = (\n";
+	ss << "\t\t\t);\n";
+	ss << "\t\t\tdependencies = (\n";
+	ss << "\t\t\t);\n";
+
+	if (m_Name.length() > 0)
+		ss << "\t\t\tname = " << stringLiteral(m_Name) << ";\n";
+
+	if (m_ProductName.length() > 0)
+		ss << "\t\t\tproductName = " << stringLiteral(m_ProductName) << ";\n";
+
+	if (m_ProductReference)
+		ss << "\t\t\tproductReference = " << objectID(m_ProductReference) << ";\n";
+
+	if (m_ProductType.length() > 0)
+		ss << "\t\t\tproductType = " << stringLiteral(m_ProductType) << ";\n";
+
+	ss << "\t\t};\n";
+
+	return ss.str();
 }

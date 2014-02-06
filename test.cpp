@@ -227,6 +227,18 @@ int main()
 	file_images_xcassets->setUniqueID("A38BD25F18A3044000AD1F3F");
 	file_images_xcassets->setFileRef(ref_images_xcassets);
 
+	// Native target
+
+	XCodeNativeTarget * target = project.addNativeTarget();
+	target->setUniqueID("A38BD24818A3044000AD1F3F");
+	target->setName("PRODPROD");
+	target->setBuildConfigurationList(targetCfgList);
+	target->setProductName("PRODPROD");
+	target->setProductReference(ref_app);
+	target->addBuildPhase(sourcesBuildPhase);
+	target->addBuildPhase(frameworksBuildPhase);
+	target->addBuildPhase(resourcesBuildPhase);
+
 	// --- Generate
 
 	std::string data = project.toString();
