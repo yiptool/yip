@@ -20,44 +20,52 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "xcode_build_file.h"
-#include "xcode_build_phase.h"
-#include "xcode_file_reference.h"
-#include <sstream>
+#ifndef __b7390afae6562371d80d6ad21e31a2c6__
+#define __b7390afae6562371d80d6ad21e31a2c6__
 
-XCodeBuildFile::XCodeBuildFile(XCodeBuildPhase * phase)
-	: XCodeObject("PBXBuildFile"),
-	  m_FileRef(NULL),
-	  m_BuildPhase(phase)
+#include "xcode_object.h"
+#include <vector>
+
+class XCodeProject;
+class XCodeBuildFile;
+
+class XCodeBuildPhase : public XCodeObject
 {
-}
+public:
+	enum Type
+	{
+		Frameworks,
+		Sources,
+		Resources
+	};
 
-XCodeBuildFile::~XCodeBuildFile()
-{
-}
+	inline std::string objectName() const { return phaseName(m_Type); }
+	inline Type type() const { return m_Type; }
 
-std::string XCodeBuildFile::objectName() const
-{
-	std::stringstream ss;
+	inline long buildActionMask() const { return m_BuildActionMask; }
+	inline void setBuildActionMask(long mask) { m_BuildActionMask = mask; }
 
-	ss << m_FileRef->objectName();
-	if (m_BuildPhase)
-		ss << " in " << m_BuildPhase->objectName();
+	inline bool runOnlyForDeploymentPostProcessing() const { return m_RunOnlyForDeploymentPostProcessing; }
+	inline void setRunOnlyForDeploymentPostProcessing(bool flag) { m_RunOnlyForDeploymentPostProcessing = flag; }
 
-	return ss.str();
-}
+	XCodeBuildFile * addFile();
 
-std::string XCodeBuildFile::toString() const
-{
-	std::stringstream ss;
+	std::string toString() const;
 
-	ss << objectID(this) << " = {";
-	ss << "isa = " << className() << "; ";
+private:
+	XCodeProject * m_Project;
+	Type m_Type;
+	long m_BuildActionMask;
+	bool m_RunOnlyForDeploymentPostProcessing;
+	std::vector<XCodeBuildFile *> m_Files;
 
-	if (m_FileRef)
-		ss << "fileRef = " << objectID(m_FileRef) << "; ";
+	XCodeBuildPhase(XCodeProject * project, Type type);
+	~XCodeBuildPhase();
 
-	ss << "};";
+	static std::string phaseName(Type type);
+	static std::string classNameForPhase(Type type);
 
-	return ss.str();
-}
+	friend class XCodeProject;
+};
+
+#endif

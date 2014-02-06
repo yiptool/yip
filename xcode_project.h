@@ -30,6 +30,7 @@
 #include "xcode_build_configuration.h"
 #include "xcode_configuration_list.h"
 #include "xcode_build_file.h"
+#include "xcode_build_phase.h"
 #include "xcode_native_target.h"
 #include <set>
 #include <string>
@@ -76,7 +77,9 @@ public:
 	inline XCodeConfigurationList * buildConfigurationList() const { return m_BuildConfigurationList; }
 	inline void setBuildConfigurationList(XCodeConfigurationList * cfg) { m_BuildConfigurationList = cfg; }
 
-	XCodeBuildFile * addBuildFile();
+	XCodeBuildPhase * addFrameworksBuildPhase();
+	XCodeBuildPhase * addSourcesBuildPhase();
+	XCodeBuildPhase * addResourcesBuildPhase();
 
 	std::string toString() const;
 
@@ -96,6 +99,16 @@ private:
 	std::vector<XCodeBuildConfiguration *> m_Cfgs;
 	std::vector<XCodeConfigurationList *> m_CfgLists;
 	std::vector<XCodeBuildFile *> m_BuildFiles;
+	std::vector<XCodeBuildPhase *> m_FrameworksBuildPhase;
+	std::vector<XCodeBuildPhase *> m_SourcesBuildPhase;
+	std::vector<XCodeBuildPhase *> m_ResourcesBuildPhase;
+
+	XCodeBuildFile * addBuildFile(XCodeBuildPhase * phase);
+
+	XCodeProject(const XCodeProject &);
+	XCodeProject & operator=(const XCodeProject &);
+
+	friend class XCodeBuildPhase;
 };
 
 #endif

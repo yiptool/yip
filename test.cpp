@@ -186,33 +186,44 @@ int main()
 	targetCfgList->addConfiguration(cfgTargetDebug);
 	targetCfgList->addConfiguration(cfgTargetRelease);
 
+	// Build phases
+
+	XCodeBuildPhase * frameworksBuildPhase = project.addFrameworksBuildPhase();
+	frameworksBuildPhase->setUniqueID("A38BD24618A3044000AD1F3F");
+
+	XCodeBuildPhase * sourcesBuildPhase = project.addSourcesBuildPhase();
+	sourcesBuildPhase->setUniqueID("A38BD24518A3044000AD1F3F");
+
+	XCodeBuildPhase * resourcesBuildPhase = project.addResourcesBuildPhase();
+	resourcesBuildPhase->setUniqueID("A38BD24718A3044000AD1F3F");
+
 	// Build files
 
-	XCodeBuildFile * file_foundation = project.addBuildFile();
+	XCodeBuildFile * file_foundation = frameworksBuildPhase->addFile();
 	file_foundation->setUniqueID("A38BD24D18A3044000AD1F3F");
 	file_foundation->setFileRef(ref_foundation);
 
-	XCodeBuildFile * file_coreGraphics = project.addBuildFile();
+	XCodeBuildFile * file_coreGraphics = frameworksBuildPhase->addFile();
 	file_coreGraphics->setUniqueID("A38BD24F18A3044000AD1F3F");
 	file_coreGraphics->setFileRef(ref_coreGraphics);
 
-	XCodeBuildFile * file_uikit = project.addBuildFile();
+	XCodeBuildFile * file_uikit = frameworksBuildPhase->addFile();
 	file_uikit->setUniqueID("A38BD25118A3044000AD1F3F");
 	file_uikit->setFileRef(ref_uikit);
 
-	XCodeBuildFile * file_infoplist = project.addBuildFile();
+	XCodeBuildFile * file_infoplist = resourcesBuildPhase->addFile();
 	file_infoplist->setUniqueID("A38BD25718A3044000AD1F3F");
 	file_infoplist->setFileRef(varGroup);
 
-	XCodeBuildFile * file_main_m = project.addBuildFile();
+	XCodeBuildFile * file_main_m = sourcesBuildPhase->addFile();
 	file_main_m->setUniqueID("A38BD25918A3044000AD1F3F");
 	file_main_m->setFileRef(ref_main_m);
 
-	XCodeBuildFile * file_appdelegate_m = project.addBuildFile();
+	XCodeBuildFile * file_appdelegate_m = sourcesBuildPhase->addFile();
 	file_appdelegate_m->setUniqueID("A38BD25D18A3044000AD1F3F");
 	file_appdelegate_m->setFileRef(ref_appdelegate_m);
 
-	XCodeBuildFile * file_images_xcassets = project.addBuildFile();
+	XCodeBuildFile * file_images_xcassets = resourcesBuildPhase->addFile();
 	file_images_xcassets->setUniqueID("A38BD25F18A3044000AD1F3F");
 	file_images_xcassets->setFileRef(ref_images_xcassets);
 

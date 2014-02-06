@@ -6,6 +6,8 @@ ADD_LIBRARY(xcode STATIC
 	xcode_build_configuration.h
 	xcode_build_file.cpp
 	xcode_build_file.h
+	xcode_build_phase.cpp
+	xcode_build_phase.h
 	xcode_configuration_list.cpp
 	xcode_configuration_list.h
 	xcode_file_reference.cpp

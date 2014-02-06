@@ -54,6 +54,18 @@ XCodeProject::~XCodeProject()
 	for (std::vector<XCodeBuildFile *>::const_iterator it = m_BuildFiles.begin(); it != m_BuildFiles.end(); ++it)
 		delete *it;
 
+	for (std::vector<XCodeBuildPhase *>::const_iterator
+			it = m_FrameworksBuildPhase.begin(); it != m_FrameworksBuildPhase.end(); ++it)
+		delete *it;
+
+	for (std::vector<XCodeBuildPhase *>::const_iterator
+			it = m_SourcesBuildPhase.begin(); it != m_SourcesBuildPhase.end(); ++it)
+		delete *it;
+
+	for (std::vector<XCodeBuildPhase *>::const_iterator
+			it = m_ResourcesBuildPhase.begin(); it != m_ResourcesBuildPhase.end(); ++it)
+		delete *it;
+
 	for (std::vector<XCodeNativeTarget *>::const_iterator
 			it = m_NativeTargets.begin(); it != m_NativeTargets.end(); ++it)
 		delete *it;
@@ -94,11 +106,25 @@ XCodeConfigurationList * XCodeProject::addConfigurationList()
 	return list;
 }
 
-XCodeBuildFile * XCodeProject::addBuildFile()
+XCodeBuildPhase * XCodeProject::addFrameworksBuildPhase()
 {
-	XCodeBuildFile * file = new XCodeBuildFile;
-	m_BuildFiles.push_back(file);
-	return file;
+	XCodeBuildPhase * phase = new XCodeBuildPhase(this, XCodeBuildPhase::Frameworks);
+	m_FrameworksBuildPhase.push_back(phase);
+	return phase;
+}
+
+XCodeBuildPhase * XCodeProject::addSourcesBuildPhase()
+{
+	XCodeBuildPhase * phase = new XCodeBuildPhase(this, XCodeBuildPhase::Sources);
+	m_SourcesBuildPhase.push_back(phase);
+	return phase;
+}
+
+XCodeBuildPhase * XCodeProject::addResourcesBuildPhase()
+{
+	XCodeBuildPhase * phase = new XCodeBuildPhase(this, XCodeBuildPhase::Resources);
+	m_ResourcesBuildPhase.push_back(phase);
+	return phase;
 }
 
 std::string XCodeProject::toString() const
@@ -111,6 +137,7 @@ std::string XCodeProject::toString() const
 	ss << "\t};\n";
 	ss << "\tobjectVersion = 46;\n";
 	ss << "\tobjects = {\n";
+	ss << '\n';
 
 	ss << "/* Begin PBXBuildFile section */\n";
 	for (std::vector<XCodeBuildFile *>::const_iterator it = m_BuildFiles.begin(); it != m_BuildFiles.end(); ++it)
@@ -122,6 +149,13 @@ std::string XCodeProject::toString() const
 	for (std::vector<XCodeFileReference *>::const_iterator it = m_FileRefs.begin(); it != m_FileRefs.end(); ++it)
 		ss << "\t\t" << (*it)->toString() << '\n';
 	ss << "/* End PBXFileReference section */\n";
+	ss << '\n';
+
+	ss << "/* Begin PBXFrameworksBuildPhase section */\n";
+	for (std::vector<XCodeBuildPhase *>::const_iterator
+			it = m_FrameworksBuildPhase.begin(); it != m_FrameworksBuildPhase.end(); ++it)
+		ss << (*it)->toString();
+	ss << "/* End PBXFrameworksBuildPhase section */\n";
 	ss << '\n';
 
 	ss << "/* Begin PBXGroup section */\n";
@@ -157,6 +191,21 @@ std::string XCodeProject::toString() const
 	ss << "\t\t\t);\n";
 	ss << "\t\t};\n";
 	ss << "/* End PBXProject section */\n";
+	ss << '\n';
+
+	ss << "/* Begin PBXResourcesBuildPhase section */\n";
+	for (std::vector<XCodeBuildPhase *>::const_iterator
+			it = m_ResourcesBuildPhase.begin(); it != m_ResourcesBuildPhase.end(); ++it)
+		ss << (*it)->toString();
+	ss << "/* End PBXResourcesBuildPhase section */\n";
+	ss << '\n';
+
+	ss << "/* Begin PBXSourcesBuildPhase section */\n";
+	for (std::vector<XCodeBuildPhase *>::const_iterator
+			it = m_SourcesBuildPhase.begin(); it != m_SourcesBuildPhase.end(); ++it)
+		ss << (*it)->toString();
+	ss << "/* End PBXSourcesBuildPhase section */\n";
+	ss << '\n';
 
 	ss << "/* Begin PBXVariantGroup section */\n";
 	for (std::vector<XCodeVariantGroup *>::const_iterator it = m_VarGroups.begin(); it != m_VarGroups.end(); ++it)
@@ -179,4 +228,11 @@ std::string XCodeProject::toString() const
 	ss << "\trootObject = " << uniqueID().toString() << " /* Project object */;\n";
 	ss << "}\n";
 	return ss.str();
+}
+
+XCodeBuildFile * XCodeProject::addBuildFile(XCodeBuildPhase * phase)
+{
+	XCodeBuildFile * file = new XCodeBuildFile(phase);
+	m_BuildFiles.push_back(file);
+	return file;
 }

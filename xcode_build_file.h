@@ -26,11 +26,14 @@
 #include "xcode_object.h"
 
 class XCodeProject;
+class XCodeBuildPhase;
 
 class XCodeBuildFile : public XCodeObject
 {
 public:
 	std::string objectName() const;
+
+	inline XCodeBuildPhase * buildPhase() const { return m_BuildPhase; }
 
 	inline XCodeObject * fileRef() const { return m_FileRef; }
 	inline void setFileRef(XCodeObject * ref) { m_FileRef = ref; }
@@ -39,8 +42,9 @@ public:
 
 private:
 	XCodeObject * m_FileRef;
+	XCodeBuildPhase * m_BuildPhase;
 
-	XCodeBuildFile();
+	XCodeBuildFile(XCodeBuildPhase * phase);
 	~XCodeBuildFile();
 
 	friend class XCodeProject;
