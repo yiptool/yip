@@ -27,7 +27,8 @@ XCodeProject::XCodeProject()
 	: XCodeObject("PBXProject"),
 	  m_OrganizationName("Nikolay Zapolnov"),
 	  m_DevelopmentRegion("English"),
-	  m_MainGroup(NULL)
+	  m_MainGroup(NULL),
+	  m_ProductRefGroup(NULL)
 {
 	m_KnownRegions.insert("en");
 }
@@ -66,7 +67,7 @@ std::string XCodeProject::toString() const
 	ss << "/* End PBXGroup section */\n";
 
 	ss << "/* Begin PBXProject section */\n";
-	ss << "\t\t" << uniqueID().toString() << " /* Project object */ = {\n";
+	ss << "\t\t" << objectID(this) << " = {\n";
 	ss << "\t\t\tisa = " << className() << ";\n";
 	ss << "\t\t\tattributes = {\n";
 	ss << "\t\t\t\tLastUpgradeCheck = 0500;\n";
@@ -81,10 +82,11 @@ std::string XCodeProject::toString() const
 		ss << "\t\t\t\t" << stringLiteral(*it) << ",\n";
 	ss << "\t\t\t);\n";
 	if (m_MainGroup)
-		ss << "\t\t\tmainGroup = " << m_MainGroup->uniqueID().toString() << ";\n";
-//	ss << "\t\t\tproductRefGroup = 0AB4FF0317968C1B00105C66 /* Products */;\n";
-	ss << "\t\t\tprojectDirPath = \"\";\n";
-	ss << "\t\t\tprojectRoot = \"\";\n";
+		ss << "\t\t\tmainGroup = " << objectID(m_MainGroup) << ";\n";
+	if (m_ProductRefGroup)
+		ss << "\t\t\tproductRefGroup = " << objectID(m_ProductRefGroup) << ";\n";
+	ss << "\t\t\tprojectDirPath = " << stringLiteral(m_ProjectDirPath) << ";\n";
+	ss << "\t\t\tprojectRoot = " << stringLiteral(m_ProjectRoot) << ";\n";
 	ss << "\t\t\ttargets = (\n";
 //	ss << "\t\t\t\t0AB4FF0117968C1B00105C66 /* Minesweeper */,
 	ss << "\t\t\t);\n";

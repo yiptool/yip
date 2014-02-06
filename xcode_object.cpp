@@ -60,3 +60,16 @@ std::string XCodeObject::stringLiteral(const std::string & str)
 
 	return ss.str();
 }
+
+std::string XCodeObject::objectID(const XCodeObject * object)
+{
+	std::stringstream ss;
+
+	ss << object->uniqueID().toString();
+
+	const std::string & name = object->objectName();
+	if (name.length() > 0)
+		ss << " /* " << name << " */";
+
+	return ss.str();
+}

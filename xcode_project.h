@@ -36,24 +36,41 @@ public:
 	XCodeProject();
 	~XCodeProject();
 
+	std::string objectName() const { return "Project object"; }
+
 	inline const std::string & organizationName() const { return m_OrganizationName; }
 	inline void setOrganizationName(const std::string & name) { m_OrganizationName = name; }
 
+	inline const std::string & developmentRegion() const { return m_DevelopmentRegion; }
+	inline void setDevelopmentRegion(const std::string & reg) { m_DevelopmentRegion = reg; }
+
 	inline void addKnownRegion(const std::string & reg) { m_KnownRegions.insert(reg); }
 	inline void removeKnownRegion(const std::string & reg) { m_KnownRegions.erase(reg); }
+
+	inline const std::string & projectDirPath() const { return m_ProjectDirPath; }
+	inline void setProjectDirPath(const std::string & path) { m_ProjectDirPath = path; }
+
+	inline const std::string & projectRoot() const { return m_ProjectRoot; }
+	inline void setProjectRoot(const std::string & path) { m_ProjectRoot = path; }
 
 	XCodeGroup * addGroup();
 
 	inline XCodeGroup * mainGroup() const { return m_MainGroup; }
 	inline void setMainGroup(XCodeGroup * group) { m_MainGroup = group; }
 
+	inline XCodeGroup * productRefGroup() const { return m_ProductRefGroup; }
+	inline void setProductRefGroup(XCodeGroup * group) { m_ProductRefGroup = group; }
+
 	std::string toString() const;
 
 private:
 	std::string m_OrganizationName;
 	std::string m_DevelopmentRegion;
+	std::string m_ProjectDirPath;
+	std::string m_ProjectRoot;
 	std::set<std::string> m_KnownRegions;
 	XCodeGroup * m_MainGroup;
+	XCodeGroup * m_ProductRefGroup;
 	std::vector<XCodeGroup *> m_Groups;
 	std::vector<XCodeNativeTarget *> m_NativeTargets;
 };

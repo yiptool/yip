@@ -25,12 +25,15 @@
 
 #include "xcode_object.h"
 #include <string>
+#include <vector>
 
 class XCodeProject;
 
 class XCodeGroup : public XCodeObject
 {
 public:
+	inline std::string objectName() const { return (m_Name.length() > 0 ? m_Name : m_Path); }
+
 	inline const std::string & name() const { return m_Name; }
 	inline void setName(const std::string & name) { m_Name = name; }
 
@@ -40,9 +43,12 @@ public:
 	inline const std::string & sourceTree() const { return m_SourceTree; }
 	inline void setSourceTree(const std::string & tree) { m_SourceTree = tree; }
 
+	inline void addChild(const XCodeObject * child) { m_Children.push_back(child); }
+
 	std::string toString() const;
 
 private:
+	std::vector<const XCodeObject *> m_Children;
 	std::string m_Name;
 	std::string m_Path;
 	std::string m_SourceTree;
