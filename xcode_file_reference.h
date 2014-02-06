@@ -29,6 +29,7 @@ class XCodeProject;
 
 extern const std::string FILETYPE_WRAPPER_APPLICATION;
 extern const std::string FILETYPE_WRAPPER_FRAMEWORK;
+extern const std::string FILETYPE_COMPILED_MACHO_EXECUTABLE;
 extern const std::string FILETYPE_TEXT;
 extern const std::string FILETYPE_TEXT_PLIST_XML;
 extern const std::string FILETYPE_TEXT_PLIST_STRINGS;

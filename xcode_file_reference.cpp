@@ -25,6 +25,7 @@
 
 const std::string FILETYPE_WRAPPER_APPLICATION = "wrapper.application";
 const std::string FILETYPE_WRAPPER_FRAMEWORK = "wrapper.framework";
+const std::string FILETYPE_COMPILED_MACHO_EXECUTABLE = "compiled.mach-o.executable";
 const std::string FILETYPE_TEXT = "text";
 const std::string FILETYPE_TEXT_PLIST_XML = "text.plist.xml";
 const std::string FILETYPE_TEXT_PLIST_STRINGS = "text.plist.strings";
