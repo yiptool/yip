@@ -25,10 +25,19 @@
 
 const std::string FILETYPE_WRAPPER_APPLICATION = "wrapper.application";
 const std::string FILETYPE_WRAPPER_FRAMEWORK = "wrapper.framework";
+const std::string FILETYPE_TEXT = "text";
 const std::string FILETYPE_TEXT_PLIST_XML = "text.plist.xml";
 const std::string FILETYPE_TEXT_PLIST_STRINGS = "text.plist.strings";
+const std::string FILETYPE_SOURCECODE_C = "sourcecode.c";
 const std::string FILETYPE_SOURCECODE_C_H = "sourcecode.c.h";
+const std::string FILETYPE_SOURCECODE_CPP_CPP = "sourcecode.cpp.cpp";
+const std::string FILETYPE_SOURCECODE_CPP_H = "sourcecode.cpp.h";
 const std::string FILETYPE_SOURCECODE_C_OBJC = "sourcecode.c.objc";
+const std::string FILETYPE_SOURCECODE_CPP_OBJCPP = "sourcecode.cpp.objcpp";
+const std::string FILETYPE_SOURCECODE_GLSL = "sourcecode.glsl";
+const std::string FILETYPE_SOURCECODE_JAVA = "sourcecode.java";
+const std::string FILETYPE_IMAGE_PNG = "image.png";
+const std::string FILETYPE_IMAGE_JPEG = "image.jpeg";
 const std::string FILETYPE_FOLDER_ASSETCATALOG = "folder.assetcatalog";
 
 XCodeFileReference::XCodeFileReference()
