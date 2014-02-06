@@ -20,42 +20,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __c2f59d4a58e379e2289a28376e51f150__
-#define __c2f59d4a58e379e2289a28376e51f150__
+#ifndef __ffdaac4d241879c46a6945d5b79fbe15__
+#define __ffdaac4d241879c46a6945d5b79fbe15__
 
 #include "xcode_object.h"
-#include "xcode_group.h"
-#include "xcode_native_target.h"
-#include <set>
 #include <string>
-#include <vector>
 
-class XCodeProject : public XCodeObject
+class XCodeProject;
+
+class XCodeGroup : public XCodeObject
 {
 public:
-	XCodeProject();
-	~XCodeProject();
+	inline const std::string & name() const { return m_Name; }
+	inline void setName(const std::string & name) { m_Name = name; }
 
-	inline const std::string & organizationName() const { return m_OrganizationName; }
-	inline void setOrganizationName(const std::string & name) { m_OrganizationName = name; }
+	inline const std::string & path() const { return m_Path; }
+	inline void setPath(const std::string & path) { m_Path = path; }
 
-	inline void addKnownRegion(const std::string & reg) { m_KnownRegions.insert(reg); }
-	inline void removeKnownRegion(const std::string & reg) { m_KnownRegions.erase(reg); }
-
-	XCodeGroup * addGroup();
-
-	inline XCodeGroup * mainGroup() const { return m_MainGroup; }
-	inline void setMainGroup(XCodeGroup * group) { m_MainGroup = group; }
+	inline const std::string & sourceTree() const { return m_SourceTree; }
+	inline void setSourceTree(const std::string & tree) { m_SourceTree = tree; }
 
 	std::string toString() const;
 
 private:
-	std::string m_OrganizationName;
-	std::string m_DevelopmentRegion;
-	std::set<std::string> m_KnownRegions;
-	XCodeGroup * m_MainGroup;
-	std::vector<XCodeGroup *> m_Groups;
-	std::vector<XCodeNativeTarget *> m_NativeTargets;
+	std::string m_Name;
+	std::string m_Path;
+	std::string m_SourceTree;
+
+	XCodeGroup();
+	~XCodeGroup();
+
+	friend class XCodeProject;
 };
 
 #endif

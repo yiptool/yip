@@ -28,16 +28,20 @@
 class XCodeObject
 {
 public:
+	inline const std::string & className() const { return m_ClassName; }
 	inline const XCodeUniqueID & uniqueID() const { return m_ID; }
 
 	virtual std::string toString() const = 0;
 
 protected:
-	XCodeObject();
+	XCodeObject(const std::string & className);
 	virtual ~XCodeObject();
+
+	static std::string stringLiteral(const std::string & str);
 
 private:
 	XCodeUniqueID m_ID;
+	std::string m_ClassName;
 };
 
 #endif
