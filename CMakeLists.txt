@@ -13,3 +13,9 @@ ADD_LIBRARY(xcode STATIC
 	xcode_unique_id.cpp
 	xcode_unique_id.h
 )
+
+SET(BUILD_TEST_APP NO CACHE BOOLEAN "Build the test app")
+IF(BUILD_TEST_APP)
+	ADD_EXECUTABLE(test test.cpp)
+	TARGET_LINK_LIBRARIES(test xcode)
+ENDIF()
