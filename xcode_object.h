@@ -29,7 +29,10 @@ class XCodeObject
 {
 public:
 	inline const std::string & className() const { return m_ClassName; }
+
 	inline const XCodeUniqueID & uniqueID() const { return m_ID; }
+	inline void setUniqueID(const XCodeUniqueID & id) { m_ID = id; }
+	inline void setUniqueID(const std::string & id) { m_ID = id; }
 
 	virtual std::string toString() const = 0;
 

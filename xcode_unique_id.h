@@ -29,6 +29,7 @@ class XCodeUniqueID
 {
 public:
 	XCodeUniqueID();
+	XCodeUniqueID(const std::string & hex);
 	~XCodeUniqueID();
 
 	std::string toString() const;

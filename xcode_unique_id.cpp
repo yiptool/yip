@@ -33,6 +33,32 @@ XCodeUniqueID::XCodeUniqueID()
 	m_ID[2] = (m_ID[0] + m_ID[1]) ^ 0xCAFEBABE + g_Counter++;
 }
 
+XCodeUniqueID::XCodeUniqueID(const std::string & hex)
+{
+	const char * p = hex.c_str();
+	for (size_t i = 0; i < 3; i++)
+	{
+		unsigned val = 0;
+		for (size_t j = 0; j < 32; j += 4)
+		{
+			char ch = *p;
+			if (ch)
+				++p;
+
+			unsigned digit = 0;
+			if (ch >= '0' && ch <= '9')
+				digit = ch - '0';
+			else if (ch >= 'a' && ch <= 'f')
+				digit = ch - 'a' + 10;
+			else if (ch >= 'A' && ch <= 'F')
+				digit = ch - 'A' + 10;
+
+			val |= digit << j;
+		}
+		m_ID[i] = val;
+	}
+}
+
 XCodeUniqueID::~XCodeUniqueID()
 {
 }
