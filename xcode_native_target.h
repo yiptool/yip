@@ -30,6 +30,9 @@ class XCodeProject;
 class XCodeConfigurationList;
 class XCodeBuildPhase;
 
+extern const std::string PRODUCTTYPE_APPLICATION;
+extern const std::string PRODUCTTYPE_TOOL;
+
 class XCodeNativeTarget : public XCodeObject
 {
 public:

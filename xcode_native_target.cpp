@@ -25,11 +25,14 @@
 #include "xcode_build_phase.h"
 #include <sstream>
 
+const std::string PRODUCTTYPE_APPLICATION = "com.apple.product-type.application";
+const std::string PRODUCTTYPE_TOOL = "com.apple.product-type.tool";
+
 XCodeNativeTarget::XCodeNativeTarget()
 	: XCodeObject("PBXNativeTarget"),
 	  m_BuildConfigurationList(NULL),
 	  m_ProductReference(NULL),
-	  m_ProductType("com.apple.product-type.application")
+	  m_ProductType(PRODUCTTYPE_APPLICATION)
 {
 }
 
