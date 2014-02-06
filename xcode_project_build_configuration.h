@@ -84,6 +84,9 @@ public:
 	inline bool copyPhaseStrip() const { return m_CopyPhaseStrip; }
 	inline void setCopyPhaseStrip(bool flag) { m_CopyPhaseStrip = flag; }
 
+	inline const std::string & debugInformationFormat() const { return m_DebugInformationFormat; }
+	inline void setDebugInformationFormat(const std::string & fmt) { m_DebugInformationFormat = fmt; }
+
 	inline bool enableNSAssertions() const { return m_EnableNSAssertions; }
 	inline void setEnableNSAssertions(bool flag) { m_EnableNSAssertions = flag; }
 
@@ -92,6 +95,9 @@ public:
 
 	inline bool gccDynamicNoPIC() const { return m_GccDynamicNoPIC; }
 	inline void setGccDynamicNoPIC(bool flag) { m_GccDynamicNoPIC = flag; }
+
+	inline bool gccEnableObjCExceptions() const { return m_GccEnableObjCExceptions; }
+	inline void setGccEnableObjCExceptions(bool flag) { m_GccEnableObjCExceptions = flag; }
 
 	inline const std::string & gccOptimizationLevel() const { return m_GccOptimizationLevel; }
 	inline void setGccOptimizationLevel(const std::string & level) { m_GccOptimizationLevel = level; }
@@ -120,8 +126,14 @@ public:
 	inline const std::string & iphoneOSDeploymentTarget() const { return m_IPhoneOSDeploymentTarget; }
 	inline void setIPhoneOSDeploymentTarget(const std::string & tgt) { m_IPhoneOSDeploymentTarget = tgt; }
 
+	inline const std::string & macOSXDeploymentTarget() const { return m_MacOSXDeploymentTarget; }
+	inline void setMacOSXDeploymentTarget(const std::string & tgt) { m_MacOSXDeploymentTarget = tgt; }
+
 	inline bool onlyActiveArch() const { return m_OnlyActiveArch; }
 	inline void setOnlyActiveArch(bool flag) { m_OnlyActiveArch = flag; }
+
+	inline const std::string & productName() const { return m_ProductName; }
+	inline void setProductName(const std::string & name) { m_ProductName = name; }
 
 	inline const std::string & sdkRoot() const { return m_SDKRoot; }
 	inline void setSDKRoot(const std::string & root) { m_SDKRoot = root; }
@@ -156,9 +168,11 @@ private:
 	XCodeWarnFlag m_ClangWarnObjCRootClass;
 	XCodeWarnFlag m_ClangWarnDuplicateMethodMatch;
 	bool m_CopyPhaseStrip;
+	std::string m_DebugInformationFormat;
 	bool m_EnableNSAssertions;
 	std::string m_GnuCLanguageStandard;
 	bool m_GccDynamicNoPIC;
+	bool m_GccEnableObjCExceptions;
 	std::string m_GccOptimizationLevel;
 	bool m_GccSymbolsPrivateExtern;
 	XCodeWarnFlag m_GccWarn64To32BitConversion;
@@ -168,7 +182,9 @@ private:
 	XCodeWarnFlag m_GccWarnUnusedFunction;
 	XCodeWarnFlag m_GccWarnUnusedVariable;
 	std::string m_IPhoneOSDeploymentTarget;
+	std::string m_MacOSXDeploymentTarget;
 	bool m_OnlyActiveArch;
+	std::string m_ProductName;
 	std::string m_SDKRoot;
 	std::string m_TargetedDeviceFamily;
 	bool m_ValidateProduct;

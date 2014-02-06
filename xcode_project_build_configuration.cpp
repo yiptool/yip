@@ -42,6 +42,7 @@ XCodeProjectBuildConfiguration::XCodeProjectBuildConfiguration()
 	  m_EnableNSAssertions(true),
 	  m_GnuCLanguageStandard("gnu99"),
 	  m_GccDynamicNoPIC(false),
+	  m_GccEnableObjCExceptions(true),
 	  m_GccSymbolsPrivateExtern(false),
 	  m_GccWarn64To32BitConversion(XCodeEnableWarning),
 	  m_GccWarnAboutReturnType(XCodeWarningAsError),
@@ -82,9 +83,14 @@ void XCodeProjectBuildConfiguration::writeBuildSettings(std::stringstream & ss) 
 	}
 
 	ss << "\t\t\t\tCOPY_PHASE_STRIP = " << (m_CopyPhaseStrip ? "YES" : "NO") << ";\n";
+
+	if (m_DebugInformationFormat.length() > 0)
+		ss << "\t\t\t\tDEBUG_INFORMATION_FORMAT = " << stringLiteral(m_DebugInformationFormat) << ";\n";
+
 	ss << "\t\t\t\tENABLE_NS_ASSERTIONS = " << (m_EnableNSAssertions ? "YES" : "NO") << ";\n";
 	ss << "\t\t\t\tGCC_C_LANGUAGE_STANDARD = " << stringLiteral(m_GnuCLanguageStandard) << ";\n";
 	ss << "\t\t\t\tGCC_DYNAMIC_NO_PIC = " << (m_GccDynamicNoPIC ? "YES" : "NO") << ";\n";
+	ss << "\t\t\t\tGCC_ENABLE_OBJC_EXCEPTIONS = " << (m_GccEnableObjCExceptions ? "YES" : "NO") << ";\n";
 	if (m_GccOptimizationLevel.length() > 0)
 		ss << "\t\t\t\tGCC_OPTIMIZATION_LEVEL = " << m_GccOptimizationLevel << ";\n";
 
@@ -108,7 +114,13 @@ void XCodeProjectBuildConfiguration::writeBuildSettings(std::stringstream & ss) 
 	if (m_IPhoneOSDeploymentTarget.length() > 0)
 		ss << "\t\t\t\tIPHONEOS_DEPLOYMENT_TARGET = " << stringLiteral(m_IPhoneOSDeploymentTarget) << ";\n";
 
+	if (m_MacOSXDeploymentTarget.length() > 0)
+		ss << "\t\t\t\tMACOSX_DEPLOYMENT_TARGET = " << stringLiteral(m_MacOSXDeploymentTarget) << ";\n";
+
 	ss << "\t\t\t\tONLY_ACTIVE_ARCH = " << (m_OnlyActiveArch ? "YES" : "NO") << ";\n";
+
+	if (m_ProductName.length() > 0)
+		ss << "\t\t\t\tPRODUCT_NAME = " << stringLiteral(m_ProductName) << ";\n";
 
 	if (m_SDKRoot.length() > 0)
 		ss << "\t\t\t\tSDKROOT = " << stringLiteral(m_SDKRoot) << ";\n";
