@@ -92,9 +92,16 @@ XCodeFileReference * XCodeProject::addFileReference()
 	return ref;
 }
 
-XCodeBuildConfiguration * XCodeProject::addBuildConfiguration()
+XCodeProjectBuildConfiguration * XCodeProject::addProjectBuildConfiguration()
 {
-	XCodeBuildConfiguration * config = new XCodeBuildConfiguration;
+	XCodeProjectBuildConfiguration * config = new XCodeProjectBuildConfiguration;
+	m_Cfgs.push_back(config);
+	return config;
+}
+
+XCodeTargetBuildConfiguration * XCodeProject::addTargetBuildConfiguration()
+{
+	XCodeTargetBuildConfiguration * config = new XCodeTargetBuildConfiguration;
 	m_Cfgs.push_back(config);
 	return config;
 }

@@ -20,6 +20,10 @@ ADD_LIBRARY(xcode STATIC
 	xcode_object.h
 	xcode_project.cpp
 	xcode_project.h
+	xcode_project_build_configuration.cpp
+	xcode_project_build_configuration.h
+	xcode_target_build_configuration.cpp
+	xcode_target_build_configuration.h
 	xcode_unique_id.cpp
 	xcode_unique_id.h
 	xcode_variant_group.cpp

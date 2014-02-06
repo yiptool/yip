@@ -27,7 +27,8 @@
 #include "xcode_group.h"
 #include "xcode_variant_group.h"
 #include "xcode_file_reference.h"
-#include "xcode_build_configuration.h"
+#include "xcode_project_build_configuration.h"
+#include "xcode_target_build_configuration.h"
 #include "xcode_configuration_list.h"
 #include "xcode_build_file.h"
 #include "xcode_build_phase.h"
@@ -71,7 +72,8 @@ public:
 
 	XCodeFileReference * addFileReference();
 
-	XCodeBuildConfiguration * addBuildConfiguration();
+	XCodeProjectBuildConfiguration * addProjectBuildConfiguration();
+	XCodeTargetBuildConfiguration * addTargetBuildConfiguration();
 	XCodeConfigurationList * addConfigurationList();
 
 	inline XCodeConfigurationList * buildConfigurationList() const { return m_BuildConfigurationList; }

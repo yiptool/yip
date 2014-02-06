@@ -20,32 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __34005306ac7d3391afe4aae2d0a45951__
-#define __34005306ac7d3391afe4aae2d0a45951__
+#ifndef __c7386a7c1f865726067bebd964f4a475__
+#define __c7386a7c1f865726067bebd964f4a475__
 
-#include "xcode_object.h"
-#include <sstream>
+#include "xcode_build_configuration.h"
 
 class XCodeProject;
 
-class XCodeBuildConfiguration : public XCodeObject
+class XCodeProjectBuildConfiguration : public XCodeBuildConfiguration
 {
-public:
-	std::string objectName() const { return m_Name; }
-
-	inline const std::string & name() const { return m_Name; }
-	inline void setName(const std::string & name) { m_Name = name; }
-
-	std::string toString() const;
-
 protected:
-	XCodeBuildConfiguration();
-	~XCodeBuildConfiguration();
-
-	virtual void writeBuildSettings(std::stringstream & ss) const = 0;
+	void writeBuildSettings(std::stringstream & ss) const;
 
 private:
-	std::string m_Name;
+	XCodeProjectBuildConfiguration();
+	~XCodeProjectBuildConfiguration();
 
 	friend class XCodeProject;
 };

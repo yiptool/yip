@@ -155,21 +155,31 @@ int main()
 
 	// Build configurations
 
-	XCodeBuildConfiguration * cfgProjectDebug = project.addBuildConfiguration();
+	XCodeProjectBuildConfiguration * cfgProjectDebug = project.addProjectBuildConfiguration();
 	cfgProjectDebug->setUniqueID("A38BD27318A3044000AD1F3F");
 	cfgProjectDebug->setName("Debug");
 
-	XCodeBuildConfiguration * cfgProjectRelease = project.addBuildConfiguration();
+	XCodeProjectBuildConfiguration * cfgProjectRelease = project.addProjectBuildConfiguration();
 	cfgProjectRelease->setUniqueID("A38BD27418A3044000AD1F3F");
 	cfgProjectRelease->setName("Release");
 
-	XCodeBuildConfiguration * cfgTargetDebug = project.addBuildConfiguration();
+	XCodeTargetBuildConfiguration * cfgTargetDebug = project.addTargetBuildConfiguration();
 	cfgTargetDebug->setUniqueID("A38BD27618A3044000AD1F3F");
 	cfgTargetDebug->setName("Debug");
+	cfgTargetDebug->setPrecompilePrefixHeader(true);
+	cfgTargetDebug->setPrefixHeader("PRODPROD/PRODPROD-Prefix.pch");
+	cfgTargetDebug->setInfoPListFile("PRODPROD/PRODPROD-Info.plist");
+	cfgTargetDebug->setAssetCatalogAppIconName("AppIcon");
+	cfgTargetDebug->setAssetCatalogLaunchImageName("LaunchImage");
 
-	XCodeBuildConfiguration * cfgTargetRelease = project.addBuildConfiguration();
+	XCodeTargetBuildConfiguration * cfgTargetRelease = project.addTargetBuildConfiguration();
 	cfgTargetRelease->setUniqueID("A38BD27718A3044000AD1F3F");
 	cfgTargetRelease->setName("Release");
+	cfgTargetRelease->setPrecompilePrefixHeader(true);
+	cfgTargetRelease->setPrefixHeader("PRODPROD/PRODPROD-Prefix.pch");
+	cfgTargetRelease->setInfoPListFile("PRODPROD/PRODPROD-Info.plist");
+	cfgTargetRelease->setAssetCatalogAppIconName("AppIcon");
+	cfgTargetRelease->setAssetCatalogLaunchImageName("LaunchImage");
 
 	// Configuration lists
 
