@@ -38,6 +38,9 @@ std::string XCodeObject::stringLiteral(const std::string & str)
 	const char * allowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
 	bool shortForm = true;
 
+	if (str.length() == 0)
+		return "\"\"";
+
 	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it)
 	{
 		if (!*it || !strchr(allowed, *it))

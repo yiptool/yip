@@ -83,8 +83,8 @@ std::string XCodeProject::toString() const
 	if (m_MainGroup)
 		ss << "\t\t\tmainGroup = " << m_MainGroup->uniqueID().toString() << ";\n";
 //	ss << "\t\t\tproductRefGroup = 0AB4FF0317968C1B00105C66 /* Products */;\n";
-	ss << "\t\t\tprojectDirPath = "";\n";
-	ss << "\t\t\tprojectRoot = "";\n";
+	ss << "\t\t\tprojectDirPath = \"\";\n";
+	ss << "\t\t\tprojectRoot = \"\";\n";
 	ss << "\t\t\ttargets = (\n";
 //	ss << "\t\t\t\t0AB4FF0117968C1B00105C66 /* Minesweeper */,
 	ss << "\t\t\t);\n";
