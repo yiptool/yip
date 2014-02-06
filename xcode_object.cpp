@@ -55,7 +55,15 @@ std::string XCodeObject::stringLiteral(const std::string & str)
 
 	std::stringstream ss;
 	ss << '"';
-	ss << str;
+	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it)
+	{
+		if (*it == '"')
+			ss << "\\\"";
+		else if (*it == '\\')
+			ss << "\\\\";
+		else
+			ss << *it;
+	}
 	ss << '"';
 
 	return ss.str();
