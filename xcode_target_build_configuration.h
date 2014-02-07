@@ -24,6 +24,8 @@
 #define __5cefef426b1c5f3cbadad67afb0ad9ae__
 
 #include "xcode_build_configuration.h"
+#include <vector>
+#include <string>
 
 class XCodeProject;
 
@@ -51,6 +53,8 @@ public:
 	inline const std::string & wrapperExtension() const { return m_WrapperExtension; }
 	inline void setWrapperExtension(const std::string & ext) { m_WrapperExtension = ext; }
 
+	inline void addPreprocessorDefinition(const std::string & def) { m_Defines.push_back(def); }
+
 protected:
 	void writeBuildSettings(std::stringstream & ss) const;
 
@@ -62,6 +66,7 @@ private:
 	std::string m_InfoPListFile;
 	std::string m_ProductName;
 	std::string m_WrapperExtension;
+	std::vector<std::string> m_Defines;
 
 	XCodeTargetBuildConfiguration();
 	~XCodeTargetBuildConfiguration();

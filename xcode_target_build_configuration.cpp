@@ -42,6 +42,16 @@ void XCodeTargetBuildConfiguration::writeBuildSettings(std::stringstream & ss) c
 	ss << "\t\t\t\tGCC_PRECOMPILE_PREFIX_HEADER = " << (m_PrecompilePrefixHeader ? "YES" : "NO") << ";\n";
 	if (m_PrefixHeader.length() > 0)
 		ss << "\t\t\t\tGCC_PREFIX_HEADER = " << stringLiteral(m_PrefixHeader) << ";\n";
+
+	if (m_Defines.size() > 0)
+	{
+		ss << "\t\t\t\tGCC_PREPROCESSOR_DEFINITIONS = (\n";
+		for (std::vector<std::string>::const_iterator it = m_Defines.begin(); it != m_Defines.end(); ++it)
+			ss << "\t\t\t\t\t" << stringLiteral(*it) << ",\n";
+		ss << "\t\t\t\t\t\"$(inherited)\",\n";
+		ss << "\t\t\t\t);\n";
+	}
+
 	if (m_InfoPListFile.length() > 0)
 		ss << "\t\t\t\tINFOPLIST_FILE = " << stringLiteral(m_InfoPListFile) << ";\n";
 	if (m_ProductName.length() > 0)
