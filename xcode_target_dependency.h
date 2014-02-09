@@ -32,10 +32,10 @@ class XCodeTargetDependency : public XCodeObject
 {
 public:
 	inline XCodeObject * target() const { return m_Target; }
-	inline void setTarget(XCodeObject * target) { m_Target = target; }
+	inline void setTarget(XCodeObject * tgt) { m_Target = tgt; }
 
 	inline XCodeObject * targetProxy() const { return m_TargetProxy; }
-	inline void setTargetProxy(XCodeObject * target) { m_TargetProxy = target; }
+	inline void setTargetProxy(XCodeObject * tgt) { m_TargetProxy = tgt; }
 
 	std::string toString() const;
 

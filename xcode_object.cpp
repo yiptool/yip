@@ -24,8 +24,8 @@
 #include <cstring>
 #include <sstream>
 
-XCodeObject::XCodeObject(const std::string & className)
-	: m_ClassName(className)
+XCodeObject::XCodeObject(const std::string & clsName)
+	: m_ClassName(clsName)
 {
 }
 

@@ -60,10 +60,10 @@ public:
 	inline void setIncludeInIndex(bool flag) { m_IncludeInIndex = flag; }
 
 	inline const std::string & name() const { return m_Name; }
-	inline void setName(const std::string & name) { m_Name = name; }
+	inline void setName(const std::string & name_) { m_Name = name_; }
 
 	inline const std::string & path() const { return m_Path; }
-	inline void setPath(const std::string & path) { m_Path = path; }
+	inline void setPath(const std::string & path_) { m_Path = path_; }
 
 	inline const std::string & sourceTree() const { return m_SourceTree; }
 	inline void setSourceTree(const std::string & tree) { m_SourceTree = tree; }

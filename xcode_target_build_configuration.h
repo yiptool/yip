@@ -33,10 +33,10 @@ class XCodeTargetBuildConfiguration : public XCodeBuildConfiguration
 {
 public:
 	inline const std::string & assetCatalogAppIconName() const { return m_AssetCatalogAppIconName; }
-	inline void setAssetCatalogAppIconName(const std::string & name) { m_AssetCatalogAppIconName = name; }
+	inline void setAssetCatalogAppIconName(const std::string & name_) { m_AssetCatalogAppIconName = name_; }
 
 	inline const std::string & assetCatalogLaunchImageName() const { return m_AssetCatalogLaunchImageName; }
-	inline void setAssetCatalogLaunchImageName(const std::string & name) { m_AssetCatalogLaunchImageName = name; }
+	inline void setAssetCatalogLaunchImageName(const std::string & name_) { m_AssetCatalogLaunchImageName = name_; }
 
 	inline bool precompilePrefixHeader() const { return m_PrecompilePrefixHeader; }
 	inline void setPrecompilePrefixHeader(bool flag) { m_PrecompilePrefixHeader = flag; }
@@ -48,7 +48,7 @@ public:
 	inline void setInfoPListFile(const std::string & file) { m_InfoPListFile = file; }
 
 	inline const std::string & productName() const { return m_ProductName; }
-	inline void setProductName(const std::string & name) { m_ProductName = name; }
+	inline void setProductName(const std::string & name_) { m_ProductName = name_; }
 
 	inline const std::string & wrapperExtension() const { return m_WrapperExtension; }
 	inline void setWrapperExtension(const std::string & ext) { m_WrapperExtension = ext; }

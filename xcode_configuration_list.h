@@ -35,13 +35,13 @@ public:
 	std::string objectName() const;
 
 	inline const std::string & name() const { return m_Name; }
-	inline void setName(const std::string & name) { m_Name = name; }
+	inline void setName(const std::string & name_) { m_Name = name_; }
 
 	inline bool defaultConfigurationIsVisible() const { return m_DefaultConfigurationIsVisible; }
 	inline void setDefaultConfigurationIsVisible(bool flag) { m_DefaultConfigurationIsVisible = flag; }
 
 	inline const std::string & defaultConfigurationName() const { return m_DefaultConfigurationName; }
-	inline void setDefaultConfigurationName(const std::string & name) { m_DefaultConfigurationName = name; }
+	inline void setDefaultConfigurationName(const std::string & name_) { m_DefaultConfigurationName = name_; }
 
 	inline void addConfiguration(const XCodeBuildConfiguration * cfg) { m_Cfgs.push_back(cfg); }
 

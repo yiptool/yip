@@ -38,7 +38,7 @@ public:
 	virtual std::string toString() const = 0;
 
 protected:
-	XCodeObject(const std::string & className);
+	XCodeObject(const std::string & clsName);
 	virtual ~XCodeObject();
 
 	static std::string stringLiteral(const std::string & str);

@@ -30,7 +30,7 @@ XCodeUniqueID::XCodeUniqueID()
 {
 	m_ID[0] = time(NULL);
 	m_ID[1] = reinterpret_cast<size_t>(this) & 0xFFFFFFFFU;
-	m_ID[2] = (m_ID[0] + m_ID[1]) ^ 0xCAFEBABE + g_Counter++;
+	m_ID[2] = ((m_ID[0] + m_ID[1]) ^ 0xCAFEBABE) + g_Counter++;
 }
 
 XCodeUniqueID::XCodeUniqueID(const std::string & hex)

@@ -43,7 +43,7 @@ public:
 	inline void setAlwaysSearchUserPaths(bool flag) { m_AlwaysSearchUserPaths = flag; }
 
 	inline const std::string & archs() const { return m_Archs; }
-	inline void setArchs(const std::string & archs) { m_Archs = archs; }
+	inline void setArchs(const std::string & archs_) { m_Archs = archs_; }
 
 	inline const std::string & clangCxxLanguageStandard() const { return m_ClangCxxLanguageStandard; }
 	inline void setClangCxxLanguageStandard(const std::string & std) { m_ClangCxxLanguageStandard = std; }
@@ -133,7 +133,7 @@ public:
 	inline void setOnlyActiveArch(bool flag) { m_OnlyActiveArch = flag; }
 
 	inline const std::string & productName() const { return m_ProductName; }
-	inline void setProductName(const std::string & name) { m_ProductName = name; }
+	inline void setProductName(const std::string & name_) { m_ProductName = name_; }
 
 	inline const std::string & sdkRoot() const { return m_SDKRoot; }
 	inline void setSDKRoot(const std::string & root) { m_SDKRoot = root; }

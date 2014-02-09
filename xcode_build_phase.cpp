@@ -25,10 +25,10 @@
 #include <sstream>
 #include <stdexcept>
 
-XCodeBuildPhase::XCodeBuildPhase(XCodeProject * project, Type type)
-	: XCodeObject(classNameForPhase(type)),
+XCodeBuildPhase::XCodeBuildPhase(XCodeProject * project, Type projectType)
+	: XCodeObject(classNameForPhase(projectType)),
 	  m_Project(project),
-	  m_Type(type),
+	  m_Type(projectType),
 	  m_BuildActionMask(2147483647),
 	  m_RunOnlyForDeploymentPostProcessing(false),
 	  m_ShellPath("/bin/sh"),

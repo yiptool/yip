@@ -40,10 +40,10 @@ public:
 	inline std::string objectName() const { return m_Name; }
 
 	inline const std::string & name() const { return m_Name; }
-	inline void setName(const std::string & name) { m_Name = name; }
+	inline void setName(const std::string & name_) { m_Name = name_; }
 
 	inline const std::string & productName() const { return m_ProductName; }
-	inline void setProductName(const std::string & name) { m_ProductName = name; }
+	inline void setProductName(const std::string & name_) { m_ProductName = name_; }
 
 	inline XCodeConfigurationList * buildConfigurationList() const { return m_BuildConfigurationList; }
 	inline void setBuildConfigurationList(XCodeConfigurationList * cfg) { m_BuildConfigurationList = cfg; }
