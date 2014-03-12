@@ -47,11 +47,11 @@ XCodeUniqueID::XCodeUniqueID(const std::string & hex)
 
 			unsigned digit = 0;
 			if (ch >= '0' && ch <= '9')
-				digit = ch - '0';
+				digit = static_cast<unsigned>(ch - '0');
 			else if (ch >= 'a' && ch <= 'f')
-				digit = ch - 'a' + 10;
+				digit = static_cast<unsigned>(ch - 'a' + 10);
 			else if (ch >= 'A' && ch <= 'F')
-				digit = ch - 'A' + 10;
+				digit = static_cast<unsigned>(ch - 'A' + 10);
 
 			val |= digit << j;
 		}
