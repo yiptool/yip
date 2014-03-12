@@ -32,12 +32,12 @@ FileType determineFileType(const std::string & path)
 {
 	if (!g_Initialized)
 	{
-		g_ExtMap.insert(std::make_pair(".txt", FILE_TEXT));
-		g_ExtMap.insert(std::make_pair(".htm", FILE_HTML));
-		g_ExtMap.insert(std::make_pair(".html", FILE_HTML));
-		g_ExtMap.insert(std::make_pair(".css", FILE_CSS));
-		g_ExtMap.insert(std::make_pair(".md", FILE_MARKDOWN));
-		g_ExtMap.insert(std::make_pair(".xml", FILE_XML));
+		g_ExtMap.insert(std::make_pair(".txt", FILE_TEXT_PLAIN));
+		g_ExtMap.insert(std::make_pair(".htm", FILE_TEXT_HTML));
+		g_ExtMap.insert(std::make_pair(".html", FILE_TEXT_HTML));
+		g_ExtMap.insert(std::make_pair(".css", FILE_TEXT_CSS));
+		g_ExtMap.insert(std::make_pair(".md", FILE_TEXT_MARKDOWN));
+		g_ExtMap.insert(std::make_pair(".xml", FILE_TEXT_XML));
 		g_ExtMap.insert(std::make_pair(".arj", FILE_ARCHIVE_ARJ));
 		g_ExtMap.insert(std::make_pair(".zip", FILE_ARCHIVE_ZIP));
 		g_ExtMap.insert(std::make_pair(".rar", FILE_ARCHIVE_RAR));
@@ -47,6 +47,14 @@ FileType determineFileType(const std::string & path)
 		g_ExtMap.insert(std::make_pair(".gz", FILE_ARCHIVE_GZIP));
 		g_ExtMap.insert(std::make_pair(".bz2", FILE_ARCHIVE_BZIP2));
 		g_ExtMap.insert(std::make_pair(".cmake", FILE_BUILD_CMAKE_SCRIPT));
+		g_ExtMap.insert(std::make_pair(".exe", FILE_BINARY_WIN32_EXE));
+		g_ExtMap.insert(std::make_pair(".dll", FILE_BINARY_WIN32_DLL));
+		g_ExtMap.insert(std::make_pair(".res", FILE_BINARY_WIN32_RES));
+		g_ExtMap.insert(std::make_pair(".lib", FILE_BINARY_WIN32_LIB));
+		g_ExtMap.insert(std::make_pair(".o", FILE_BINARY_OBJECT));
+		g_ExtMap.insert(std::make_pair(".obj", FILE_BINARY_OBJECT));
+		g_ExtMap.insert(std::make_pair(".so", FILE_BINARY_SHARED_OBJECT));
+		g_ExtMap.insert(std::make_pair(".a", FILE_BINARY_ARCHIVE));
 		g_ExtMap.insert(std::make_pair(".c", FILE_SOURCE_C));
 		g_ExtMap.insert(std::make_pair(".C", FILE_SOURCE_CXX));
 		g_ExtMap.insert(std::make_pair(".cc", FILE_SOURCE_CXX));
@@ -60,6 +68,13 @@ FileType determineFileType(const std::string & path)
 		g_ExtMap.insert(std::make_pair(".java", FILE_SOURCE_JAVA));
 		g_ExtMap.insert(std::make_pair(".js", FILE_SOURCE_JAVASCRIPT));
 		g_ExtMap.insert(std::make_pair(".lua", FILE_SOURCE_LUA));
+		g_ExtMap.insert(std::make_pair(".sh", FILE_SOURCE_SHELL));
+		g_ExtMap.insert(std::make_pair(".php", FILE_SOURCE_PHP));
+		g_ExtMap.insert(std::make_pair(".php4", FILE_SOURCE_PHP));
+		g_ExtMap.insert(std::make_pair(".php5", FILE_SOURCE_PHP));
+		g_ExtMap.insert(std::make_pair(".py", FILE_SOURCE_PYTHON));
+		g_ExtMap.insert(std::make_pair(".rc", FILE_SOURCE_WIN32_RC));
+		g_ExtMap.insert(std::make_pair(".def", FILE_SOURCE_WIN32_DEF));
 		g_ExtMap.insert(std::make_pair(".png", FILE_IMAGE_PNG));
 		g_ExtMap.insert(std::make_pair(".jpg", FILE_IMAGE_JPEG));
 		g_ExtMap.insert(std::make_pair(".jpeg", FILE_IMAGE_JPEG));
