@@ -98,7 +98,11 @@ void ProjectFileParser::parseSources()
 	{
 		if (m_Token != Token::Literal)
 			reportError("expected file name.");
-		printf("[[%s]]\n", pathMakeAbsolute(m_TokenText, m_ProjectPath).c_str());
+
+		std::string name = m_TokenText;
+		std::string path = pathMakeAbsolute(m_TokenText, m_ProjectPath);
+		m_ProjectFile->addSourceFile(name, path);
+
 		getToken();
 	}
 

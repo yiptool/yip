@@ -22,7 +22,10 @@
 //
 #include "source_file.h"
 
-SourceFile::SourceFile(const std::string & path)
+SourceFile::SourceFile(const std::string & fileName, const std::string & filePath)
+	: m_Name(fileName),
+	  m_Path(filePath),
+	  m_Type(determineFileType(filePath))
 {
 }
 

@@ -29,3 +29,10 @@ ProjectFile::ProjectFile()
 ProjectFile::~ProjectFile()
 {
 }
+
+SourceFilePtr ProjectFile::addSourceFile(const std::string & name, const std::string & path)
+{
+	SourceFilePtr file = std::make_shared<SourceFile>(name, path);
+	m_SourceFiles.push_back(file);
+	return file;
+}

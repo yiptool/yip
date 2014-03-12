@@ -33,6 +33,8 @@ public:
 	ProjectFile();
 	~ProjectFile();
 
+	SourceFilePtr addSourceFile(const std::string & name, const std::string & path);
+
 private:
 	std::vector<SourceFilePtr> m_SourceFiles;
 

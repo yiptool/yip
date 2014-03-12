@@ -23,16 +23,27 @@
 #ifndef __cd8034b5cabf20e1be1ba06b0fc20482__
 #define __cd8034b5cabf20e1be1ba06b0fc20482__
 
+#include "../util/file_type.h"
 #include <string>
 #include <memory>
 
 class SourceFile
 {
 public:
-	SourceFile(const std::string & path);
+	SourceFile(const std::string & fileName, const std::string & filePath);
 	~SourceFile();
 
+	inline const std::string & name() const { return m_Name; }
+	inline const std::string & path() const { return m_Path; }
+
+	inline FileType type() const { return m_Type; }
+	inline void setFileType(FileType type) { m_Type = type; }
+
 private:
+	std::string m_Name;
+	std::string m_Path;
+	FileType m_Type;
+
 	SourceFile(const SourceFile &) = delete;
 	SourceFile & operator=(const SourceFile &) = delete;
 };
