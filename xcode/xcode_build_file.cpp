@@ -27,7 +27,7 @@
 
 XCodeBuildFile::XCodeBuildFile(XCodeBuildPhase * phase)
 	: XCodeObject("PBXBuildFile"),
-	  m_FileRef(NULL),
+	  m_FileRef(nullptr),
 	  m_BuildPhase(phase)
 {
 }

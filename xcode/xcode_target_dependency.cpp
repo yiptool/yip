@@ -25,8 +25,8 @@
 
 XCodeTargetDependency::XCodeTargetDependency()
 	: XCodeObject("PBXTargetDependency"),
-	  m_Target(NULL),
-	  m_TargetProxy(NULL)
+	  m_Target(nullptr),
+	  m_TargetProxy(nullptr)
 {
 }
 

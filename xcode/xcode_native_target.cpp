@@ -31,8 +31,8 @@ const std::string PRODUCTTYPE_TOOL = "com.apple.product-type.tool";
 
 XCodeNativeTarget::XCodeNativeTarget()
 	: XCodeObject("PBXNativeTarget"),
-	  m_BuildConfigurationList(NULL),
-	  m_ProductReference(NULL),
+	  m_BuildConfigurationList(nullptr),
+	  m_ProductReference(nullptr),
 	  m_ProductType(PRODUCTTYPE_APPLICATION)
 {
 }

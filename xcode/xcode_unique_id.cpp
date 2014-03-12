@@ -28,7 +28,7 @@ static volatile unsigned int g_Counter = 1;
 
 XCodeUniqueID::XCodeUniqueID()
 {
-	m_ID[0] = static_cast<unsigned int>(time(NULL));
+	m_ID[0] = static_cast<unsigned int>(time(nullptr));
 	m_ID[1] = static_cast<unsigned int>(reinterpret_cast<size_t>(this) & 0xFFFFFFFFU);
 	m_ID[2] = ((m_ID[0] + m_ID[1]) ^ 0xCAFEBABE) + g_Counter++;
 }

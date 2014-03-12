@@ -27,9 +27,9 @@ XCodeProject::XCodeProject()
 	: XCodeObject("PBXProject"),
 	  m_OrganizationName("Nikolay Zapolnov"),
 	  m_DevelopmentRegion("English"),
-	  m_MainGroup(NULL),
-	  m_ProductRefGroup(NULL),
-	  m_BuildConfigurationList(NULL)
+	  m_MainGroup(nullptr),
+	  m_ProductRefGroup(nullptr),
+	  m_BuildConfigurationList(nullptr)
 {
 	m_KnownRegions.insert("en");
 }

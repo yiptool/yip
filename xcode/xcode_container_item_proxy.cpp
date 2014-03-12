@@ -25,7 +25,7 @@
 
 XCodeContainerItemProxy::XCodeContainerItemProxy()
 	: XCodeObject("PBXContainerItemProxy"),
-	  m_ContainerPortal(NULL),
+	  m_ContainerPortal(nullptr),
 	  m_ProxyType("1")
 {
 }
