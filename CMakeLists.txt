@@ -27,6 +27,7 @@ IF(APPLE)
 	CHECK_CXX_FLAG(STDLIB_LIBCXX "-stdlib=libc++")
 ENDIF()
 
+ADD_SUBDIRECTORY(util)
 ADD_SUBDIRECTORY(xcode)
 ADD_SUBDIRECTORY(project)
 
@@ -34,6 +35,6 @@ ADD_EXECUTABLE(yip
 	main.cpp
 )
 
-TARGET_LINK_LIBRARIES(yip project xcode)
+TARGET_LINK_LIBRARIES(yip project xcode util)
 
 INSTALL(TARGETS yip RUNTIME DESTINATION "bin")
