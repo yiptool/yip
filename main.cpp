@@ -31,8 +31,7 @@ int main()
 	{
 		ProjectFilePtr projectFile = std::make_shared<ProjectFile>();
 
-		std::ifstream stream("YipYip");
-		ProjectFileParser p(stream, "YipYip");
+		ProjectFileParser p("YipYip");
 		p.parse(projectFile);
 	}
 	catch (const std::exception & e)

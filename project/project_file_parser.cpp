@@ -34,15 +34,17 @@ enum class ProjectFileParser::Token
 	Literal,
 };
 
-ProjectFileParser::ProjectFileParser(std::istream & stream, const std::string & filename)
-	: m_Stream(stream),
-	  m_FileName(pathMakeAbsolute(filename)),
+ProjectFileParser::ProjectFileParser(const std::string & filename)
+	: m_FileName(pathMakeAbsolute(filename)),
 	  m_ProjectPath(pathGetDirectory(m_FileName)),
 	  m_Token(Token::Eof),
 	  m_CurLine(1),
 	  m_TokenLine(1),
 	  m_LastChar(0)
 {
+	m_Stream.open(filename, std::ios::in);
+	if (!m_Stream.is_open() || m_Stream.fail() || m_Stream.bad())
+		throw std::runtime_error(fmt() << "unable to open file '" << filename << "'.");
 }
 
 ProjectFileParser::~ProjectFileParser()

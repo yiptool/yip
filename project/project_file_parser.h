@@ -25,12 +25,13 @@
 
 #include "project_file.h"
 #include <string>
+#include <fstream>
 #include <sstream>
 
 class ProjectFileParser
 {
 public:
-	ProjectFileParser(std::istream & stream, const std::string & filename);
+	ProjectFileParser(const std::string & filename);
 	~ProjectFileParser();
 
 	void parse(const ProjectFilePtr & projectFile);
@@ -44,7 +45,7 @@ protected:
 private:
 	enum class Token : int;
 
-	std::istream & m_Stream;
+	std::ifstream m_Stream;
 	ProjectFile * m_ProjectFile;
 	std::string m_FileName;
 	std::string m_ProjectPath;
