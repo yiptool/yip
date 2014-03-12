@@ -32,6 +32,8 @@ ADD_SUBDIRECTORY(xcode)
 ADD_SUBDIRECTORY(project)
 
 ADD_EXECUTABLE(yip
+	config.cpp
+	config.h
 	main.cpp
 )
 

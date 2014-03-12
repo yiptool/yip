@@ -20,26 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "project/project_file_parser.h"
-#include "config.h"
-#include <exception>
-#include <fstream>
-#include <iostream>
+#ifndef __8e5d594fd698d87dead631288c8bc4f0__
+#define __8e5d594fd698d87dead631288c8bc4f0__
 
-int main()
-{
-	try
-	{
-		ProjectFilePtr projectFile = std::make_shared<ProjectFile>();
+#include <string>
 
-		ProjectFileParser p(g_ProjectFileName);
-		p.parse(projectFile);
-	}
-	catch (const std::exception & e)
-	{
-		std::cerr << e.what() << std::endl;
-		return 1;
-	}
+extern std::string g_ProjectFileName;
 
-	return 0;
-}
+#endif
