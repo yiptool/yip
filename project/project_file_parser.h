@@ -20,24 +20,44 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "project/project_file_parser.h"
-#include <exception>
-#include <fstream>
-#include <iostream>
+#ifndef __75611f4e5912eed939ce360c67631442__
+#define __75611f4e5912eed939ce360c67631442__
 
-int main()
+#include <sstream>
+#include <string>
+
+class ProjectFileParser
 {
-	try
-	{
-		std::ifstream stream("YipYip");
-		ProjectFileParser p(stream, "YipYip");
-		p.parse();
-	}
-	catch (const std::exception & e)
-	{
-		std::cerr << e.what() << std::endl;
-		return 1;
-	}
+public:
+	ProjectFileParser(std::istream & stream, const std::string & filename);
+	~ProjectFileParser();
 
-	return 0;
-}
+	void parse();
+
+protected:
+	inline const std::string & fileName() const { return m_FileName; }
+	inline int tokenLine() const { return m_TokenLine; }
+
+	virtual void reportError(const std::string & message);
+
+private:
+	enum class Token : int;
+
+	std::istream & m_Stream;
+	std::string m_FileName;
+	std::stringstream m_Buffer;
+	std::string m_TokenText;
+	Token m_Token;
+	int m_TokenLine;
+	int m_LastChar;
+
+	Token getToken();
+
+	int getChar();
+	void ungetChar();
+
+	ProjectFileParser(const ProjectFileParser &) = delete;
+	ProjectFileParser & operator=(const ProjectFileParser &) = delete;
+};
+
+#endif
