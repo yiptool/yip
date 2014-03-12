@@ -20,50 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __75611f4e5912eed939ce360c67631442__
-#define __75611f4e5912eed939ce360c67631442__
+#ifndef __b452a1405c1a5aa54336e360b8b4fe1f__
+#define __b452a1405c1a5aa54336e360b8b4fe1f__
 
-#include "project_file.h"
-#include <string>
-#include <sstream>
+#include "source_file.h"
+#include <vector>
+#include <memory>
 
-class ProjectFileParser
+class ProjectFile
 {
 public:
-	ProjectFileParser(std::istream & stream, const std::string & filename);
-	~ProjectFileParser();
-
-	void parse(const ProjectFilePtr & projectFile);
-
-protected:
-	inline const std::string & fileName() const { return m_FileName; }
-	inline int tokenLine() const { return m_TokenLine; }
-
-	virtual void reportError(const std::string & message);
+	ProjectFile();
+	~ProjectFile();
 
 private:
-	enum class Token : int;
+	std::vector<SourceFilePtr> m_SourceFiles;
 
-	std::istream & m_Stream;
-	ProjectFile * m_ProjectFile;
-	std::string m_FileName;
-	std::string m_ProjectPath;
-	std::stringstream m_Buffer;
-	std::string m_TokenText;
-	Token m_Token;
-	int m_CurLine;
-	int m_TokenLine;
-	int m_LastChar;
-
-	void parseSources();
-
-	Token getToken();
-
-	int getChar();
-	void ungetChar();
-
-	ProjectFileParser(const ProjectFileParser &) = delete;
-	ProjectFileParser & operator=(const ProjectFileParser &) = delete;
+	ProjectFile(const ProjectFile &) = delete;
+	ProjectFile & operator=(const ProjectFile &) = delete;
 };
+
+typedef std::shared_ptr<ProjectFile> ProjectFilePtr;
 
 #endif

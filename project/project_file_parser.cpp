@@ -21,6 +21,8 @@
 // THE SOFTWARE.
 //
 #include "project_file_parser.h"
+#include "../util/fmt.h"
+#include "../util/path.h"
 #include <cassert>
 #include <stdexcept>
 
@@ -29,13 +31,15 @@ enum class ProjectFileParser::Token
 	Eof = 0,
 	LCurly,
 	RCurly,
-	Identifier,
+	Literal,
 };
 
 ProjectFileParser::ProjectFileParser(std::istream & stream, const std::string & filename)
 	: m_Stream(stream),
-	  m_FileName(filename),
+	  m_FileName(pathMakeAbsolute(filename)),
+	  m_ProjectPath(pathGetDirectory(m_FileName)),
 	  m_Token(Token::Eof),
+	  m_CurLine(1),
 	  m_TokenLine(1),
 	  m_LastChar(0)
 {
@@ -45,18 +49,61 @@ ProjectFileParser::~ProjectFileParser()
 {
 }
 
-void ProjectFileParser::parse()
+void ProjectFileParser::parse(const ProjectFilePtr & projectFile)
 {
+	m_ProjectFile = projectFile.get();
+
+	for (;;)
+	{
+		switch (getToken())
+		{
+		case Token::Eof:
+			break;
+
+		case Token::Literal:
+			if (m_TokenText == "sources")
+			{
+				parseSources();
+				continue;
+			}
+			goto unexpected;
+
+		default:
+		unexpected:
+			reportError(fmt() << "unexpected '" << m_TokenText << "'.");
+			return;
+		}
+		break;
+	}
+
+/*
 	while (getToken() != Token::Eof)
 		printf("%d [%s]\n", (int)m_Token, m_TokenText.c_str());
 	printf("%d [%s]\n", (int)m_Token, m_TokenText.c_str());
+*/
 }
 
 void ProjectFileParser::reportError(const std::string & message)
 {
-	std::stringstream ss;
-	ss << m_FileName << '(' << m_TokenLine << "):" << message;
-	throw std::runtime_error(ss.str());
+	throw std::runtime_error(fmt() << m_FileName << '(' << m_TokenLine << "):" << message);
+}
+
+void ProjectFileParser::parseSources()
+{
+	if (getToken() != Token::LCurly)
+		reportError("expected '{'.");
+
+	getToken();
+	while (m_Token != Token::RCurly && m_Token != Token::Eof)
+	{
+		if (m_Token != Token::Literal)
+			reportError("expected file name.");
+		printf("[[%s]]\n", pathMakeAbsolute(m_TokenText, m_ProjectPath).c_str());
+		getToken();
+	}
+
+	if (m_Token != Token::RCurly)
+		reportError("expected '}'.");
 }
 
 ProjectFileParser::Token ProjectFileParser::getToken()
@@ -70,10 +117,14 @@ ProjectFileParser::Token ProjectFileParser::getToken()
 		case 'u': case 'v': case 'w': case 'x': case 'y': case 'z': case 'A': case 'B': case 'C': case 'D': \
 		case 'E': case 'F': case 'G': case 'H': case 'I': case 'J': case 'K': case 'L': case 'M': case 'N': \
 		case 'O': case 'P': case 'Q': case 'R': case 'S': case 'T': case 'U': case 'V': case 'W': case 'X': \
-		case 'Y': case 'Z': case '_'
+		case 'Y': case 'Z'
+
+	#define EXTRA_SYMBOLS \
+			 '_': case '-': case '+': case '/': case '.': case ',': case '~'
 
 	m_TokenText.clear();
 	m_Token = Token::Eof;
+	m_TokenLine = m_CurLine;
 
 	for (;;)
 	{
@@ -89,6 +140,7 @@ ProjectFileParser::Token ProjectFileParser::getToken()
 		case '\n':
 		case '\v':
 		case '\f':
+			m_TokenLine = m_CurLine;
 			continue;
 
 		case '{':
@@ -98,6 +150,7 @@ ProjectFileParser::Token ProjectFileParser::getToken()
 			return (m_TokenText = '}', m_Token = Token::RCurly);
 
 		case LETTERS:
+		case EXTRA_SYMBOLS:
 			m_Buffer.str(std::string());
 			for (;;)
 			{
@@ -107,6 +160,7 @@ ProjectFileParser::Token ProjectFileParser::getToken()
 				{
 				case LETTERS:
 				case DIGITS:
+				case EXTRA_SYMBOLS:
 					continue;
 				case EOF:
 					break;
@@ -117,13 +171,44 @@ ProjectFileParser::Token ProjectFileParser::getToken()
 			}
 			m_TokenText = m_Buffer.str();
 			m_Buffer.str(std::string());
-			return (m_Token = Token::Identifier);
+			return (m_Token = Token::Literal);
 
-		default: {
-			std::stringstream ss;
-			ss << "unexpected symbol '" << static_cast<char>(ch) << "'.";
-			reportError(ss.str());
+		case '"':
+			m_Buffer.str(std::string());
+			for (;;)
+			{
+				ch = getChar();
+				switch (ch)
+				{
+				case '"':
+					break;
+				case EOF:
+					reportError("unterminated string literal.");
+					return (m_Token = Token::Eof);
+				case '\\':
+					ch = getChar();
+					switch (ch)
+					{
+					case 'n': m_Buffer << '\n'; continue;
+					case '\\': m_Buffer << '\\'; continue;
+					case '"': m_Buffer << '"'; continue;
+					default:
+						reportError(fmt() << "invalid escape sequence '\\" << static_cast<char>(ch) << "'.");
+						return (m_Token = Token::Eof);
+					}
+				default:
+					m_Buffer << static_cast<char>(ch);
+					continue;
+				}
+				break;
 			}
+			m_TokenText = m_Buffer.str();
+			m_Buffer.str(std::string());
+			return (m_Token = Token::Literal);
+
+		default:
+			reportError(fmt() << "unexpected symbol '" << static_cast<char>(ch) << "'.");
+			return (m_Token = Token::Eof);
 		}
 	}
 }
@@ -132,7 +217,7 @@ int ProjectFileParser::getChar()
 {
 	m_LastChar = m_Stream.get();
 	if (m_LastChar == '\n')
-		++m_TokenLine;
+		++m_CurLine;
 	else if (m_LastChar == 0)
 		throw std::runtime_error("attempted to parse a binary file.");
 	return m_LastChar;
@@ -143,6 +228,6 @@ void ProjectFileParser::ungetChar()
 	assert(m_LastChar != 0);
 	m_Stream.unget();
 	if (m_LastChar == '\n')
-		--m_TokenLine;
+		--m_CurLine;
 	m_LastChar = 0;
 }

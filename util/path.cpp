@@ -184,7 +184,7 @@ bool pathIsAbsolute(const std::string & path)
   #endif
 }
 
-std::string pathMakeAbsolute(const std::string & path)
+std::string pathMakeAbsolute(const std::string & path, const std::string & basePath)
 {
   #ifndef _WIN32
 	if (path.length() >= 1 && path[0] == '~')
@@ -196,7 +196,18 @@ std::string pathMakeAbsolute(const std::string & path)
 	}
 	if (pathIsSeparator(path[0]))
 		return pathSimplify(path);
-	return pathSimplify(pathConcat(pathGetCurrentDirectory(), path));
+  #else
+	if (pathIsWin32PathWithDriveLetter(path) || (path.length() > 0 && pathIsSeparator(path[0])))
+		return pathMakeAbsolute(path);
+  #endif
+
+	return pathSimplify(pathConcat(basePath, path));
+}
+
+std::string pathMakeAbsolute(const std::string & path)
+{
+  #ifndef _WIN32
+	return pathMakeAbsolute(path, pathGetCurrentDirectory());
   #else
 	DWORD size = GetFullPathNameA(path.c_str(), 0, nullptr, nullptr);
 	if (size == 0)
@@ -337,6 +348,14 @@ size_t pathIndexOfFileName(const std::string & path)
   #endif
 
 	return (pos != std::string::npos ? pos + 1 : 0);
+}
+
+std::string pathGetDirectory(const std::string & path)
+{
+	size_t pos = pathIndexOfFileName(path);
+	if (pos > 0)
+		--pos;
+	return path.substr(0, pos);
 }
 
 std::string pathGetFileName(const std::string & path)
