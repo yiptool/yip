@@ -1,8 +1,8 @@
 
-XCode
-=====
+YIP
+===
 
-This is the small C++ library to generate project files for the Apple XCode (.pbxproj).
+The ultimate replacement for *make*.
 
 
 License
