@@ -28,10 +28,22 @@
 std::string pathToNativeSeparators(const std::string & path);
 std::string pathToUnixSeparators(const std::string & path);
 
+const char * pathSeparator();
 bool pathIsSeparator(char ch);
+
 bool pathIsWin32DriveLetter(char ch);
 bool pathIsWin32PathWithDriveLetter(const std::string & path);
-bool pathIsUNC(const std::string & path);
+
+std::string pathGetCurrentDirectory();
+std::string pathGetUserHomeDirectory();
+
+bool pathIsAbsolute(const std::string & path);
+std::string pathMakeAbsolute(const std::string & path);
+
+size_t pathIndexOfFirstSeparator(const std::string & path, size_t start = 0);
+std::string pathSimplify(const std::string & path);
+
+std::string pathConcat(const std::string & path1, const std::string & path2);
 
 size_t pathIndexOfFileName(const std::string & path);
 std::string pathGetFileName(const std::string & path);

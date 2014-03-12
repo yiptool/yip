@@ -6,3 +6,7 @@ ADD_LIBRARY(util STATIC
 	path.cpp
 	path.h
 )
+
+IF(WIN32)
+	TARGET_LINK_LIBRARIES(util shlwapi userenv)
+ENDIF()
