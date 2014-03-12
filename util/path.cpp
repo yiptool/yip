@@ -180,7 +180,7 @@ bool pathIsAbsolute(const std::string & path)
   #else
 	if (PathIsRelativeA(path.c_str()))
 		return false;
-	return (path.length() > 2 && pathIsWin32PathWithDriveLetter(path) && pathIsSeparator(path[2]))
+	return (path.length() > 2 && pathIsWin32PathWithDriveLetter(path) && pathIsSeparator(path[2]));
   #endif
 }
 
