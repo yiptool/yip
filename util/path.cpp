@@ -160,7 +160,7 @@ std::string pathGetUserHomeDirectory()
 			DWORD err = GetLastError();
 			throw std::runtime_error(fmt() << "unable to determine path to the user home directory (code " << err << ").");
 		}
-		result.assign(buf.data(), size);
+		result = buf.data();
 	}
 	catch (...)
 	{
