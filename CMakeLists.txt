@@ -15,8 +15,8 @@ MACRO(ADD_SUBMODULE path)
 	ADD_SUBDIRECTORY("${path}")
 ENDMACRO()
 
-ADD_SUBMODULE(3rdparty/zlib)
-ADD_SUBMODULE(3rdparty/openssl)
+ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/zlib")
+ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/openssl")
 
 ##################################################################################################################
 ## Compiler flags
