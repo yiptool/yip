@@ -24,6 +24,7 @@
 #define __75611f4e5912eed939ce360c67631442__
 
 #include "project_file.h"
+#include <unordered_map>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -47,6 +48,7 @@ private:
 
 	std::ifstream m_Stream;
 	ProjectFile * m_ProjectFile;
+	std::unordered_map<std::string, void (ProjectFileParser::*)()> m_CommandHandlers;
 	std::string m_FileName;
 	std::string m_ProjectPath;
 	std::stringstream m_Buffer;

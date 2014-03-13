@@ -45,6 +45,8 @@ ProjectFileParser::ProjectFileParser(const std::string & filename)
 	m_Stream.open(filename, std::ios::in);
 	if (!m_Stream.is_open() || m_Stream.fail() || m_Stream.bad())
 		throw std::runtime_error(fmt() << "unable to open file '" << filename << "'.");
+
+	m_CommandHandlers.insert(std::make_pair("sources", &ProjectFileParser::parseSources));
 }
 
 ProjectFileParser::~ProjectFileParser()
@@ -62,13 +64,15 @@ void ProjectFileParser::parse(const ProjectFilePtr & projectFile)
 		case Token::Eof:
 			break;
 
-		case Token::Literal:
-			if (m_TokenText == "sources")
+		case Token::Literal: {
+			auto it = m_CommandHandlers.find(m_TokenText);
+			if (it != m_CommandHandlers.end())
 			{
-				parseSources();
+				(this->*(it->second))();
 				continue;
 			}
 			goto unexpected;
+			}
 
 		default:
 		unexpected:
