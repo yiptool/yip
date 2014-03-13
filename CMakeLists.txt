@@ -1,6 +1,25 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
+##################################################################################################################
+## 3rdparty libraries
+
+MACRO(ADD_SUBMODULE path)
+	IF(NOT EXISTS "${path}/CMakeLists.txt")
+		EXECUTE_PROCESS(COMMAND
+				git submodule update --init --recursive "${path}"
+			WORKING_DIRECTORY
+				"${CMAKE_SOURCE_DIR}"
+		)
+	ENDIF()
+	ADD_SUBDIRECTORY("${path}")
+ENDMACRO()
+
+ADD_SUBMODULE(3rdparty/zlib)
+
+##################################################################################################################
+## Compiler flags
+
 INCLUDE(CheckCXXCompilerFlag)
 
 MACRO(CHECK_CXX_FLAG var name)
@@ -27,9 +46,12 @@ IF(APPLE)
 	CHECK_CXX_FLAG(STDLIB_LIBCXX "-stdlib=libc++")
 ENDIF()
 
+##################################################################################################################
+## Yip
+
 ADD_SUBDIRECTORY(util)
-ADD_SUBDIRECTORY(xcode)
 ADD_SUBDIRECTORY(project)
+ADD_SUBDIRECTORY(xcode)
 
 ADD_EXECUTABLE(yip
 	config.cpp
