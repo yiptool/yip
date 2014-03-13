@@ -13,3 +13,6 @@
 [submodule "3rdparty/inih"]
 	path = 3rdparty/inih
 	url = https://github.com/oss-forks/inih.git
+[submodule "3rdparty/sqlite3"]
+	path = 3rdparty/sqlite3
+	url = https://github.com/oss-forks/sqlite3.git
