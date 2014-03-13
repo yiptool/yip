@@ -30,6 +30,18 @@ THE SOFTWARE.
 
 ---------
 
+*libgit2* © the libgit2 contributors, unless otherwise stated.
+See the `3rdparty/libgit2/AUTHORS` file for details.
+
+*libgit2* is under GPL2 **with linking exemption**. This means you can link to
+and use the library from any program, proprietary or open source; paid or
+gratis.  However, you cannot modify libgit2 and distribute it without
+supplying the source.
+
+See the `3rdparty/libgit2/COPYING` for the full license text.
+
+---------
+
 *libssh2*, a client-side C library implementing the SSH2 protocol.  
 Copyright © 2004-2007 Sara Golemon <sarag@libssh2.org>  
 Copyright © 2005,2006 Mikhail Gusarov <dottedmag@dottedmag.net>  

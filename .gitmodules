@@ -7,3 +7,6 @@
 [submodule "3rdparty/libssh2"]
 	path = 3rdparty/libssh2
 	url = https://github.com/oss-forks/libssh2.git
+[submodule "3rdparty/libgit2"]
+	path = 3rdparty/libgit2
+	url = https://github.com/oss-forks/libgit2.git

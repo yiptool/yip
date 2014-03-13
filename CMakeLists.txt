@@ -18,6 +18,7 @@ ENDMACRO()
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/zlib")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/openssl")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/libssh2")
+ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/libgit2")
 
 ##################################################################################################################
 ## Compiler flags
@@ -61,6 +62,6 @@ ADD_EXECUTABLE(yip
 	main.cpp
 )
 
-TARGET_LINK_LIBRARIES(yip project xcode util)
+TARGET_LINK_LIBRARIES(yip project xcode util libgit2)
 
 INSTALL(TARGETS yip RUNTIME DESTINATION "bin")
