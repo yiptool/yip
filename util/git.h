@@ -89,6 +89,8 @@ public:
 
 	static GitRepositoryPtr openEx(const std::string & path, unsigned flags, const char * ceiling_dirs = nullptr);
 
+	std::string path() const;
+
 	void fetch(const char * remoteName = "origin", GitProgressPrinter * printer = nullptr);
 
 private:

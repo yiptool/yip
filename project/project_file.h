@@ -27,7 +27,7 @@
 #include <vector>
 #include <memory>
 
-class ProjectFile
+class ProjectFile : public std::enable_shared_from_this<ProjectFile>
 {
 public:
 	ProjectFile();

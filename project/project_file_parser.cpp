@@ -124,13 +124,26 @@ void ProjectFileParser::parseRequires()
 	auto it = g_Config->repos.find(m_TokenText);
 	std::string url = (it != g_Config->repos.end() ? it->second : m_TokenText);
 
+	GitRepositoryPtr repo;
 	try
 	{
-		GitRepositoryPtr repo = m_ProjectConfig->openGitRepository(url);
+		repo = m_ProjectConfig->openGitRepository(url);
 	}
 	catch (const std::exception & e)
 	{
 		reportError(fmt() << "unable to open git repository at '" << url << "': " << e.what());
+		return;
+	}
+
+	try
+	{
+		std::string file = pathConcat(repo->path(), g_Config->projectFileName);
+		ProjectFileParser parser(file, m_ProjectConfig);
+		parser.parse(m_ProjectFile->shared_from_this());
+	}
+	catch (const std::exception & e)
+	{
+		reportError(fmt() << "unable to parse project file in git repository at '" << url << "': " << e.what());
 		return;
 	}
 }

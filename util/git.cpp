@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 //
 #include "git.h"
+#include "path.h"
 #include "fmt.h"
 #include <cstring>
 #include <iostream>
@@ -282,6 +283,23 @@ GitRepositoryPtr GitRepository::openEx(const std::string & path, unsigned flags,
 {
 	git_repository * repo = nullptr;
 	return wrap(repo, git_repository_open_ext(&repo, path.c_str(), flags, ceiling_dirs));
+}
+
+std::string GitRepository::path() const
+{
+	const char * dir = git_repository_path(m_Pointer);
+	if (!dir)
+		return std::string();
+
+	size_t len = strlen(dir);
+
+	if (len >= 4 && !memcmp(&dir[len - 4], ".git", 4))
+		return std::string(dir, len - 4);
+
+	if (len >= 5 && !memcmp(&dir[len - 5], ".git", 4) && pathIsSeparator(dir[len - 1]))
+		return std::string(dir, len - 5);
+
+	return std::string(dir, len);
 }
 
 void GitRepository::fetch(const char * remoteName, GitProgressPrinter * printer)
