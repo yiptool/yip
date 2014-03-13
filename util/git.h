@@ -46,22 +46,31 @@ public:
 	~GitProgressPrinter();
 
 	void reset();
+	void finish();
 
 	void init(git_clone_options * opts);
+	void init(git_remote_callbacks * cb);
 	void init(git_checkout_options * opts);
+
+	virtual void reportGitFetch(const std::string & url);
+	virtual void reportGitClone(const std::string & url);
 
 protected:
 	virtual void reportGitProgress();
+	virtual void reportGitNewTip(const std::string & oid, const std::string & refname);
+	virtual void reportGitUpdatedTip(const std::string & oid1, const std::string & oid2, const std::string & refn);
 
 private:
 	git_transfer_progress m_FetchProgress;
 	const char * m_Path;
 	size_t m_CompletedSteps;
 	size_t m_TotalSteps;
-	bool m_NewLinePending;
+	bool m_NewLinePending1;
+	bool m_NewLinePending2;
 
 	static int fetchProgress(const git_transfer_progress * progress, void * payload);
 	static void checkoutProgress(const char * path, size_t cur, size_t tot, void * payload);
+	static int updateTips(const char * refname, const git_oid * a, const git_oid * b, void * payload);
 };
 
 class GitRepository
@@ -74,9 +83,13 @@ public:
 	static GitRepositoryPtr initEx(const std::string & path, git_repository_init_options * opts);
 
 	static GitRepositoryPtr clone(const std::string & path, const std::string & url,
-		const git_clone_options * opts = NULL);
+		const git_clone_options * opts = nullptr);
+	static GitRepositoryPtr clone(const std::string & path, const std::string & url,
+		GitProgressPrinter * printer = nullptr);
 
 	static GitRepositoryPtr openEx(const std::string & path, unsigned flags, const char * ceiling_dirs = nullptr);
+
+	void fetch(const char * remoteName = "origin", GitProgressPrinter * printer = nullptr);
 
 private:
 	git_repository * m_Pointer;

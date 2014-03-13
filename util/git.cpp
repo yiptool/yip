@@ -44,8 +44,7 @@ GitProgressPrinter::GitProgressPrinter()
 
 GitProgressPrinter::~GitProgressPrinter()
 {
-	if (m_NewLinePending)
-		std::cout << std::endl;
+	finish();
 }
 
 void GitProgressPrinter::reset()
@@ -54,14 +53,31 @@ void GitProgressPrinter::reset()
 	m_Path = "";
 	m_CompletedSteps = 0;
 	m_TotalSteps = 0;
-	m_NewLinePending = false;
+	m_NewLinePending1 = false;
+	m_NewLinePending2 = false;
+}
+
+void GitProgressPrinter::finish()
+{
+	if (m_NewLinePending1 || m_NewLinePending2)
+	{
+		std::cout << std::endl;
+		m_NewLinePending1 = false;
+		m_NewLinePending2 = false;
+	}
 }
 
 void GitProgressPrinter::init(git_clone_options * opts)
 {
 	init(&opts->checkout_opts);
-	opts->remote_callbacks.transfer_progress = &fetchProgress;
-	opts->remote_callbacks.payload = this;
+	init(&opts->remote_callbacks);
+}
+
+void GitProgressPrinter::init(git_remote_callbacks * cb)
+{
+	cb->update_tips = &updateTips;
+	cb->transfer_progress = &fetchProgress;
+	cb->payload = this;
 }
 
 void GitProgressPrinter::init(git_checkout_options * opts)
@@ -69,6 +85,16 @@ void GitProgressPrinter::init(git_checkout_options * opts)
 	reset();
 	opts->progress_cb = &checkoutProgress;
 	opts->progress_payload = this;
+}
+
+void GitProgressPrinter::reportGitClone(const std::string & url)
+{
+	std::cout << "git: cloning '" << url << "'." << std::endl;
+}
+
+void GitProgressPrinter::reportGitFetch(const std::string & url)
+{
+	std::cout << "git: fetching '" << url << "'." << std::endl;
 }
 
 void GitProgressPrinter::reportGitProgress()
@@ -80,30 +106,55 @@ void GitProgressPrinter::reportGitProgress()
 
 	if (m_FetchProgress.received_objects == m_FetchProgress.total_objects)
 	{
-		std::cout << "Resolving deltas "
+		if (m_NewLinePending2)
+		{
+			std::cout << std::endl;
+			m_NewLinePending2 = false;
+		}
+
+		std::cout << "git: resolving deltas "
 			<< m_FetchProgress.indexed_deltas << '/' << m_FetchProgress.total_deltas << "  \r" << std::flush;
-		m_NewLinePending = true;
+		m_NewLinePending1 = true;
 	}
 	else
 	{
+		if (m_NewLinePending1)
+		{
+			std::cout << std::endl;
+			m_NewLinePending1 = false;
+		}
+
 		std::cout
-			<< "net "
-				<< std::setw(3) << networkPercent << "%% ("
-				<< std::setw(4) << kbytes << " kb, "
-				<< std::setw(5) << m_FetchProgress.received_objects << '/'
-				<< std::setw(5) << m_FetchProgress.total_objects << ")  /  "
+			<< "git: net "
+				<< networkPercent << "% ("
+				<< kbytes << " kb, "
+				<< m_FetchProgress.received_objects << '/'
+				<< m_FetchProgress.total_objects << "), "
 			<< "idx "
-				<< std::setw(3) << indexPercent << "%% ("
-				<< std::setw(5) << m_FetchProgress.indexed_objects << '/'
-				<< std::setw(5) << m_FetchProgress.total_objects << ")  /  "
+				<< indexPercent << "% ("
+				<< m_FetchProgress.indexed_objects << '/'
+				<< m_FetchProgress.total_objects << "), "
 			<< "chk "
-				<< std::setw(3) << checkoutPercent << "%% ("
-				<< std::setw(4) << m_CompletedSteps << '/'
-				<< std::setw(4) << m_TotalSteps << ')'
-			<< "   \r"
+				<< checkoutPercent << "% ("
+				<< m_CompletedSteps << '/'
+				<< m_TotalSteps << ')'
+			<< "       \r"
 			<< std::flush;
-		m_NewLinePending = true;
+		m_NewLinePending2 = true;
 	}
+}
+
+void GitProgressPrinter::reportGitNewTip(const std::string & oid, const std::string & refname)
+{
+	finish();
+	std::cout << "git: [new] " << oid << ' ' << refname << std::endl;
+}
+
+void GitProgressPrinter::reportGitUpdatedTip(const std::string & oid1, const std::string & oid2,
+	const std::string & refn)
+{
+	finish();
+	std::cout << "git: [upd] " << oid1 << ".." << oid2 << ' ' << refn << std::endl;
 }
 
 int GitProgressPrinter::fetchProgress(const git_transfer_progress * progress, void * payload)
@@ -121,6 +172,26 @@ void GitProgressPrinter::checkoutProgress(const char * path, size_t cur, size_t 
 	self->m_CompletedSteps = cur;
 	self->m_TotalSteps = tot;
 	self->reportGitProgress();
+}
+
+int GitProgressPrinter::updateTips(const char * refname, const git_oid * a, const git_oid * b, void * payload)
+{
+	GitProgressPrinter * self = reinterpret_cast<GitProgressPrinter *>(payload);
+	char astr[GIT_OID_HEXSZ + 1], bstr[GIT_OID_HEXSZ + 1];
+
+	git_oid_fmt(bstr, b);
+	bstr[GIT_OID_HEXSZ] = 0;
+
+	if (git_oid_iszero(a))
+		self->reportGitNewTip(bstr, refname);
+	else
+	{
+		git_oid_fmt(astr, a);
+		astr[GIT_OID_HEXSZ] = 0;
+		self->reportGitUpdatedTip(astr, bstr, refname);
+	}
+
+	return 0;
 }
 
 
@@ -171,8 +242,93 @@ GitRepositoryPtr GitRepository::clone(const std::string & path, const std::strin
 	return wrap(repo, git_clone(&repo, url.c_str(), path.c_str(), opts));
 }
 
+GitRepositoryPtr GitRepository::clone(const std::string & path, const std::string & url,
+	GitProgressPrinter * printer)
+{
+	GitRepositoryPtr repo;
+
+	git_checkout_options checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
+	checkout_opts.checkout_strategy = GIT_CHECKOUT_SAFE_CREATE;
+
+	git_clone_options clone_opts = GIT_CLONE_OPTIONS_INIT;
+	clone_opts.checkout_opts = checkout_opts;
+	clone_opts.remote_callbacks.credentials = git_cred_userpass;
+	clone_opts.ignore_cert_errors = true;
+
+	if (printer)
+	{
+		printer->init(&clone_opts);
+		printer->reportGitClone(url);
+	}
+
+	try
+	{
+		repo = GitRepository::clone(path, url, &clone_opts);
+	}
+	catch (...)
+	{
+		if (printer)
+			printer->finish();
+		throw;
+	}
+
+	if (printer)
+		printer->finish();
+
+	return repo;
+}
+
 GitRepositoryPtr GitRepository::openEx(const std::string & path, unsigned flags, const char * ceiling_dirs)
 {
 	git_repository * repo = nullptr;
 	return wrap(repo, git_repository_open_ext(&repo, path.c_str(), flags, ceiling_dirs));
+}
+
+void GitRepository::fetch(const char * remoteName, GitProgressPrinter * printer)
+{
+	git_remote * remote = nullptr;
+	int error = git_remote_load(&remote, m_Pointer, remoteName);
+	if (error < 0 || !remote)
+		throw GitError(error);
+
+	try
+	{
+		if (printer)
+		{
+			const char * url = git_remote_url(remote);
+			printer->reportGitFetch(url ? url : "");
+		}
+
+		git_remote_callbacks callbacks = GIT_REMOTE_CALLBACKS_INIT;
+		if (printer)
+			printer->init(&callbacks);
+
+		git_remote_set_callbacks(remote, &callbacks);
+		git_remote_check_cert(remote, false);
+
+		try
+		{
+			error = git_remote_fetch(remote, nullptr, nullptr);
+			if (error < 0)
+				throw GitError(error);
+		}
+		catch (...)
+		{
+			if (printer)
+				printer->finish();
+			throw;
+		}
+
+		if (printer)
+			printer->finish();
+	}
+	catch (...)
+	{
+		git_remote_disconnect(remote);
+		git_remote_free(remote);
+		throw;
+	}
+
+	git_remote_disconnect(remote);
+	git_remote_free(remote);
 }

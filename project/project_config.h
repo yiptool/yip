@@ -36,7 +36,8 @@ public:
 
 	inline const std::string & path() const;
 
-	GitRepositoryPtr openGitRepository(const std::string & url);
+	GitRepositoryPtr openGitRepository(const std::string & url,
+		GitProgressPrinter && printer = GitProgressPrinter());
 
 private:
 	std::string m_Path;
