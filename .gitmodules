@@ -1,3 +1,6 @@
 [submodule "3rdparty/zlib"]
 	path = 3rdparty/zlib
 	url = https://github.com/oss-forks/zlib
+[submodule "3rdparty/openssl"]
+	path = 3rdparty/openssl
+	url = https://github.com/oss-forks/openssl

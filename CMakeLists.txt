@@ -16,6 +16,7 @@ MACRO(ADD_SUBMODULE path)
 ENDMACRO()
 
 ADD_SUBMODULE(3rdparty/zlib)
+ADD_SUBMODULE(3rdparty/openssl)
 
 ##################################################################################################################
 ## Compiler flags

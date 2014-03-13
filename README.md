@@ -30,6 +30,14 @@ THE SOFTWARE.
 
 ---------
 
+The *OpenSSL toolkit* stays under a dual license, i.e. both the conditions of
+the OpenSSL License and the original SSLeay license apply to the toolkit.
+See file `3rdparty/openssl/LICENSE` for the actual license texts. Actually both
+licenses are BSD-style Open Source licenses. In case of any license issues
+related to OpenSSL please contact `openssl-core@openssl.org`.
+
+---------
+
 *zlib* © 1995-2013 Jean-loup Gailly and Mark Adler
 
 This software is provided 'as-is', without any express or implied
