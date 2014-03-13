@@ -73,7 +73,7 @@ GitRepositoryPtr ProjectConfig::openGitRepository(const std::string & url)
 		GitProgressPrinter printer;
 		printer.init(&clone_opts);
 
-		repo = GitRepository::clone(dirName, url);
+		repo = GitRepository::clone(dirName, url, &clone_opts);
 	}
 
 	return repo;
