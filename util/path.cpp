@@ -95,7 +95,7 @@ bool pathIsSeparator(char ch)
 
 bool pathIsWin32DriveLetter(char ch)
 {
-	return ((ch >= 'a' && ch <= 'z') && (ch >= 'A' && ch <= 'Z'));
+	return ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'));
 }
 
 bool pathIsWin32PathWithDriveLetter(const std::string & path)
