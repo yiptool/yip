@@ -24,7 +24,25 @@
 #define __8e5d594fd698d87dead631288c8bc4f0__
 
 #include <string>
+#include <memory>
+#include <map>
 
-extern std::string g_ProjectFileName;
+struct Config
+{
+	std::string projectFileName;
+	std::map<std::string, std::string> repos;
+
+	Config();
+
+	bool read(const std::string & path);
+	void write(const std::string & path);
+};
+
+typedef std::shared_ptr<Config> ConfigPtr;
+
+extern ConfigPtr g_Config;
+
+ConfigPtr loadConfigFile(bool create = false);
+void loadConfig();
 
 #endif

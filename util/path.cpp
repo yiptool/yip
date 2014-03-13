@@ -30,6 +30,7 @@
 
 #ifndef _WIN32
  #include <unistd.h>
+ #include <sys/stat.h>
  #include <sys/types.h>
  #include <pwd.h>
 #else
@@ -381,4 +382,72 @@ std::string pathGetFullFileExtension(const std::string & path)
 	size_t offset = pathIndexOfFileName(path);
 	size_t pos = path.find('.', offset);
 	return (pos == std::string::npos ? std::string() : path.substr(pos));
+}
+
+bool pathCreate(const std::string & path)
+{
+	std::string dir = pathMakeAbsolute(path);
+	bool result = false;
+	size_t off = 0;
+
+  #ifndef _WIN32
+	if (pathIsSeparator(dir[0]))
+		off = 1;
+	else
+		throw std::runtime_error(fmt() << "invalid path '" << dir << "'.");
+  #else
+	if (pathIsWin32PathWithDriveLetter(dir))
+		off = 3;
+	else if (PathIsUNCA(dir.c_str()))
+	{
+		off = pathIndexOfFirstSeparator(dir, 2);
+		if (off == std::string::npos)
+			throw std::runtime_error(fmt() << "invalid path '" << dir << "'.");
+		++off;
+	}
+	else
+		throw std::runtime_error(fmt() << "invalid path '" << dir << "'.");
+  #endif
+
+	size_t end;
+	do
+	{
+		end = pathIndexOfFirstSeparator(dir, off);
+		off = end + 1;
+
+		std::string subdir;
+		if (end == std::string::npos)
+			subdir = dir;
+		else
+			subdir = dir.substr(0, end);
+
+	  #ifndef _WIN32
+		if (mkdir(subdir.c_str(), 0755) == 0)
+			result = true;
+		else
+		{
+			int err = errno;
+			if (err != EEXIST)
+			{
+				throw std::runtime_error(fmt()
+					<< "unable to create directory '" << subdir << "': " << strerror(err));
+			}
+		}
+	  #else
+		if (CreateDirectoryA(substr.c_str(), NULL))
+			result = true;
+		else
+		{
+			DWORD err = GetLastError();
+			if (err != ERROR_ALREADY_EXISTS)
+			{
+				throw std::runtime_error(fmt()
+					<< "unable to create directory '" << subdir << "' (code " << err << ").");
+			}
+		}
+	  #endif
+	}
+	while (end != std::string::npos);
+
+	return result;
 }

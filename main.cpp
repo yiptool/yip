@@ -30,14 +30,16 @@ int main()
 {
 	try
 	{
+		loadConfig();
+
 		ProjectFilePtr projectFile = std::make_shared<ProjectFile>();
 
-		ProjectFileParser p(g_ProjectFileName);
+		ProjectFileParser p(g_Config->projectFileName);
 		p.parse(projectFile);
 	}
 	catch (const std::exception & e)
 	{
-		std::cerr << e.what() << std::endl;
+		std::cerr << "error: " << e.what() << std::endl;
 		return 1;
 	}
 

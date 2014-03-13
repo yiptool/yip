@@ -53,4 +53,6 @@ std::string pathGetFileName(const std::string & path);
 std::string pathGetShortFileExtension(const std::string & path);
 std::string pathGetFullFileExtension(const std::string & path);
 
+bool pathCreate(const std::string & path);
+
 #endif
