@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 //
 #include "project_file_parser.h"
+#include "../config.h"
 #include "../util/fmt.h"
 #include "../util/path.h"
 #include <cassert>
@@ -51,6 +52,7 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const Project
 		m_ProjectConfig = std::make_shared<ProjectConfig>(m_ProjectPath);
 
 	m_CommandHandlers.insert(std::make_pair("sources", &ProjectFileParser::parseSources));
+	m_CommandHandlers.insert(std::make_pair("requires", &ProjectFileParser::parseRequires));
 }
 
 ProjectFileParser::~ProjectFileParser()
@@ -89,7 +91,7 @@ void ProjectFileParser::parse(const ProjectFilePtr & projectFile)
 
 void ProjectFileParser::reportError(const std::string & message)
 {
-	throw std::runtime_error(fmt() << m_FileName << '(' << m_TokenLine << "):" << message);
+	throw std::runtime_error(fmt() << m_FileName << '(' << m_TokenLine << "): " << message);
 }
 
 void ProjectFileParser::parseSources()
@@ -106,12 +108,31 @@ void ProjectFileParser::parseSources()
 		std::string name = m_TokenText;
 		std::string path = pathMakeAbsolute(m_TokenText, m_ProjectPath);
 		m_ProjectFile->addSourceFile(name, path);
-
+printf("[%s]\n", path.c_str());
 		getToken();
 	}
 
 	if (m_Token != Token::RCurly)
 		reportError("expected '}'.");
+}
+
+void ProjectFileParser::parseRequires()
+{
+	if (getToken() != Token::Literal)
+		reportError("expected dependency name after 'requires'.");
+
+	auto it = g_Config->repos.find(m_TokenText);
+	std::string url = (it != g_Config->repos.end() ? it->second : m_TokenText);
+
+	try
+	{
+		GitRepositoryPtr repo = m_ProjectConfig->openGitRepository(url);
+	}
+	catch (const std::exception & e)
+	{
+		reportError(fmt() << "unable to open git repository at '" << url << "': " << e.what());
+		return;
+	}
 }
 
 ProjectFileParser::Token ProjectFileParser::getToken()

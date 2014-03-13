@@ -434,7 +434,7 @@ bool pathCreate(const std::string & path)
 			}
 		}
 	  #else
-		if (CreateDirectoryA(substr.c_str(), NULL))
+		if (CreateDirectoryA(substr.c_str(), nullptr))
 			result = true;
 		else
 		{

@@ -20,33 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __8d3668e7a9293f349502913684e4cb1c__
-#define __8d3668e7a9293f349502913684e4cb1c__
+#include "sha1.h"
+#include "../3rdparty/openssl/include/openssl/sha.h"
 
-#include "../util/git.h"
-#include "../3rdparty/sqlite3/sqlite3.h"
-#include <memory>
-#include <string>
-
-class ProjectConfig
+std::string sha1(const std::string & data)
 {
-public:
-	ProjectConfig(const std::string & projectPath);
-	~ProjectConfig();
+	const char * hex = "0123456789abcdef";
+	char buf[40];
+	SHA_CTX ctx;
 
-	inline const std::string & path() const;
+	SHA1_Init(&ctx);
+	SHA1_Update(&ctx, data.data(), data.length());
+	SHA1_Final(reinterpret_cast<unsigned char *>(buf), &ctx);
 
-	GitRepositoryPtr openGitRepository(const std::string & url);
+	for (int i = 19; i >= 0; i--)
+	{
+		buf[i * 2 + 1] = hex[static_cast<unsigned char>(buf[i]) & 0xF];
+		buf[i * 2 + 0] = hex[static_cast<unsigned char>(buf[i]) >> 4];
+	}
 
-private:
-	std::string m_Path;
-	std::string m_DBFile;
-	sqlite3 * m_DB;
-
-	ProjectConfig(const ProjectConfig &) = delete;
-	ProjectConfig & operator=(const ProjectConfig &) = delete;
-};
-
-typedef std::shared_ptr<ProjectConfig> ProjectConfigPtr;
-
-#endif
+	return std::string(buf, 40);
+}

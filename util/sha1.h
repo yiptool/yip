@@ -20,33 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __8d3668e7a9293f349502913684e4cb1c__
-#define __8d3668e7a9293f349502913684e4cb1c__
+#ifndef __2a7bc89af2e1be6ac85cc75d9354e771__
+#define __2a7bc89af2e1be6ac85cc75d9354e771__
 
-#include "../util/git.h"
-#include "../3rdparty/sqlite3/sqlite3.h"
-#include <memory>
 #include <string>
 
-class ProjectConfig
-{
-public:
-	ProjectConfig(const std::string & projectPath);
-	~ProjectConfig();
-
-	inline const std::string & path() const;
-
-	GitRepositoryPtr openGitRepository(const std::string & url);
-
-private:
-	std::string m_Path;
-	std::string m_DBFile;
-	sqlite3 * m_DB;
-
-	ProjectConfig(const ProjectConfig &) = delete;
-	ProjectConfig & operator=(const ProjectConfig &) = delete;
-};
-
-typedef std::shared_ptr<ProjectConfig> ProjectConfigPtr;
+std::string sha1(const std::string & data);
 
 #endif

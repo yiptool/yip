@@ -63,6 +63,7 @@ private:
 	int m_LastChar;
 
 	void parseSources();
+	void parseRequires();
 
 	Token getToken();
 

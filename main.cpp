@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 //
 #include "project/project_file_parser.h"
+#include "3rdparty/libgit2/include/git2/threads.h"
 #include "config.h"
 #include <exception>
 #include <fstream>
@@ -30,6 +31,8 @@ int main()
 {
 	try
 	{
+		git_threads_init();
+
 		loadConfig();
 
 		ProjectFilePtr projectFile = std::make_shared<ProjectFile>();

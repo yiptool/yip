@@ -3,8 +3,12 @@ ADD_LIBRARY(util STATIC
 	file_type.cpp
 	file_type.h
 	fmt.h
+	git.cpp
+	git.h
 	path.cpp
 	path.h
+	sha1.cpp
+	sha1.h
 )
 
 IF(WIN32)

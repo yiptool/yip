@@ -23,6 +23,7 @@
 #include "project_config.h"
 #include "../util/fmt.h"
 #include "../util/path.h"
+#include "../util/sha1.h"
 #include <iostream>
 
 ProjectConfig::ProjectConfig(const std::string & projectPath)
@@ -31,7 +32,7 @@ ProjectConfig::ProjectConfig(const std::string & projectPath)
 	pathCreate(m_Path);
 
 	m_DBFile = pathConcat(m_Path, "db");
-	int err = sqlite3_open_v2(m_DBFile.c_str(), &m_DB, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
+	int err = sqlite3_open_v2(m_DBFile.c_str(), &m_DB, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
 	if (err != SQLITE_OK)
 	{
 		throw std::runtime_error(fmt()
@@ -44,4 +45,36 @@ ProjectConfig::~ProjectConfig()
 	int err = sqlite3_close(m_DB);
 	if (err != SQLITE_OK)
 		std::cerr << "warning: unable to close sqlite database '" << m_DBFile << "': " << sqlite3_errstr(err);
+}
+
+
+GitRepositoryPtr ProjectConfig::openGitRepository(const std::string & url)
+{
+	std::string dirName = pathConcat(m_Path, "git-" + sha1(url).substr(1, 10));
+
+	GitRepositoryPtr repo;
+	bool isNew = false;
+	try
+	{
+		repo = GitRepository::openEx(dirName, GIT_REPOSITORY_OPEN_NO_SEARCH);
+	}
+	catch (const GitError &)
+	{
+		isNew = true;
+
+		git_checkout_options checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
+		checkout_opts.checkout_strategy = GIT_CHECKOUT_SAFE_CREATE;
+
+		git_clone_options clone_opts = GIT_CLONE_OPTIONS_INIT;
+		clone_opts.checkout_opts = checkout_opts;
+		clone_opts.remote_callbacks.credentials = git_cred_userpass;
+		clone_opts.ignore_cert_errors = true;
+
+		GitProgressPrinter printer;
+		printer.init(&clone_opts);
+
+		repo = GitRepository::clone(dirName, url);
+	}
+
+	return repo;
 }
