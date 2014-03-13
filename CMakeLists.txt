@@ -17,6 +17,7 @@ ENDMACRO()
 
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/zlib")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/openssl")
+ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/libssh2")
 
 ##################################################################################################################
 ## Compiler flags
