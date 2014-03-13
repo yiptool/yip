@@ -34,8 +34,9 @@ enum class ProjectFileParser::Token
 	Literal,
 };
 
-ProjectFileParser::ProjectFileParser(const std::string & filename)
-	: m_FileName(pathMakeAbsolute(filename)),
+ProjectFileParser::ProjectFileParser(const std::string & filename, const ProjectConfigPtr & prjConfig)
+	: m_ProjectConfig(prjConfig),
+	  m_FileName(pathMakeAbsolute(filename)),
 	  m_ProjectPath(pathGetDirectory(m_FileName)),
 	  m_Token(Token::Eof),
 	  m_CurLine(1),
@@ -45,6 +46,9 @@ ProjectFileParser::ProjectFileParser(const std::string & filename)
 	m_Stream.open(filename, std::ios::in);
 	if (!m_Stream.is_open() || m_Stream.fail() || m_Stream.bad())
 		throw std::runtime_error(fmt() << "unable to open file '" << filename << "'.");
+
+	if (!m_ProjectConfig)
+		m_ProjectConfig = std::make_shared<ProjectConfig>(m_ProjectPath);
 
 	m_CommandHandlers.insert(std::make_pair("sources", &ProjectFileParser::parseSources));
 }
@@ -81,12 +85,6 @@ void ProjectFileParser::parse(const ProjectFilePtr & projectFile)
 		}
 		break;
 	}
-
-/*
-	while (getToken() != Token::Eof)
-		printf("%d [%s]\n", (int)m_Token, m_TokenText.c_str());
-	printf("%d [%s]\n", (int)m_Token, m_TokenText.c_str());
-*/
 }
 
 void ProjectFileParser::reportError(const std::string & message)

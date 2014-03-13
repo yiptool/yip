@@ -1,5 +1,7 @@
 
 ADD_LIBRARY(project STATIC
+	project_config.cpp
+	project_config.h
 	project_file.cpp
 	project_file.h
 	project_file_parser.cpp
