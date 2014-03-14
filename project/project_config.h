@@ -47,6 +47,8 @@ private:
 	std::string m_ProjectPath;
 	SQLiteDatabasePtr m_DB;
 
+	void initDB();
+
 	ProjectConfig(const ProjectConfig &) = delete;
 	ProjectConfig & operator=(const ProjectConfig &) = delete;
 };

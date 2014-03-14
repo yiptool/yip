@@ -26,6 +26,9 @@
 #include "../3rdparty/sqlite3/sqlite3.h"
 #include <string>
 #include <memory>
+#include <functional>
+
+class SQLiteTransaction;
 
 class SQLiteDatabase
 {
@@ -36,11 +39,52 @@ public:
 	inline const std::string & fileName() const { return m_DBFile; }
 	inline sqlite3 * handle() const { return m_Handle; }
 
+	void exec(const char * sql);
+	inline void exec(const std::string & sql) { exec(sql.c_str()); }
+
+	int queryInt(const char * sql);
+	inline int queryInt(const std::string & sql) { return queryInt(sql.c_str()); }
+
 private:
 	sqlite3 * m_Handle;
+	sqlite3_stmt * m_StmtBegin;
+	sqlite3_stmt * m_StmtRollback;
+	sqlite3_stmt * m_StmtCommit;
 	std::string m_DBFile;
+	int m_InTransaction;
+	bool m_TransactionFailed;
+
+	void begin();
+	void rollback();
+	void commit();
+
+	void prepare(sqlite3_stmt *& stmt, const char * sql);
+	void exec(sqlite3_stmt * stmt, std::function<void()> = nullptr);
+
+	SQLiteDatabase(const SQLiteDatabase &) = delete;
+	SQLiteDatabase & operator=(const SQLiteDatabase &) = delete;
+
+	friend class SQLiteTransaction;
 };
 
 typedef std::shared_ptr<SQLiteDatabase> SQLiteDatabasePtr;
+
+class SQLiteTransaction
+{
+public:
+	inline SQLiteTransaction(const SQLiteDatabasePtr & db) : m_DB(db), m_Committed(false) { m_DB->begin(); }
+	inline ~SQLiteTransaction() { if (!m_Committed) m_DB->rollback(); }
+
+	inline const SQLiteDatabasePtr & db() const { return m_DB; }
+
+	void commit();
+
+private:
+	SQLiteDatabasePtr m_DB;
+	bool m_Committed;
+
+	SQLiteTransaction(const SQLiteTransaction &) = delete;
+	SQLiteTransaction & operator=(const SQLiteTransaction &) = delete;
+};
 
 #endif

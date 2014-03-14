@@ -39,9 +39,8 @@ enum class ProjectFileParser::Token
 	Literal,
 };
 
-ProjectFileParser::ProjectFileParser(const std::string & filename, const ProjectConfigPtr & prjConfig)
-	: m_ProjectConfig(prjConfig),
-	  m_FileName(pathMakeAbsolute(filename)),
+ProjectFileParser::ProjectFileParser(const std::string & filename)
+	: m_FileName(pathMakeAbsolute(filename)),
 	  m_ProjectPath(pathGetDirectory(m_FileName)),
 	  m_Token(Token::Eof),
 	  m_CurLine(1),
@@ -51,9 +50,6 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const Project
 	m_Stream.open(filename, std::ios::in);
 	if (!m_Stream.is_open() || m_Stream.fail() || m_Stream.bad())
 		throw std::runtime_error(fmt() << "unable to open file '" << filename << "'.");
-
-	if (!m_ProjectConfig)
-		m_ProjectConfig = std::make_shared<ProjectConfig>(m_ProjectPath);
 
 	m_CommandHandlers.insert(std::make_pair("sources", &ProjectFileParser::parseSources));
 	m_CommandHandlers.insert(std::make_pair("requires", &ProjectFileParser::parseRequires));
@@ -148,7 +144,7 @@ void ProjectFileParser::parseRequires()
 	GitRepositoryPtr repo;
 	try
 	{
-		repo = m_ProjectConfig->openGitRepository(url);
+		repo = m_ProjectFile->config()->openGitRepository(url);
 	}
 	catch (const std::exception & e)
 	{
@@ -159,7 +155,7 @@ void ProjectFileParser::parseRequires()
 	try
 	{
 		std::string file = pathConcat(repo->path(), g_Config->projectFileName);
-		ProjectFileParser parser(file, m_ProjectConfig);
+		ProjectFileParser parser(file);
 		parser.parse(m_ProjectFile->shared_from_this());
 	}
 	catch (const std::exception & e)

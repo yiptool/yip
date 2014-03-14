@@ -34,10 +34,8 @@
 class ProjectFileParser
 {
 public:
-	ProjectFileParser(const std::string & filename, const ProjectConfigPtr & prjConfig = ProjectConfigPtr());
+	ProjectFileParser(const std::string & filename);
 	~ProjectFileParser();
-
-	inline const ProjectConfigPtr & config() const { return m_ProjectConfig; }
 
 	void parse(const ProjectFilePtr & projectFile);
 
@@ -53,7 +51,6 @@ private:
 
 	std::ifstream m_Stream;
 	ProjectFile * m_ProjectFile;
-	ProjectConfigPtr m_ProjectConfig;
 	std::unordered_map<std::string, void (ProjectFileParser::*)()> m_CommandHandlers;
 	std::string m_FileName;
 	std::string m_ProjectPath;

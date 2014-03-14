@@ -28,12 +28,16 @@
 #include <cerrno>
 #include <cstring>
 
+#define DATABASE_VERSION 1
+
 ProjectConfig::ProjectConfig(const std::string & prjPath)
 	: m_Path(pathConcat(prjPath, ".yip")),
 	  m_ProjectPath(prjPath)
 {
 	pathCreate(m_Path);
+
 	m_DB = std::make_shared<SQLiteDatabase>(pathConcat(m_Path, "db"));
+	initDB();
 }
 
 ProjectConfig::~ProjectConfig()
@@ -100,4 +104,28 @@ GitRepositoryPtr ProjectConfig::openGitRepository(const std::string & url, GitPr
 	}
 
 	return repo;
+}
+
+void ProjectConfig::initDB()
+{
+	// Create tables
+	m_DB->exec("CREATE TABLE IF NOT EXISTS version (id INTEGER PRIMARY KEY, value INTEGER);");
+
+	SQLiteTransaction transaction(m_DB);
+
+	// Check database version
+	int version = m_DB->queryInt("SELECT value FROM version WHERE id = 1 LIMIT 1");
+	if (version > DATABASE_VERSION)
+	{
+		throw std::runtime_error(fmt() << "database version " << version
+			<< " is not supported (maximum supported version is " << DATABASE_VERSION << ").");
+	}
+
+	// Update database version
+	m_DB->exec(fmt() << "REPLACE INTO version (id, value) VALUES (1, " << DATABASE_VERSION << ")");
+
+	transaction.commit();
+
+	if (version != 0 && version != DATABASE_VERSION)
+		std::cout << "notice: database has been updated to version " << DATABASE_VERSION << '.' << std::endl;
 }
