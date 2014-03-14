@@ -54,6 +54,7 @@ void GitProgressPrinter::reset()
 	m_Path = "";
 	m_CompletedSteps = 0;
 	m_TotalSteps = 0;
+	m_ResolvingDeltasPercent = static_cast<size_t>(-1);
 	m_NewLinePending1 = false;
 	m_NewLinePending2 = false;
 }
@@ -63,6 +64,7 @@ void GitProgressPrinter::finish()
 	if (m_NewLinePending1 || m_NewLinePending2)
 	{
 		std::cout << std::endl;
+		m_ResolvingDeltasPercent = static_cast<size_t>(-1);
 		m_NewLinePending1 = false;
 		m_NewLinePending2 = false;
 	}
@@ -111,47 +113,61 @@ static size_t calcPercent(size_t cur, size_t total)
 
 void GitProgressPrinter::reportGitProgress()
 {
-	size_t networkPercent = calcPercent(m_FetchProgress.received_objects, m_FetchProgress.total_objects);
-	size_t indexPercent = calcPercent(m_FetchProgress.indexed_objects, m_FetchProgress.total_objects);
-	size_t checkoutPercent = calcPercent(m_CompletedSteps, m_TotalSteps);
-	size_t kbytes = m_FetchProgress.received_bytes / 1024;
-
-	if (m_FetchProgress.received_objects == m_FetchProgress.total_objects)
+	if (m_FetchProgress.indexed_deltas > 0 && m_FetchProgress.received_objects == m_FetchProgress.total_objects)
 	{
-		if (m_NewLinePending2)
+		size_t percent = calcPercent(m_FetchProgress.indexed_deltas, m_FetchProgress.total_deltas);
+		if (percent != m_ResolvingDeltasPercent)
 		{
-			std::cout << std::endl;
-			m_NewLinePending2 = false;
-		}
+			if (m_NewLinePending2)
+			{
+				std::cout << std::endl;
+				m_NewLinePending2 = false;
+			}
 
-		std::cout << "git: resolving deltas: "
-			<< m_FetchProgress.indexed_deltas << '/' << m_FetchProgress.total_deltas << "  \r" << std::flush;
-		m_NewLinePending1 = true;
+			std::cout << "\rgit: resolving deltas: " << percent << "%" << std::flush;
+
+			m_ResolvingDeltasPercent = percent;
+			m_NewLinePending1 = true;
+		}
 	}
-	else
+	else if (m_FetchProgress.total_objects > 0 || m_FetchProgress.received_bytes > 0 || m_TotalSteps > 0)
 	{
 		if (m_NewLinePending1)
 		{
 			std::cout << std::endl;
+			m_ResolvingDeltasPercent = static_cast<size_t>(-1);
 			m_NewLinePending1 = false;
 		}
 
-		std::cout
-			<< "git: receiving objects: "
-				<< networkPercent << "% ("
-				<< kbytes << " kb, "
-				<< m_FetchProgress.received_objects << '/'
-				<< m_FetchProgress.total_objects << "), "
-			<< "indexes: "
-				<< indexPercent << "% ("
-				<< m_FetchProgress.indexed_objects << '/'
-				<< m_FetchProgress.total_objects << "), "
-			<< "checkout: "
-				<< checkoutPercent << "% ("
-				<< m_CompletedSteps << '/'
-				<< m_TotalSteps << ')'
-			<< "       \r"
-			<< std::flush;
+		const char * pre = "";
+		std::stringstream ss;
+
+		if (m_FetchProgress.total_objects > 0)
+		{
+			size_t cur = std::max(m_FetchProgress.received_objects, m_FetchProgress.indexed_objects);
+			size_t total = m_FetchProgress.total_objects;
+			ss << pre << "receiving objects: " << calcPercent(cur, total) << "% (" << cur << '/' << total << ")";
+			pre = ", ";
+		}
+
+		if (m_TotalSteps > 0)
+		{
+			ss << pre << "checkout: " << calcPercent(m_CompletedSteps, m_TotalSteps) << "% ("
+				<< m_CompletedSteps << '/' << m_TotalSteps << ')';
+			pre = ", ";
+		}
+
+		if (m_FetchProgress.received_bytes > 0)
+		{
+			char buf[256];
+			if (m_FetchProgress.received_bytes < 1048576)
+				sprintf(buf, "%u KB", static_cast<unsigned>(m_FetchProgress.received_bytes) / 1024);
+			else
+				sprintf(buf, "%.1f MB", static_cast<double>(m_FetchProgress.received_bytes) / 1048576.0);
+			ss << pre << buf;
+		}
+
+		std::cout << "\rgit: " << ss.str() << std::flush;
 		m_NewLinePending2 = true;
 	}
 }

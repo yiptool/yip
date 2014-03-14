@@ -66,6 +66,7 @@ private:
 	const char * m_Path;
 	size_t m_CompletedSteps;
 	size_t m_TotalSteps;
+	size_t m_ResolvingDeltasPercent;
 	bool m_NewLinePending1;
 	bool m_NewLinePending2;
 
