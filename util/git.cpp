@@ -150,14 +150,14 @@ void GitProgressPrinter::reportGitProgress()
 void GitProgressPrinter::reportGitNewTip(const std::string & oid, const std::string & refname)
 {
 	finish();
-	std::cout << "git: [new] " << oid << ' ' << refname << std::endl;
+	std::cout << "git: [new] " << oid.substr(0, 10) << ' ' << refname << std::endl;
 }
 
 void GitProgressPrinter::reportGitUpdatedTip(const std::string & oid1, const std::string & oid2,
 	const std::string & refn)
 {
 	finish();
-	std::cout << "git: [upd] " << oid1 << ".." << oid2 << ' ' << refn << std::endl;
+	std::cout << "git: [upd] " << oid1.substr(0, 10) << ".." << oid2.substr(0, 10) << ' ' << refn << std::endl;
 }
 
 int GitProgressPrinter::fetchProgress(const git_transfer_progress * progress, void * payload)
