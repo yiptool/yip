@@ -26,6 +26,7 @@
 #include "../util/path.h"
 #include <cassert>
 #include <stdexcept>
+#include <iostream>
 
 enum class ProjectFileParser::Token
 {
@@ -89,6 +90,11 @@ void ProjectFileParser::parse(const ProjectFilePtr & projectFile)
 	}
 }
 
+void ProjectFileParser::reportWarning(const std::string & message)
+{
+	std::cerr << m_FileName << '(' << m_TokenLine << "): " << message << std::endl;
+}
+
 void ProjectFileParser::reportError(const std::string & message)
 {
 	throw std::runtime_error(fmt() << m_FileName << '(' << m_TokenLine << "): " << message);
@@ -143,8 +149,8 @@ void ProjectFileParser::parseRequires()
 	}
 	catch (const std::exception & e)
 	{
-		reportError(fmt() << "unable to parse project file in git repository at '" << url << "': " << e.what());
-		return;
+		reportWarning(fmt() << "unable to parse project file in git repository at '" << url << "': " << e.what());
+		m_ProjectFile->setValid(false);
 	}
 
 	m_ProjectFile->addRepository(repo);

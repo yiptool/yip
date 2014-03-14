@@ -44,6 +44,7 @@ protected:
 	inline const std::string & fileName() const { return m_FileName; }
 	inline int tokenLine() const { return m_TokenLine; }
 
+	virtual void reportWarning(const std::string & message);
 	virtual void reportError(const std::string & message);
 
 private:

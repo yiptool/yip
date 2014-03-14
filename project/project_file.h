@@ -34,6 +34,9 @@ public:
 	ProjectFile();
 	~ProjectFile();
 
+	inline bool isValid() const { return m_Valid; }
+	inline void setValid(bool flag) { m_Valid = flag; }
+
 	SourceFilePtr addSourceFile(const std::string & name, const std::string & path);
 
 	inline void addRepository(const GitRepositoryPtr & repo) { m_Repositories.push_back(repo); }
@@ -42,6 +45,7 @@ public:
 private:
 	std::vector<SourceFilePtr> m_SourceFiles;
 	std::vector<GitRepositoryPtr> m_Repositories;
+	bool m_Valid;
 
 	ProjectFile(const ProjectFile &) = delete;
 	ProjectFile & operator=(const ProjectFile &) = delete;

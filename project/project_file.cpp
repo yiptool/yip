@@ -23,6 +23,7 @@
 #include "project_file.h"
 
 ProjectFile::ProjectFile()
+	: m_Valid(false)
 {
 }
 

@@ -54,6 +54,9 @@ static void usage()
 static int build(int, char **)
 {
 	ProjectFilePtr projectFile = loadProjectFile();
+	if (!projectFile->isValid())
+		return 1;
+
 	return 0;
 }
 
