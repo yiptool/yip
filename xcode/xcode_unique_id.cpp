@@ -21,16 +21,25 @@
 // THE SOFTWARE.
 //
 #include "xcode_unique_id.h"
+#include "../util/fmt.h"
+#include "../util/sha1.h"
 #include <ctime>
+#include <cstring>
 #include <sstream>
 
-static volatile unsigned int g_Counter = 1;
+static volatile uint32_t g_Counter;
+
+uint32_t XCodeUniqueID::m_Seed[3];
+bool XCodeUniqueID::m_HasSeed;
 
 XCodeUniqueID::XCodeUniqueID()
 {
-	m_ID[0] = static_cast<unsigned int>(time(nullptr));
-	m_ID[1] = static_cast<unsigned int>(reinterpret_cast<size_t>(this) & 0xFFFFFFFFU);
-	m_ID[2] = ((m_ID[0] + m_ID[1]) ^ 0xCAFEBABE) + g_Counter++;
+	if (!m_HasSeed)
+		setRandomSeed();
+
+	static_assert(sizeof(m_ID) == sizeof(m_Seed), "sizeof(m_ID) == sizeof(m_Seed)");
+	memcpy(m_ID, m_Seed, sizeof(m_ID));
+	m_ID[2] += g_Counter++;
 }
 
 XCodeUniqueID::XCodeUniqueID(const std::string & hex)
@@ -61,6 +70,38 @@ XCodeUniqueID::XCodeUniqueID(const std::string & hex)
 
 XCodeUniqueID::~XCodeUniqueID()
 {
+}
+
+void XCodeUniqueID::setRandomSeed()
+{
+	m_Seed[0] = static_cast<uint32_t>(time(nullptr));
+	m_Seed[1] = static_cast<uint32_t>(reinterpret_cast<size_t>(&m_HasSeed) & 0xFFFFFFFFU);
+	m_Seed[2] = ((m_Seed[0] + m_Seed[1]) ^ 0xCAFEBABE);
+	m_HasSeed = true;
+}
+
+void XCodeUniqueID::setSeed(const std::string & seed)
+{
+	std::string seed_sha1 = sha1(seed);
+	const char * p = seed_sha1.c_str();
+
+	for (size_t i = 0; i < 3; i++)
+	{
+		m_Seed[i] = 0;
+		for (size_t j = 0; j < 32; j += 4)
+		{
+			char ch = *p++;
+			if (ch >= '0' && ch <= '9')
+				ch -= '0';
+			else if (ch >= 'a' && ch <= 'f')
+				ch = ch - 'a' + 10;
+			else if (ch >= 'A' && ch <= 'F')
+				ch = ch - 'A' + 10;
+			m_Seed[i] |= (static_cast<unsigned>(ch) & 0xF) << j;
+		}
+	}
+
+	m_HasSeed = true;
 }
 
 std::string XCodeUniqueID::toString() const

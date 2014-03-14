@@ -24,6 +24,7 @@
 #define __6cc9a0aa15ab52da0a1a16cf38d99b3a__
 
 #include <string>
+#include <cstdint>
 
 class XCodeUniqueID
 {
@@ -32,10 +33,16 @@ public:
 	XCodeUniqueID(const std::string & hex);
 	~XCodeUniqueID();
 
+	static void setRandomSeed();
+	static void setSeed(const std::string & seed);
+
 	std::string toString() const;
 
 private:
-	unsigned int m_ID[3];
+	static uint32_t m_Seed[3];
+	static bool m_HasSeed;
+
+	uint32_t m_ID[3];
 };
 
 #endif

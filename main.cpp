@@ -23,6 +23,7 @@
 #include "project/project_file_parser.h"
 #include "project/generate_xcode.h"
 #include "3rdparty/libgit2/include/git2/threads.h"
+#include "xcode/xcode_unique_id.h"
 #include "util/fmt.h"
 #include "util/shell.h"
 #include "util/path.h"
@@ -108,6 +109,8 @@ static void usage()
 static ProjectFilePtr loadProjectFile()
 {
 	std::string projectPath = pathGetDirectory(pathMakeAbsolute(g_Config->projectFileName));
+	XCodeUniqueID::setSeed(projectPath);
+
 	ProjectFilePtr projectFile = std::make_shared<ProjectFile>(projectPath);
 
 	ProjectFileParser parser(g_Config->projectFileName);
