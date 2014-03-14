@@ -61,6 +61,9 @@ public:
 	int queryInt(const char * sql);
 	inline int queryInt(const std::string & sql) { return queryInt(sql.c_str()); }
 
+	std::string queryString(const char * sql);
+	inline std::string queryString(const std::string & sql) { return queryString(sql.c_str()); }
+
 private:
 	sqlite3 * m_Handle;
 	sqlite3_stmt * m_StmtBegin;

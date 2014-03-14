@@ -35,6 +35,7 @@ ProjectConfig::ProjectConfig(const std::string & prjPath)
 	  m_ProjectPath(prjPath)
 {
 	pathCreate(m_Path);
+	m_Path = pathMakeCanonical(m_Path);
 
 	m_DB = std::make_shared<SQLiteDatabase>(pathConcat(m_Path, "db"));
 	initDB();
@@ -88,11 +89,11 @@ void ProjectConfig::writeFile(const std::string & path, const std::string & data
 	// Do not overwrite file if it did not change
 	if (!write)
 	{
-		std::cout << "Keeping " << path << std::endl;
+		std::cout << "keeping " << path << std::endl;
 		return;
 	}
 
-	std::cout << "Writing " << path << std::endl;
+	std::cout << "writing " << path << std::endl;
 
 	// Calculate SHA1 sum of the file
 	if (!has_sha1)
@@ -160,6 +161,7 @@ void ProjectConfig::initDB()
 {
 	// Create tables
 	m_DB->exec("CREATE TABLE IF NOT EXISTS version (id INTEGER PRIMARY KEY, value INTEGER);");
+	m_DB->exec("CREATE TABLE IF NOT EXISTS project_dir (id INTEGER PRIMARY KEY, path TEXT);");
 	m_DB->exec("CREATE TABLE IF NOT EXISTS files (path TEXT PRIMARY KEY, size INTEGER, "
 		"time INTEGER, sha1 TEXT);");
 
@@ -176,8 +178,19 @@ void ProjectConfig::initDB()
 	// Update database version
 	m_DB->exec(fmt() << "REPLACE INTO version (id, value) VALUES (1, " << DATABASE_VERSION << ")");
 
-	transaction.commit();
-
 	if (version != 0 && version != DATABASE_VERSION)
 		std::cout << "notice: database has been updated to version " << DATABASE_VERSION << '.' << std::endl;
+
+	// Check whether project directory has changed
+	std::string projectDir = m_DB->queryString("SELECT path FROM project_dir WHERE id = 1 LIMIT 1");
+	if (projectDir.length() == 0)
+		m_DB->exec("REPLACE INTO project_dir (id, path) VALUES (1, ?)", { m_Path });
+	else if (projectDir != m_Path)
+	{
+		std::cout << "notice: project directory has changed - resyncing." << std::endl;
+		m_DB->exec("DELETE FROM files");
+		m_DB->exec("REPLACE INTO project_dir (id, path) VALUES (1, ?)", { m_Path });
+	}
+
+	transaction.commit();
 }

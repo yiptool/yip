@@ -104,24 +104,14 @@ void SQLiteDatabase::select(const char * sql, const std::initializer_list<std::s
 int SQLiteDatabase::queryInt(const char * sql)
 {
 	int result = 0;
+	select(sql, [&result](const SQLiteCursor & cursor) { result = cursor.toInt(0); });
+	return result;
+}
 
-	sqlite3_stmt * stmt = nullptr;
-	prepare(stmt, sql);
-
-	try
-	{
-		exec(stmt, [stmt, &result]() {
-			result = sqlite3_column_int(stmt, 0);
-		});
-	}
-	catch (...)
-	{
-		sqlite3_finalize(stmt);
-		throw;
-	}
-
-	sqlite3_finalize(stmt);
-
+std::string SQLiteDatabase::queryString(const char * sql)
+{
+	std::string result;
+	select(sql, [&result](const SQLiteCursor & cursor) { result = cursor.toString(0); });
 	return result;
 }
 
