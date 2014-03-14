@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 //
 #include "project_file.h"
+#include "../util/fmt.h"
 
 ProjectFile::ProjectFile(const std::string & prjPath)
 	: m_ProjectPath(prjPath),
@@ -49,6 +50,25 @@ const ProjectConfigPtr & ProjectFile::config() const
 SourceFilePtr ProjectFile::addSourceFile(const std::string & name, const std::string & path)
 {
 	SourceFilePtr file = std::make_shared<SourceFile>(name, path);
-	m_SourceFiles.push_back(file);
+	if (!m_SourceFiles.insert(std::make_pair(name, file)).second)
+		throw std::runtime_error(fmt() << "duplicate source file '" << path << "'.");
 	return file;
+}
+
+DefinePtr ProjectFile::addDefine(const std::string & name, Platform::Type platforms, BuildType::Value buildTypes)
+{
+	DefinePtr define = std::make_shared<Define>(name);
+	auto r = m_Defines.insert(std::make_pair(name, define));
+	if (r.second)
+	{
+		define->setPlatforms(platforms);
+		define->setBuildTypes(buildTypes);
+	}
+	else
+	{
+		define = r.first->second;
+		define->setPlatforms(define->platforms() | platforms);
+		define->setBuildTypes(define->buildTypes() | buildTypes);
+	}
+	return define;
 }

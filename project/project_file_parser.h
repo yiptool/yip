@@ -62,10 +62,13 @@ private:
 	int m_LastChar;
 
 	void parseSources();
+	void parseDefines();
 	void parseRequires();
 
 	Platform::Type parsePlatformMask();
 	Platform::Type parsePlatformName();
+
+	void parsePlatformOrBuildTypeMask(Platform::Type & platforms, BuildType::Value & buildTypes);
 
 	Token getToken();
 

@@ -20,42 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __fa594c356da31cf51f641b71cfedf275__
-#define __fa594c356da31cf51f641b71cfedf275__
+#include "define.h"
 
-#include <string>
-
-namespace Platform
+Define::Define(const std::string & macroName)
+	: m_Name(macroName),
+	  m_Platforms(Platform::All),
+	  m_BuildTypes(BuildType::All)
 {
-	static const unsigned None = 0;
-	static const unsigned All = 0xFFFF;
-
-	static const unsigned iOS = 0x0001;
-	static const unsigned Android = 0x0002;
-	static const unsigned OSX = 0x0004;
-	static const unsigned WinRT = 0x0008;
-	static const unsigned Qt = 0x0010;
-	static const unsigned Tizen = 0x0020;
-	static const unsigned NaCl = 0x0040;
-
-	typedef unsigned Type;
 }
 
-namespace BuildType
+Define::~Define()
 {
-	static const unsigned Unspecified = 0;
-	static const unsigned All = 0xFFFF;
-
-	static const unsigned Debug = 0x0001;
-	static const unsigned Release = 0x0002;
-
-	typedef unsigned Value;
 }
-
-Platform::Type platformFromString(const std::string & name);
-Platform::Type platformFromString(const std::string & name, const std::nothrow_t &);
-
-BuildType::Value buildTypeFromString(const std::string & name);
-BuildType::Value buildTypeFromString(const std::string & name, const std::nothrow_t &);
-
-#endif

@@ -52,6 +52,7 @@ ProjectFileParser::ProjectFileParser(const std::string & filename)
 		throw std::runtime_error(fmt() << "unable to open file '" << filename << "'.");
 
 	m_CommandHandlers.insert(std::make_pair("sources", &ProjectFileParser::parseSources));
+	m_CommandHandlers.insert(std::make_pair("defines", &ProjectFileParser::parseDefines));
 	m_CommandHandlers.insert(std::make_pair("requires", &ProjectFileParser::parseRequires));
 }
 
@@ -123,6 +124,33 @@ void ProjectFileParser::parseSources()
 
 		sourceFile->setPlatforms(platforms);
 
+		getToken();
+	}
+
+	if (m_Token != Token::RCurly)
+		reportError("expected '}'.");
+}
+
+void ProjectFileParser::parseDefines()
+{
+	BuildType::Value buildTypes = BuildType::All;
+	Platform::Type platforms = Platform::All;
+
+	if (getToken() == Token::Colon)
+	{
+		getToken();
+		parsePlatformOrBuildTypeMask(platforms, buildTypes);
+	}
+
+	if (m_Token != Token::LCurly)
+		reportError("expected '{'.");
+
+	getToken();
+	while (m_Token != Token::RCurly && m_Token != Token::Eof)
+	{
+		if (m_Token != Token::Literal)
+			reportError("expected preprocessor definition.");
+		m_ProjectFile->addDefine(m_TokenText, platforms, buildTypes);
 		getToken();
 	}
 
@@ -207,6 +235,43 @@ Platform::Type ProjectFileParser::parsePlatformName()
 		reportError(e.what());
 		return Platform::None;
 	}
+}
+
+void ProjectFileParser::parsePlatformOrBuildTypeMask(Platform::Type & platforms, BuildType::Value & buildTypes)
+{
+	BuildType::Value buildMask = 0;
+	Platform::Type platfMask = 0;
+	bool inverse = false;
+
+	if (m_Token == Token::Exclamation)
+	{
+		inverse = true;
+		getToken();
+	}
+
+	platforms = 0;
+	for (;;)
+	{
+		if (m_Token != Token::Literal)
+		{
+			reportError("expected platform or build type name.");
+			return;
+		}
+
+		BuildType::Value buildType = buildTypeFromString(m_TokenText, std::nothrow);
+		if (buildType != BuildType::Unspecified)
+			buildMask |= buildType;
+		else
+			platfMask |= parsePlatformName();
+
+		if (m_Token != Token::Comma)
+			break;
+
+		getToken();
+	}
+
+	platforms = (inverse ? ~platfMask : platfMask);
+	buildTypes = (inverse ? ~buildMask : buildMask);
 }
 
 ProjectFileParser::Token ProjectFileParser::getToken()

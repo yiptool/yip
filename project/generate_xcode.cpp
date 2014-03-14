@@ -77,6 +77,9 @@ namespace
 		void initReleaseConfiguration();
 		void createConfigurationLists();
 
+		// Preprocessor definitions
+		void addDefines();
+
 		// Native target
 		void createNativeTarget();
 
@@ -257,8 +260,9 @@ void Gen::addSourceFile(XCodeGroup * group, XCodeBuildPhase * phase, const Sourc
 
 void Gen::addSourceFiles()
 {
-	for (const SourceFilePtr & file : projectFile->sourceFiles())
+	for (auto it : projectFile->sourceFiles())
 	{
+		const SourceFilePtr & file = it.second;
 		if (!(file->platforms() & (iOS ? Platform::iOS : Platform::OSX)))
 			continue;
 		addSourceFile(sourcesGroup, sourcesBuildPhase, file);
@@ -282,7 +286,7 @@ void Gen::initDebugConfiguration()
 	cfgProjectDebug->setIPhoneOSDeploymentTarget("");						// FIXME: make configurable
 	cfgProjectDebug->setSDKRoot("iphoneos");
 	cfgProjectDebug->setTargetedDeviceFamily("");							// FIXME: make configurable
-	cfgProjectDebug->addPreprocessorDefinition("DEBUG=1");					// FIXME: make configurable
+	cfgProjectDebug->addPreprocessorDefinition("DEBUG=1");
 	cfgProjectDebug->setCodeSignIdentity("iphoneos*", "iPhone Developer");	// FIXME: make configurable
 }
 
@@ -303,7 +307,7 @@ void Gen::initReleaseConfiguration()
 	cfgProjectRelease->setSDKRoot("iphoneos");
 	cfgProjectRelease->setTargetedDeviceFamily("");							// FIXME: make configurable
 	cfgProjectRelease->setValidateProduct(true);
-	cfgProjectRelease->addPreprocessorDefinition("NDEBUG=1");				// FIXME: make configurable
+	cfgProjectRelease->addPreprocessorDefinition("NDEBUG=1");
 	cfgProjectRelease->addPreprocessorDefinition("DISABLE_ASSERTIONS=1");
 	cfgProjectRelease->setCodeSignIdentity("iphoneos*", "iPhone Developer");// FIXME: make configurable
 }
@@ -320,6 +324,34 @@ void Gen::createConfigurationLists()
 	projectCfgList->addConfiguration(cfgProjectDebug);
 	projectCfgList->addConfiguration(cfgProjectRelease);
 	project->setBuildConfigurationList(projectCfgList);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Preprocessor definitions
+
+void Gen::addDefines()
+{
+	for (auto it : projectFile->defines())
+	{
+		const DefinePtr & define = it.second;
+		if (!(define->platforms() & (iOS ? Platform::iOS : Platform::OSX)))
+			continue;
+
+		std::stringstream ss;
+		for (char ch : define->name())
+		{
+			if (ch != '"')
+				ss << ch;
+			else
+				ss << "\\\"";
+		}
+		std::string defineName = ss.str();
+
+		if (define->buildTypes() & BuildType::Debug)
+			cfgTargetDebug->addPreprocessorDefinition(defineName);
+		if (define->buildTypes() & BuildType::Release)
+			cfgTargetRelease->addPreprocessorDefinition(defineName);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -441,6 +473,7 @@ void Gen::generate()
 	addSourceFiles();
 	initDebugConfiguration();
 	initReleaseConfiguration();
+	addDefines();
 	createConfigurationLists();
 	createNativeTarget();
 

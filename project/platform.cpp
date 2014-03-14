@@ -25,7 +25,7 @@
 #include <unordered_map>
 
 static std::unordered_map<std::string, Platform::Type> g_PlatformMap;
-static std::unordered_map<std::string, BuildType> g_BuildTypeMap;
+static std::unordered_map<std::string, BuildType::Value> g_BuildTypeMap;
 static bool g_Initialized;
 
 static void init()
@@ -62,15 +62,15 @@ Platform::Type platformFromString(const std::string & name, const std::nothrow_t
 	return (it != g_PlatformMap.end() ? it->second : Platform::None);
 }
 
-BuildType buildTypeFromString(const std::string & name)
+BuildType::Value buildTypeFromString(const std::string & name)
 {
-	BuildType type = buildTypeFromString(name, std::nothrow);
+	BuildType::Value type = buildTypeFromString(name, std::nothrow);
 	if (type != BuildType::Unspecified)
 		return type;
 	throw std::runtime_error(fmt() << "invalid build type name '" << name << "'.");
 }
 
-BuildType buildTypeFromString(const std::string & name, const std::nothrow_t &)
+BuildType::Value buildTypeFromString(const std::string & name, const std::nothrow_t &)
 {
 	init();
 	auto it = g_BuildTypeMap.find(name);

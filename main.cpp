@@ -133,14 +133,18 @@ static Platform::Type defaultTargetPlatform()
 
 static int build(int argc, char ** argv)
 {
+	BuildType::Value buildType = BuildType::Unspecified;
 	bool buildIOS = false, buildIOSSimulator = false;
-	BuildType buildType = BuildType::Unspecified;
 	Platform::Type platform = Platform::None;
 
 	for (int i = 0; i < argc; i++)
 	{
 		if (argv[i][0] != '-')
 			throw std::runtime_error(fmt() << "invalid parameter '" << argv[i] << "'.");
+		else if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--debug"))
+			buildType |= BuildType::Debug;
+		else if (!strcmp(argv[i], "-r") || !strcmp(argv[i], "--release"))
+			buildType |= BuildType::Release;
 		else if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--osx"))
 			platform |= Platform::OSX;
 		else if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--ios"))
@@ -152,16 +156,6 @@ static int build(int argc, char ** argv)
 		{
 			platform |= Platform::iOS;
 			buildIOSSimulator = true;
-		}
-		else if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--debug"))
-		{
-			buildType = (buildType == BuildType::Release || buildType == BuildType::Both
-				? BuildType::Both : BuildType::Debug);
-		}
-		else if (!strcmp(argv[i], "-r") || !strcmp(argv[i], "--release"))
-		{
-			buildType = (buildType == BuildType::Debug || buildType == BuildType::Both
-				? BuildType::Both : BuildType::Release);
 		}
 	}
 

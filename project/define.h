@@ -20,42 +20,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __fa594c356da31cf51f641b71cfedf275__
-#define __fa594c356da31cf51f641b71cfedf275__
+#ifndef __1b931389685cae1a470191d95830fc3d__
+#define __1b931389685cae1a470191d95830fc3d__
 
+#include "platform.h"
 #include <string>
+#include <memory>
 
-namespace Platform
+class Define
 {
-	static const unsigned None = 0;
-	static const unsigned All = 0xFFFF;
+public:
+	Define(const std::string & macroName);
+	~Define();
 
-	static const unsigned iOS = 0x0001;
-	static const unsigned Android = 0x0002;
-	static const unsigned OSX = 0x0004;
-	static const unsigned WinRT = 0x0008;
-	static const unsigned Qt = 0x0010;
-	static const unsigned Tizen = 0x0020;
-	static const unsigned NaCl = 0x0040;
+	inline const std::string & name() const { return m_Name; }
 
-	typedef unsigned Type;
-}
+	inline Platform::Type platforms() const { return m_Platforms; }
+	inline void setPlatforms(Platform::Type flags) { m_Platforms = flags; }
 
-namespace BuildType
-{
-	static const unsigned Unspecified = 0;
-	static const unsigned All = 0xFFFF;
+	inline BuildType::Value buildTypes() const { return m_BuildTypes; }
+	inline void setBuildTypes(BuildType::Value flags) { m_BuildTypes = flags; }
 
-	static const unsigned Debug = 0x0001;
-	static const unsigned Release = 0x0002;
+private:
+	std::string m_Name;
+	Platform::Type m_Platforms;
+	BuildType::Value m_BuildTypes;
 
-	typedef unsigned Value;
-}
+	Define(const Define &) = delete;
+	Define & operator=(const Define &) = delete;
+};
 
-Platform::Type platformFromString(const std::string & name);
-Platform::Type platformFromString(const std::string & name, const std::nothrow_t &);
-
-BuildType::Value buildTypeFromString(const std::string & name);
-BuildType::Value buildTypeFromString(const std::string & name, const std::nothrow_t &);
+typedef std::shared_ptr<Define> DefinePtr;
 
 #endif
