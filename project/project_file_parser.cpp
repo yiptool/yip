@@ -130,6 +130,9 @@ void ProjectFileParser::parseRequires()
 	auto it = g_Config->repos.find(m_TokenText);
 	std::string url = (it != g_Config->repos.end() ? it->second : m_TokenText);
 
+	if (!m_ProjectFile->addRequirement(url))
+		return;
+
 	GitRepositoryPtr repo;
 	try
 	{

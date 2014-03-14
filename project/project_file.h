@@ -26,6 +26,7 @@
 #include "source_file.h"
 #include "../util/git.h"
 #include <vector>
+#include <unordered_set>
 #include <memory>
 
 class ProjectFile : public std::enable_shared_from_this<ProjectFile>
@@ -39,11 +40,15 @@ public:
 
 	SourceFilePtr addSourceFile(const std::string & name, const std::string & path);
 
+	inline bool addRequirement(const std::string & req) { return m_Requires.insert(req).second; }
+	inline const std::unordered_set<std::string> & requires() const { return m_Requires; }
+
 	inline void addRepository(const GitRepositoryPtr & repo) { m_Repositories.push_back(repo); }
 	inline const std::vector<GitRepositoryPtr> & repositories() const { return m_Repositories; }
 
 private:
 	std::vector<SourceFilePtr> m_SourceFiles;
+	std::unordered_set<std::string> m_Requires;
 	std::vector<GitRepositoryPtr> m_Repositories;
 	bool m_Valid;
 
