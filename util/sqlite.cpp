@@ -61,14 +61,36 @@ SQLiteDatabase::~SQLiteDatabase()
 	}
 }
 
-void SQLiteDatabase::exec(const char * sql)
+void SQLiteDatabase::exec(const char * sql, const std::initializer_list<std::string> & params)
 {
 	sqlite3_stmt * stmt = nullptr;
 	prepare(stmt, sql);
 
 	try
 	{
+		bind(stmt, params);
 		exec(stmt);
+	}
+	catch (...)
+	{
+		sqlite3_finalize(stmt);
+		throw;
+	}
+
+	sqlite3_finalize(stmt);
+}
+
+void SQLiteDatabase::select(const char * sql, const std::initializer_list<std::string> & params,
+	SQLiteCallback onRow)
+{
+	sqlite3_stmt * stmt = nullptr;
+	prepare(stmt, sql);
+
+	try
+	{
+		SQLiteCursor cursor(stmt);
+		bind(stmt, params);
+		exec(stmt, [&cursor, onRow](){ onRow(cursor); });
 	}
 	catch (...)
 	{
@@ -162,6 +184,21 @@ void SQLiteDatabase::prepare(sqlite3_stmt *& stmt, const char * sql)
 	{
 		throw std::runtime_error(fmt()
 			<< "unable to prepare statement '" << sql << "': " << sqlite3_errmsg(m_Handle));
+	}
+}
+
+void SQLiteDatabase::bind(sqlite3_stmt * stmt, const std::initializer_list<std::string> & params)
+{
+	int i = 1;
+	for (const std::string & str : params)
+	{
+		int err = sqlite3_bind_text(stmt, i, str.c_str(), static_cast<int>(str.length()), SQLITE_TRANSIENT);
+		if (err != SQLITE_OK)
+		{
+			throw std::runtime_error(fmt() << "unable to bind parameter " << i << " for statement '"
+				<< sqlite3_sql(stmt) << "': " << sqlite3_errmsg(m_Handle));
+		}
+		++i;
 	}
 }
 

@@ -26,9 +26,13 @@
 #include "../3rdparty/sqlite3/sqlite3.h"
 #include <string>
 #include <memory>
+#include <initializer_list>
 #include <functional>
 
 class SQLiteTransaction;
+class SQLiteCursor;
+
+typedef std::function<void(const SQLiteCursor & cursor)> SQLiteCallback;
 
 class SQLiteDatabase
 {
@@ -39,8 +43,19 @@ public:
 	inline const std::string & fileName() const { return m_DBFile; }
 	inline sqlite3 * handle() const { return m_Handle; }
 
-	void exec(const char * sql);
-	inline void exec(const std::string & sql) { exec(sql.c_str()); }
+	inline void exec(const char * sql) { exec(sql, {}); }
+	inline void exec(const std::string & sql) { exec(sql.c_str(), {}); }
+
+	void exec(const char * sql, const std::initializer_list<std::string> & params);
+	inline void exec(const std::string & sql, const std::initializer_list<std::string> & params)
+		{ exec(sql.c_str(), params); }
+
+	inline void select(const char * sql, SQLiteCallback onRow) { select(sql, {}, onRow); }
+	inline void select(const std::string & sql, SQLiteCallback onRow) { select(sql.c_str(), {}, onRow); }
+
+	void select(const char * sql, const std::initializer_list<std::string> & params, SQLiteCallback onRow);
+	inline void select(const std::string & sql, const std::initializer_list<std::string> & params,
+		SQLiteCallback onRow) { select(sql.c_str(), params, onRow); }
 
 	int queryInt(const char * sql);
 	inline int queryInt(const std::string & sql) { return queryInt(sql.c_str()); }
@@ -59,6 +74,7 @@ private:
 	void commit();
 
 	void prepare(sqlite3_stmt *& stmt, const char * sql);
+	void bind(sqlite3_stmt * stmt, const std::initializer_list<std::string> & params);
 	void exec(sqlite3_stmt * stmt, std::function<void()> = nullptr);
 
 	SQLiteDatabase(const SQLiteDatabase &) = delete;
@@ -85,6 +101,37 @@ private:
 
 	SQLiteTransaction(const SQLiteTransaction &) = delete;
 	SQLiteTransaction & operator=(const SQLiteTransaction &) = delete;
+};
+
+class SQLiteCursor
+{
+public:
+	inline bool isNull(int index) const { return sqlite3_column_type(m_Cursor, index) == SQLITE_NULL; }
+	inline int toInt(int index) const { return sqlite3_column_int(m_Cursor, index); }
+	inline sqlite3_int64 toInt64(int index) const { return sqlite3_column_int64(m_Cursor, index); }
+	inline double toDouble(int index) const { return sqlite3_column_double(m_Cursor, index); }
+
+	inline const char * toText(int index) const
+		{ return reinterpret_cast<const char *>(sqlite3_column_text(m_Cursor, index)); }
+
+	inline std::string toString(int index) const
+	{
+		return std::string(
+			reinterpret_cast<const char *>(sqlite3_column_blob(m_Cursor, index)),
+			static_cast<size_t>(sqlite3_column_bytes(m_Cursor, index))
+		);
+	}
+
+private:
+	sqlite3_stmt * m_Cursor;
+
+	inline SQLiteCursor(sqlite3_stmt * stmt) : m_Cursor(stmt) {}
+	inline ~SQLiteCursor() {}
+
+	SQLiteCursor(const SQLiteCursor &) = delete;
+	SQLiteCursor & operator=(const SQLiteCursor &) = delete;
+
+	friend class SQLiteDatabase;
 };
 
 #endif
