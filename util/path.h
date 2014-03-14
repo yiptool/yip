@@ -55,4 +55,6 @@ std::string pathGetFullFileExtension(const std::string & path);
 
 bool pathCreate(const std::string & path);
 
+bool pathIsFile(const std::string & path);
+
 #endif

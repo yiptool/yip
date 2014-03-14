@@ -451,3 +451,31 @@ bool pathCreate(const std::string & path)
 
 	return result;
 }
+
+bool pathIsFile(const std::string & path)
+{
+  #ifndef _WIN32
+	struct stat st;
+	int err = stat(path.c_str(), &st);
+	if (err < 0)
+	{
+		err = errno;
+		if (err == ENOENT)
+			return false;
+		throw std::runtime_error(fmt() << "unable to stat file '" << path << "': " << strerror(err));
+	}
+	return S_ISREG(st.st_mode);
+  #else
+	DWORD attr = GetFileAttributesA(path.c_str());
+	if (attr == INVALID_FILE_ATTRIBUTES)
+	{
+		DWORD err = GetLastError();
+		if (err = ERROR_FILE_NOT_FOUND || err == ERROR_PATH_NOT_FOUND ||
+				err == ERROR_INVALID_DRIVE || err == ERROR_BAD_NETPATH)
+			return false;
+		throw std::runtime_error(fmt()
+			<< "unable to get attributes for file '" << path << "' (code " << err << ").");
+	}
+	return (attr & (FILE_ATTRIBUTE_DEVICE | FILE_ATTRIBUTE_DIRECTORY)) == 0;
+  #endif
+}
