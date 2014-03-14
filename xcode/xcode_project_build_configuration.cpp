@@ -26,7 +26,7 @@
 XCodeProjectBuildConfiguration::XCodeProjectBuildConfiguration()
 	: m_AlwaysSearchUserPaths(false),
 	  m_Archs("$(ARCHS_STANDARD_INCLUDING_64_BIT)"),
-	  m_ClangCxxLanguageStandard("gnu++0x"),
+	  m_ClangCxxLanguageStandard("gnu++11"),
 	  m_ClangCxxLibrary("libc++"),
 	  m_ClangEnableModules(true),
 	  m_ClangEnableObjCARC(false),

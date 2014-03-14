@@ -41,6 +41,9 @@ public:
 	inline bool precompilePrefixHeader() const { return m_PrecompilePrefixHeader; }
 	inline void setPrecompilePrefixHeader(bool flag) { m_PrecompilePrefixHeader = flag; }
 
+	inline bool combineHiDpiImages() const { return m_CombineHiDpiImages; }
+	inline void setCombineHiDpiImages(bool flag) { m_CombineHiDpiImages = flag; }
+
 	inline const std::string & prefixHeader() const { return m_PrefixHeader; }
 	inline void setPrefixHeader(const std::string & hdr) { m_PrefixHeader = hdr; }
 
@@ -62,6 +65,7 @@ private:
 	std::string m_AssetCatalogAppIconName;
 	std::string m_AssetCatalogLaunchImageName;
 	bool m_PrecompilePrefixHeader;
+	bool m_CombineHiDpiImages;
 	std::string m_PrefixHeader;
 	std::string m_InfoPListFile;
 	std::string m_ProductName;

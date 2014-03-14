@@ -278,13 +278,19 @@ void Gen::initDebugConfiguration()
 	cfgTargetDebug->setName("Debug");
 	cfgTargetDebug->setInfoPListFile(projectName + "/Info.plist");
 	cfgTargetDebug->setAssetCatalogAppIconName("AppIcon");
-	cfgTargetDebug->setAssetCatalogLaunchImageName("LaunchImage");
+	if (!iOS)
+		cfgTargetDebug->setCombineHiDpiImages(true);
+	else
+		cfgTargetDebug->setAssetCatalogLaunchImageName("LaunchImage");
 
 	cfgProjectDebug = project->addProjectBuildConfiguration();
 	cfgProjectDebug->setName("Debug");
 	cfgProjectDebug->setGccOptimizationLevel("0");
-	cfgProjectDebug->setIPhoneOSDeploymentTarget("");						// FIXME: make configurable
-	cfgProjectDebug->setSDKRoot("iphoneos");
+	if (iOS)
+		cfgProjectDebug->setIPhoneOSDeploymentTarget("6.1");				// FIXME: make configurable
+	else
+		cfgProjectDebug->setMacOSXDeploymentTarget("10.8");					// FIXME: make configurable
+	cfgProjectDebug->setSDKRoot(iOS ? "iphoneos" : "macosx");
 	cfgProjectDebug->setTargetedDeviceFamily("");							// FIXME: make configurable
 	cfgProjectDebug->addPreprocessorDefinition("DEBUG=1");
 	cfgProjectDebug->setCodeSignIdentity("iphoneos*", "iPhone Developer");	// FIXME: make configurable
@@ -296,15 +302,21 @@ void Gen::initReleaseConfiguration()
 	cfgTargetRelease->setName("Release");
 	cfgTargetRelease->setInfoPListFile(projectName + "/Info.plist");
 	cfgTargetRelease->setAssetCatalogAppIconName("AppIcon");
-	cfgTargetRelease->setAssetCatalogLaunchImageName("LaunchImage");
+	if (!iOS)
+		cfgTargetRelease->setCombineHiDpiImages(true);
+	else
+		cfgTargetRelease->setAssetCatalogLaunchImageName("LaunchImage");
 
 	cfgProjectRelease = project->addProjectBuildConfiguration();
 	cfgProjectRelease->setName("Release");
 	cfgProjectRelease->setCopyPhaseStrip(true);
 	cfgProjectRelease->setEnableNSAssertions(false);
-	cfgProjectRelease->setIPhoneOSDeploymentTarget("");						// FIXME: make configurable
+	if (iOS)
+		cfgProjectDebug->setIPhoneOSDeploymentTarget("6.1");				// FIXME: make configurable
+	else
+		cfgProjectDebug->setMacOSXDeploymentTarget("10.8");					// FIXME: make configurable
 	cfgProjectRelease->setOnlyActiveArch(false);
-	cfgProjectRelease->setSDKRoot("iphoneos");
+	cfgProjectRelease->setSDKRoot(iOS ? "iphoneos" : "macosx");
 	cfgProjectRelease->setTargetedDeviceFamily("");							// FIXME: make configurable
 	cfgProjectRelease->setValidateProduct(true);
 	cfgProjectRelease->addPreprocessorDefinition("NDEBUG=1");

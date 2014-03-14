@@ -24,6 +24,7 @@
 
 XCodeTargetBuildConfiguration::XCodeTargetBuildConfiguration()
 	: m_PrecompilePrefixHeader(false),
+	  m_CombineHiDpiImages(false),
 	  m_ProductName("$(TARGET_NAME)"),
 	  m_WrapperExtension("app")
 {
@@ -39,6 +40,8 @@ void XCodeTargetBuildConfiguration::writeBuildSettings(std::stringstream & ss) c
 		ss << "\t\t\t\tASSETCATALOG_COMPILER_APPICON_NAME = " << stringLiteral(m_AssetCatalogAppIconName) << ";\n";
 	if (m_AssetCatalogLaunchImageName.length() > 0)
 		ss << "\t\t\t\tASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = " << stringLiteral(m_AssetCatalogLaunchImageName) << ";\n";
+	if (m_CombineHiDpiImages)
+		ss << "\t\t\t\tCOMBINE_HIDPI_IMAGES = YES;\n";
 	ss << "\t\t\t\tGCC_PRECOMPILE_PREFIX_HEADER = " << (m_PrecompilePrefixHeader ? "YES" : "NO") << ";\n";
 	if (m_PrefixHeader.length() > 0)
 		ss << "\t\t\t\tGCC_PREFIX_HEADER = " << stringLiteral(m_PrefixHeader) << ";\n";
