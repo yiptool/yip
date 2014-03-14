@@ -20,37 +20,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __8d3668e7a9293f349502913684e4cb1c__
-#define __8d3668e7a9293f349502913684e4cb1c__
+#ifndef __e522f0443e271bf104c4f9cab88a6a39__
+#define __e522f0443e271bf104c4f9cab88a6a39__
 
-#include "../util/git.h"
-#include "../util/sqlite.h"
-#include <memory>
+#include "../3rdparty/sqlite3/sqlite3.h"
 #include <string>
+#include <memory>
 
-class ProjectConfig
+class SQLiteDatabase
 {
 public:
-	ProjectConfig(const std::string & projectPath);
-	~ProjectConfig();
+	SQLiteDatabase(const std::string & name);
+	~SQLiteDatabase();
 
-	inline const std::string & path() const { return m_Path; }
-	inline const std::string & projectPath() const { return m_ProjectPath; }
-
-	void writeFile(const std::string & path, const std::string & data);
-
-	GitRepositoryPtr openGitRepository(const std::string & url,
-		GitProgressPrinter && printer = GitProgressPrinter());
+	inline const std::string & fileName() const { return m_DBFile; }
+	inline sqlite3 * handle() const { return m_Handle; }
 
 private:
-	std::string m_Path;
-	std::string m_ProjectPath;
-	SQLiteDatabasePtr m_DB;
-
-	ProjectConfig(const ProjectConfig &) = delete;
-	ProjectConfig & operator=(const ProjectConfig &) = delete;
+	sqlite3 * m_Handle;
+	std::string m_DBFile;
 };
 
-typedef std::shared_ptr<ProjectConfig> ProjectConfigPtr;
+typedef std::shared_ptr<SQLiteDatabase> SQLiteDatabasePtr;
 
 #endif

@@ -11,6 +11,8 @@ ADD_LIBRARY(util STATIC
 	sha1.h
 	shell.cpp
 	shell.h
+	sqlite.cpp
+	sqlite.h
 )
 
 IF(WIN32)

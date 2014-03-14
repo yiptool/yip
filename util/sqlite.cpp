@@ -20,37 +20,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __8d3668e7a9293f349502913684e4cb1c__
-#define __8d3668e7a9293f349502913684e4cb1c__
+#include "sqlite.h"
+#include "fmt.h"
+#include <stdexcept>
+#include <iostream>
 
-#include "../util/git.h"
-#include "../util/sqlite.h"
-#include <memory>
-#include <string>
-
-class ProjectConfig
+SQLiteDatabase::SQLiteDatabase(const std::string & name)
+	: m_DBFile(name)
 {
-public:
-	ProjectConfig(const std::string & projectPath);
-	~ProjectConfig();
+	int err = sqlite3_open_v2(name.c_str(), &m_Handle, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
+	if (err != SQLITE_OK)
+	{
+		throw std::runtime_error(fmt()
+			<< "unable to open sqlite database '" << name << "': " << sqlite3_errstr(err));
+	}
+}
 
-	inline const std::string & path() const { return m_Path; }
-	inline const std::string & projectPath() const { return m_ProjectPath; }
-
-	void writeFile(const std::string & path, const std::string & data);
-
-	GitRepositoryPtr openGitRepository(const std::string & url,
-		GitProgressPrinter && printer = GitProgressPrinter());
-
-private:
-	std::string m_Path;
-	std::string m_ProjectPath;
-	SQLiteDatabasePtr m_DB;
-
-	ProjectConfig(const ProjectConfig &) = delete;
-	ProjectConfig & operator=(const ProjectConfig &) = delete;
-};
-
-typedef std::shared_ptr<ProjectConfig> ProjectConfigPtr;
-
-#endif
+SQLiteDatabase::~SQLiteDatabase()
+{
+	int err = sqlite3_close(m_Handle);
+	if (err != SQLITE_OK)
+	{
+		std::cerr << "warning: unable to close sqlite database '" << m_DBFile << "': " << sqlite3_errstr(err);
+		sqlite3_close_v2(m_Handle);
+	}
+}

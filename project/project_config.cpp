@@ -33,21 +33,11 @@ ProjectConfig::ProjectConfig(const std::string & prjPath)
 	  m_ProjectPath(prjPath)
 {
 	pathCreate(m_Path);
-
-	m_DBFile = pathConcat(m_Path, "db");
-	int err = sqlite3_open_v2(m_DBFile.c_str(), &m_DB, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
-	if (err != SQLITE_OK)
-	{
-		throw std::runtime_error(fmt()
-			<< "unable to open sqlite database '" << m_DBFile << "': " << sqlite3_errstr(err));
-	}
+	m_DB = std::make_shared<SQLiteDatabase>(pathConcat(m_Path, "db"));
 }
 
 ProjectConfig::~ProjectConfig()
 {
-	int err = sqlite3_close(m_DB);
-	if (err != SQLITE_OK)
-		std::cerr << "warning: unable to close sqlite database '" << m_DBFile << "': " << sqlite3_errstr(err);
 }
 
 void ProjectConfig::writeFile(const std::string & path, const std::string & data)
