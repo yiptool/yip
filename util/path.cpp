@@ -501,3 +501,15 @@ bool pathIsFile(const std::string & path)
 	return (attr & (FILE_ATTRIBUTE_DEVICE | FILE_ATTRIBUTE_DIRECTORY)) == 0;
   #endif
 }
+
+time_t pathGetModificationTime(const std::string & path)
+{
+	struct stat st;
+	int err = stat(path.c_str(), &st);
+	if (err < 0)
+	{
+		err = errno;
+		throw std::runtime_error(fmt() << "unable to stat file '" << path << "': " << strerror(err));
+	}
+	return st.st_mtime;
+}

@@ -27,6 +27,7 @@
 #include <string>
 #include <memory>
 #include <initializer_list>
+#include <ctime>
 #include <functional>
 
 class SQLiteTransaction;
@@ -109,6 +110,8 @@ public:
 	inline bool isNull(int index) const { return sqlite3_column_type(m_Cursor, index) == SQLITE_NULL; }
 	inline int toInt(int index) const { return sqlite3_column_int(m_Cursor, index); }
 	inline sqlite3_int64 toInt64(int index) const { return sqlite3_column_int64(m_Cursor, index); }
+	inline size_t toSizeT(int index) const { return static_cast<size_t>(sqlite3_column_int64(m_Cursor, index)); }
+	inline time_t toTimeT(int index) const { return static_cast<time_t>(sqlite3_column_int64(m_Cursor, index)); }
 	inline double toDouble(int index) const { return sqlite3_column_double(m_Cursor, index); }
 
 	inline const char * toText(int index) const

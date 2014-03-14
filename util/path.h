@@ -24,6 +24,7 @@
 #define __dee757a372efbf0af613ed62448b8c05__
 
 #include <string>
+#include <ctime>
 
 std::string pathToNativeSeparators(const std::string & path);
 std::string pathToUnixSeparators(const std::string & path);
@@ -59,5 +60,7 @@ bool pathCreate(const std::string & path);
 
 bool pathIsExistent(const std::string & path);
 bool pathIsFile(const std::string & path);
+
+time_t pathGetModificationTime(const std::string & path);
 
 #endif

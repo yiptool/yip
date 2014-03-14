@@ -47,11 +47,56 @@ ProjectConfig::~ProjectConfig()
 void ProjectConfig::writeFile(const std::string & path, const std::string & data)
 {
 	std::string file = pathSimplify(pathConcat(m_Path, path));
+	bool has_sha1 = false, write = true;
+	std::string new_sha1;
 
-	// FIXME: do not overwrite file if it did not change
-//	std::cout << "Keeping " << path << std::endl;
+	SQLiteTransaction transaction(m_DB);
+
+	// Check whether file has changed
+	if (pathIsExistent(file))
+	{
+		// Canonicalize file path
+		file = pathMakeCanonical(file);
+
+		// Get information about file from the database
+		bool found = false;
+		size_t old_size = 0;
+		time_t old_time = 0;
+		std::string old_sha1;
+		m_DB->select("SELECT size, time, sha1 FROM files WHERE path = ? LIMIT 1", { file },
+			[&found, &old_size, &old_time, &old_sha1](const SQLiteCursor & cursor) {
+				found = true;
+				old_size = cursor.toSizeT(0);
+				old_time = cursor.toTimeT(1);
+				old_sha1 = cursor.toString(2);
+			}
+		);
+
+		// Check whether file has been modified
+		if (found && data.size() == old_size)
+		{
+			if (pathGetModificationTime(file) <= old_time)
+			{
+				new_sha1 = sha1(data);
+				has_sha1 = true;
+				if (new_sha1 == old_sha1)
+					write = false;
+			}
+		}
+	}
+
+	// Do not overwrite file if it did not change
+	if (!write)
+	{
+		std::cout << "Keeping " << path << std::endl;
+		return;
+	}
 
 	std::cout << "Writing " << path << std::endl;
+
+	// Calculate SHA1 sum of the file
+	if (!has_sha1)
+		new_sha1 = sha1(data);
 
 	// Create directory for the file
 	std::string dir = pathGetDirectory(file);
@@ -88,6 +133,11 @@ void ProjectConfig::writeFile(const std::string & path, const std::string & data
 		throw;
 	}
 	fclose(f);
+
+	// Store information about file into the database
+	m_DB->exec(fmt() << "REPLACE INTO files (path, size, time, sha1) VALUES (?, " << data.size() << ", "
+		<< time(nullptr) << ", ?)", { file, new_sha1 });
+	transaction.commit();
 }
 
 GitRepositoryPtr ProjectConfig::openGitRepository(const std::string & url, GitProgressPrinter && printer)
@@ -110,6 +160,8 @@ void ProjectConfig::initDB()
 {
 	// Create tables
 	m_DB->exec("CREATE TABLE IF NOT EXISTS version (id INTEGER PRIMARY KEY, value INTEGER);");
+	m_DB->exec("CREATE TABLE IF NOT EXISTS files (path TEXT PRIMARY KEY, size INTEGER, "
+		"time INTEGER, sha1 TEXT);");
 
 	SQLiteTransaction transaction(m_DB);
 
