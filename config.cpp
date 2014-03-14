@@ -49,6 +49,7 @@ Config::Config()
 	: projectFileName(PROJECT_FILE_NAME)
 {
 	repos.insert(std::make_pair("zlib", "https://github.com/oss-forks/zlib.git"));
+	repos.insert(std::make_pair("tinyxml", "https://github.com/oss-forks/tinyxml.git"));
 }
 
 struct Context
