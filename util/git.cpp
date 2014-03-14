@@ -90,11 +90,13 @@ void GitProgressPrinter::init(git_checkout_options * opts)
 
 void GitProgressPrinter::reportGitClone(const std::string & url)
 {
+	finish();
 	std::cout << "git: cloning '" << url << "'." << std::endl;
 }
 
 void GitProgressPrinter::reportGitFetch(const std::string & url)
 {
+	finish();
 	std::cout << "git: fetching '" << url << "'." << std::endl;
 }
 
