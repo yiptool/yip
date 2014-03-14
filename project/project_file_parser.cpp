@@ -108,7 +108,7 @@ void ProjectFileParser::parseSources()
 		std::string name = m_TokenText;
 		std::string path = pathMakeAbsolute(m_TokenText, m_ProjectPath);
 		m_ProjectFile->addSourceFile(name, path);
-printf("[%s]\n", path.c_str());
+
 		getToken();
 	}
 
@@ -146,6 +146,8 @@ void ProjectFileParser::parseRequires()
 		reportError(fmt() << "unable to parse project file in git repository at '" << url << "': " << e.what());
 		return;
 	}
+
+	m_ProjectFile->addRepository(repo);
 }
 
 ProjectFileParser::Token ProjectFileParser::getToken()

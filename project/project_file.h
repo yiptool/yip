@@ -24,6 +24,7 @@
 #define __b452a1405c1a5aa54336e360b8b4fe1f__
 
 #include "source_file.h"
+#include "../util/git.h"
 #include <vector>
 #include <memory>
 
@@ -35,8 +36,12 @@ public:
 
 	SourceFilePtr addSourceFile(const std::string & name, const std::string & path);
 
+	inline void addRepository(const GitRepositoryPtr & repo) { m_Repositories.push_back(repo); }
+	inline const std::vector<GitRepositoryPtr> & repositories() const { return m_Repositories; }
+
 private:
 	std::vector<SourceFilePtr> m_SourceFiles;
+	std::vector<GitRepositoryPtr> m_Repositories;
 
 	ProjectFile(const ProjectFile &) = delete;
 	ProjectFile & operator=(const ProjectFile &) = delete;

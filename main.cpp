@@ -22,23 +22,95 @@
 //
 #include "project/project_file_parser.h"
 #include "3rdparty/libgit2/include/git2/threads.h"
+#include "util/fmt.h"
 #include "config.h"
 #include <exception>
 #include <fstream>
 #include <iostream>
 
-int main()
+static ProjectFilePtr loadProjectFile()
+{
+	ProjectFilePtr projectFile = std::make_shared<ProjectFile>();
+
+	ProjectFileParser parser(g_Config->projectFileName);
+	parser.parse(projectFile);
+
+	return projectFile;
+}
+
+static void usage()
+{
+	std::cout <<
+		"Usage: yip [command] [options]\n"
+		"\n"
+		"The following commands are available:\n"
+		"\n"
+		"   build (default)       Build the project.\n"
+		"   help                  Display this help message.\n"
+		"   update                Download latest versions of dependencies.\n"
+		<< std::endl;
+}
+
+static int build(int, char **)
+{
+	ProjectFilePtr projectFile = loadProjectFile();
+	return 0;
+}
+
+static int help(int, char **)
+{
+	usage();
+	return 1;
+}
+
+static int update(int, char **)
+{
+	ProjectFilePtr projectFile = loadProjectFile();
+
+	if (projectFile->repositories().size() == 0)
+	{
+		std::cout << "nothing to update.";
+		return 0;
+	}
+
+	GitProgressPrinter printer;
+	for (const GitRepositoryPtr & repo : projectFile->repositories())
+		repo->fetch("origin", &printer);
+
+	return 0;
+}
+
+int main(int argc, char ** argv)
 {
 	try
 	{
 		git_threads_init();
-
 		loadConfig();
 
-		ProjectFilePtr projectFile = std::make_shared<ProjectFile>();
+		for (int i = 1; i < argc; i++)
+		{
+			if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help") || !strcmp(argv[i], "/?"))
+			{
+				usage();
+				return 1;
+			}
+		}
 
-		ProjectFileParser p(g_Config->projectFileName);
-		p.parse(projectFile);
+		if (argc > 1 && argv[1][0] != '-')
+		{
+			std::unordered_map<std::string, int (*)(int, char **)> commands;
+			commands.insert(std::make_pair("build", &build));
+			commands.insert(std::make_pair("help", &help));
+			commands.insert(std::make_pair("update", &update));
+
+			auto it = commands.find(argv[1]);
+			if (it == commands.end())
+				throw std::runtime_error(fmt() << "unknown command '" << argv[1] << "'. try 'yip help'.");
+
+			return it->second(argc - 2, argv + 2);
+		}
+
+		build(argc - 1, argv + 1);
 	}
 	catch (const std::exception & e)
 	{
