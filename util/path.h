@@ -44,6 +44,8 @@ std::string pathMakeAbsolute(const std::string & path);
 size_t pathIndexOfFirstSeparator(const std::string & path, size_t start = 0);
 std::string pathSimplify(const std::string & path);
 
+std::string pathMakeCanonical(const std::string & path);
+
 std::string pathConcat(const std::string & path1, const std::string & path2);
 
 size_t pathIndexOfFileName(const std::string & path);
@@ -55,6 +57,7 @@ std::string pathGetFullFileExtension(const std::string & path);
 
 bool pathCreate(const std::string & path);
 
+bool pathIsExistent(const std::string & path);
 bool pathIsFile(const std::string & path);
 
 #endif

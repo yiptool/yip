@@ -323,6 +323,21 @@ std::string pathSimplify(const std::string & path)
 	return ss.str();
 }
 
+std::string pathMakeCanonical(const std::string & path)
+{
+  #ifndef _WIN32
+	std::vector<char> buf(std::max(static_cast<size_t>(PATH_MAX), static_cast<size_t>(2048)));
+	if (!realpath(path.c_str(), buf.data()))
+	{
+		int err = errno;
+		throw std::runtime_error(fmt() << "unable to canonicalize path '" << path << "': " << strerror(err));
+	}
+	return buf.data();
+  #else
+	return pathMakeAbsolute(path);
+  #endif
+}
+
 std::string pathConcat(const std::string & path1, const std::string & path2)
 {
 	if (path1.length() == 0)
@@ -450,6 +465,13 @@ bool pathCreate(const std::string & path)
 	while (end != std::string::npos);
 
 	return result;
+}
+
+bool pathIsExistent(const std::string & path)
+{
+	struct stat st;
+	int err = stat(path.c_str(), &st);
+	return (err == 0);
 }
 
 bool pathIsFile(const std::string & path)
