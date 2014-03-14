@@ -28,6 +28,7 @@
 #include "../3rdparty/libgit2/include/git2/clone.h"
 #include "../3rdparty/libgit2/include/git2/cred_helpers.h"
 #include <memory>
+#include <functional>
 #include <stdexcept>
 
 class GitRepository;
@@ -92,9 +93,13 @@ public:
 	std::string path() const;
 
 	void fetch(const char * remoteName = "origin", GitProgressPrinter * printer = nullptr);
+	void updateHeadToRemote(const char * remoteName = "origin", GitProgressPrinter * printer = nullptr);
 
 private:
 	git_repository * m_Pointer;
+
+	void doFetch(const char * remoteName, GitProgressPrinter * printer,
+		const std::function<void(git_remote *)> & afterFetch);
 };
 
 #endif

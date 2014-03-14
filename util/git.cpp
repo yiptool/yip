@@ -91,20 +91,29 @@ void GitProgressPrinter::init(git_checkout_options * opts)
 void GitProgressPrinter::reportGitClone(const std::string & url)
 {
 	finish();
-	std::cout << "git: cloning '" << url << "'." << std::endl;
+	std::cout << "git: --- cloning '" << url << "'." << std::endl;
 }
 
 void GitProgressPrinter::reportGitFetch(const std::string & url)
 {
 	finish();
-	std::cout << "git: fetching '" << url << "'." << std::endl;
+	std::cout << "git: --- fetching '" << url << "'." << std::endl;
+}
+
+static size_t calcPercent(size_t cur, size_t total)
+{
+	if (total == 0)
+		return 0;
+	if (cur >= total)
+		return 100;
+	return 100 * cur / total;
 }
 
 void GitProgressPrinter::reportGitProgress()
 {
-	size_t networkPercent = (100 * m_FetchProgress.received_objects) / m_FetchProgress.total_objects;
-	size_t indexPercent = (100 * m_FetchProgress.indexed_objects) / m_FetchProgress.total_objects;
-	size_t checkoutPercent = (m_TotalSteps > 0 ? 100 * m_CompletedSteps / m_TotalSteps : 0);
+	size_t networkPercent = calcPercent(m_FetchProgress.received_objects, m_FetchProgress.total_objects);
+	size_t indexPercent = calcPercent(m_FetchProgress.indexed_objects, m_FetchProgress.total_objects);
+	size_t checkoutPercent = calcPercent(m_CompletedSteps, m_TotalSteps);
 	size_t kbytes = m_FetchProgress.received_bytes / 1024;
 
 	if (m_FetchProgress.received_objects == m_FetchProgress.total_objects)
@@ -115,7 +124,7 @@ void GitProgressPrinter::reportGitProgress()
 			m_NewLinePending2 = false;
 		}
 
-		std::cout << "git: resolving deltas "
+		std::cout << "git: resolving deltas: "
 			<< m_FetchProgress.indexed_deltas << '/' << m_FetchProgress.total_deltas << "  \r" << std::flush;
 		m_NewLinePending1 = true;
 	}
@@ -128,16 +137,16 @@ void GitProgressPrinter::reportGitProgress()
 		}
 
 		std::cout
-			<< "git: net "
+			<< "git: receiving objects: "
 				<< networkPercent << "% ("
 				<< kbytes << " kb, "
 				<< m_FetchProgress.received_objects << '/'
 				<< m_FetchProgress.total_objects << "), "
-			<< "idx "
+			<< "indexes: "
 				<< indexPercent << "% ("
 				<< m_FetchProgress.indexed_objects << '/'
 				<< m_FetchProgress.total_objects << "), "
-			<< "chk "
+			<< "checkout: "
 				<< checkoutPercent << "% ("
 				<< m_CompletedSteps << '/'
 				<< m_TotalSteps << ')'
@@ -306,6 +315,33 @@ std::string GitRepository::path() const
 
 void GitRepository::fetch(const char * remoteName, GitProgressPrinter * printer)
 {
+	doFetch(remoteName, printer, [](git_remote *){});
+}
+
+void GitRepository::updateHeadToRemote(const char * remoteName, GitProgressPrinter * printer)
+{
+	git_repository * const repo = m_Pointer;
+	doFetch(remoteName, printer, [repo, printer](git_remote * remote)
+	{
+		int error = git_update_head_to_remote(repo, remote, nullptr, nullptr);
+		if (error < 0)
+			throw GitError(error);
+
+		git_checkout_options checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
+		checkout_opts.checkout_strategy = GIT_CHECKOUT_FORCE;
+
+		if (printer)
+			printer->init(&checkout_opts);
+
+		error = git_checkout_head(repo, &checkout_opts);
+		if (error < 0)
+			throw GitError(error);
+	});
+}
+
+void GitRepository::doFetch(const char * remoteName, GitProgressPrinter * printer,
+	const std::function<void(git_remote *)> & afterFetch)
+{
 	git_remote * remote = nullptr;
 	int error = git_remote_load(&remote, m_Pointer, remoteName);
 	if (error < 0 || !remote)
@@ -331,6 +367,8 @@ void GitRepository::fetch(const char * remoteName, GitProgressPrinter * printer)
 			error = git_remote_fetch(remote, nullptr, nullptr);
 			if (error < 0)
 				throw GitError(error);
+
+			afterFetch(remote);
 		}
 		catch (...)
 		{

@@ -47,7 +47,7 @@ static void usage()
 		"\n"
 		"   build (default)       Build the project.\n"
 		"   help                  Display this help message.\n"
-		"   update                Download latest versions of dependencies.\n"
+		"   update, up            Download latest versions of dependencies.\n"
 		<< std::endl;
 }
 
@@ -78,7 +78,7 @@ static int update(int, char **)
 
 	GitProgressPrinter printer;
 	for (const GitRepositoryPtr & repo : projectFile->repositories())
-		repo->fetch("origin", &printer);
+		repo->updateHeadToRemote("origin", &printer);
 
 	return 0;
 }
@@ -104,6 +104,7 @@ int main(int argc, char ** argv)
 			std::unordered_map<std::string, int (*)(int, char **)> commands;
 			commands.insert(std::make_pair("build", &build));
 			commands.insert(std::make_pair("help", &help));
+			commands.insert(std::make_pair("up", &update));
 			commands.insert(std::make_pair("update", &update));
 
 			auto it = commands.find(argv[1]);
