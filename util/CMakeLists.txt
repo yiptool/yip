@@ -9,6 +9,8 @@ ADD_LIBRARY(util STATIC
 	path.h
 	sha1.cpp
 	sha1.h
+	shell.cpp
+	shell.h
 )
 
 IF(WIN32)

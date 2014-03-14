@@ -44,8 +44,9 @@ namespace Platform
 enum class BuildType
 {
 	Unspecified = 0,
-	Debug,
-	Release,
+	Debug = 0x0001,
+	Release = 0x0002,
+	Both = 0x0003,
 };
 
 Platform::Type platformFromString(const std::string & name);

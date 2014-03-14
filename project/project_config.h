@@ -34,13 +34,17 @@ public:
 	ProjectConfig(const std::string & projectPath);
 	~ProjectConfig();
 
-	inline const std::string & path() const;
+	inline const std::string & path() const { return m_Path; }
+	inline const std::string & projectPath() const { return m_ProjectPath; }
+
+	void writeFile(const std::string & path, const std::string & data);
 
 	GitRepositoryPtr openGitRepository(const std::string & url,
 		GitProgressPrinter && printer = GitProgressPrinter());
 
 private:
 	std::string m_Path;
+	std::string m_ProjectPath;
 	std::string m_DBFile;
 	sqlite3 * m_DB;
 

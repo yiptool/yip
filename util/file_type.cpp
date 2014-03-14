@@ -55,6 +55,7 @@ FileType determineFileType(const std::string & path)
 		g_ExtMap.insert(std::make_pair(".obj", FILE_BINARY_OBJECT));
 		g_ExtMap.insert(std::make_pair(".so", FILE_BINARY_SHARED_OBJECT));
 		g_ExtMap.insert(std::make_pair(".a", FILE_BINARY_ARCHIVE));
+		g_ExtMap.insert(std::make_pair(".framework", FILE_BINARY_APPLE_FRAMEWORK));
 		g_ExtMap.insert(std::make_pair(".c", FILE_SOURCE_C));
 		g_ExtMap.insert(std::make_pair(".C", FILE_SOURCE_CXX));
 		g_ExtMap.insert(std::make_pair(".cc", FILE_SOURCE_CXX));
@@ -75,6 +76,8 @@ FileType determineFileType(const std::string & path)
 		g_ExtMap.insert(std::make_pair(".py", FILE_SOURCE_PYTHON));
 		g_ExtMap.insert(std::make_pair(".rc", FILE_SOURCE_WIN32_RC));
 		g_ExtMap.insert(std::make_pair(".def", FILE_SOURCE_WIN32_DEF));
+		g_ExtMap.insert(std::make_pair(".plist", FILE_SOURCE_PLIST));
+		g_ExtMap.insert(std::make_pair(".xcassets", FILE_IMAGE_XCASSETS));
 		g_ExtMap.insert(std::make_pair(".png", FILE_IMAGE_PNG));
 		g_ExtMap.insert(std::make_pair(".jpg", FILE_IMAGE_JPEG));
 		g_ExtMap.insert(std::make_pair(".jpeg", FILE_IMAGE_JPEG));

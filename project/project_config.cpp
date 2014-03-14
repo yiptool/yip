@@ -25,9 +25,12 @@
 #include "../util/path.h"
 #include "../util/sha1.h"
 #include <iostream>
+#include <cerrno>
+#include <cstring>
 
-ProjectConfig::ProjectConfig(const std::string & projectPath)
-	: m_Path(pathConcat(projectPath, ".yip"))
+ProjectConfig::ProjectConfig(const std::string & prjPath)
+	: m_Path(pathConcat(prjPath, ".yip")),
+	  m_ProjectPath(prjPath)
 {
 	pathCreate(m_Path);
 
@@ -45,6 +48,52 @@ ProjectConfig::~ProjectConfig()
 	int err = sqlite3_close(m_DB);
 	if (err != SQLITE_OK)
 		std::cerr << "warning: unable to close sqlite database '" << m_DBFile << "': " << sqlite3_errstr(err);
+}
+
+void ProjectConfig::writeFile(const std::string & path, const std::string & data)
+{
+	std::string file = pathSimplify(pathConcat(m_Path, path));
+
+	// FIXME: do not overwrite file if it did not change
+//	std::cout << "Keeping " << path << std::endl;
+
+	std::cout << "Writing " << path << std::endl;
+
+	// Create directory for the file
+	std::string dir = pathGetDirectory(file);
+	if (dir.length() > 0)
+		pathCreate(dir);
+
+	// Write the file
+	FILE * f = fopen(file.c_str(), "wb");
+	if (!f)
+	{
+		int err = errno;
+		throw std::runtime_error(fmt() << "unable to create file '" << file << "': " << strerror(err));
+	}
+	try
+	{
+		fwrite(data.data(), 1, data.size(), f);
+		if (ferror(f))
+		{
+			int err = errno;
+			throw std::runtime_error(fmt() << "unable to write file '" << file << "': " << strerror(err));
+		}
+
+		fflush(f);
+		if (ferror(f))
+		{
+			int err = errno;
+			throw std::runtime_error(fmt() << "unable to write file '" << file << "': " << strerror(err));
+		}
+	}
+	catch (...)
+	{
+		fclose(f);
+		remove(file.c_str());
+		throw;
+	}
+	fclose(f);
 }
 
 GitRepositoryPtr ProjectConfig::openGitRepository(const std::string & url, GitProgressPrinter && printer)

@@ -22,13 +22,28 @@
 //
 #include "project_file.h"
 
-ProjectFile::ProjectFile()
-	: m_Valid(false)
+ProjectFile::ProjectFile(const std::string & prjPath)
+	: m_ProjectPath(prjPath),
+	  m_Valid(true)
+{
+}
+
+ProjectFile::ProjectFile(const ProjectConfigPtr & prjConfig)
+	: m_ProjectPath(prjConfig->projectPath()),
+	  m_Config(prjConfig),
+	  m_Valid(true)
 {
 }
 
 ProjectFile::~ProjectFile()
 {
+}
+
+const ProjectConfigPtr & ProjectFile::config() const
+{
+	if (!m_Config)
+		m_Config = std::make_shared<ProjectConfig>(m_ProjectPath);
+	return m_Config;
 }
 
 SourceFilePtr ProjectFile::addSourceFile(const std::string & name, const std::string & path)

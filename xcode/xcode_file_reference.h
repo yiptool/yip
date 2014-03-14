@@ -27,23 +27,23 @@
 
 class XCodeProject;
 
-extern const std::string FILETYPE_WRAPPER_APPLICATION;
-extern const std::string FILETYPE_WRAPPER_FRAMEWORK;
-extern const std::string FILETYPE_COMPILED_MACHO_EXECUTABLE;
-extern const std::string FILETYPE_TEXT;
-extern const std::string FILETYPE_TEXT_PLIST_XML;
-extern const std::string FILETYPE_TEXT_PLIST_STRINGS;
-extern const std::string FILETYPE_SOURCECODE_C_C;
-extern const std::string FILETYPE_SOURCECODE_C_H;
-extern const std::string FILETYPE_SOURCECODE_CPP_CPP;
-extern const std::string FILETYPE_SOURCECODE_CPP_H;
-extern const std::string FILETYPE_SOURCECODE_C_OBJC;
-extern const std::string FILETYPE_SOURCECODE_CPP_OBJCPP;
-extern const std::string FILETYPE_SOURCECODE_GLSL;
-extern const std::string FILETYPE_SOURCECODE_JAVA;
-extern const std::string FILETYPE_IMAGE_PNG;
-extern const std::string FILETYPE_IMAGE_JPEG;
-extern const std::string FILETYPE_FOLDER_ASSETCATALOG;
+extern const std::string XCODE_FILETYPE_WRAPPER_APPLICATION;
+extern const std::string XCODE_FILETYPE_WRAPPER_FRAMEWORK;
+extern const std::string XCODE_FILETYPE_COMPILED_MACHO_EXECUTABLE;
+extern const std::string XCODE_FILETYPE_TEXT;
+extern const std::string XCODE_FILETYPE_TEXT_PLIST_XML;
+extern const std::string XCODE_FILETYPE_TEXT_PLIST_STRINGS;
+extern const std::string XCODE_FILETYPE_SOURCECODE_C_C;
+extern const std::string XCODE_FILETYPE_SOURCECODE_C_H;
+extern const std::string XCODE_FILETYPE_SOURCECODE_CPP_CPP;
+extern const std::string XCODE_FILETYPE_SOURCECODE_CPP_H;
+extern const std::string XCODE_FILETYPE_SOURCECODE_C_OBJC;
+extern const std::string XCODE_FILETYPE_SOURCECODE_CPP_OBJCPP;
+extern const std::string XCODE_FILETYPE_SOURCECODE_GLSL;
+extern const std::string XCODE_FILETYPE_SOURCECODE_JAVA;
+extern const std::string XCODE_FILETYPE_IMAGE_PNG;
+extern const std::string XCODE_FILETYPE_IMAGE_JPEG;
+extern const std::string XCODE_FILETYPE_FOLDER_ASSETCATALOG;
 
 class XCodeFileReference : public XCodeObject
 {

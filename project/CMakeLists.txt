@@ -1,5 +1,7 @@
 
 ADD_LIBRARY(project STATIC
+	generate_xcode.cpp
+	generate_xcode.h
 	platform.cpp
 	platform.h
 	project_config.cpp
