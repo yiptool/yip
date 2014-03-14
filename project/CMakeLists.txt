@@ -1,5 +1,7 @@
 
 ADD_LIBRARY(project STATIC
+	platform.cpp
+	platform.h
 	project_config.cpp
 	project_config.h
 	project_file.cpp
