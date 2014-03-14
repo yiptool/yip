@@ -33,6 +33,9 @@ enum class ProjectFileParser::Token
 	Eof = 0,
 	LCurly,
 	RCurly,
+	Colon,
+	Exclamation,
+	Comma,
 	Literal,
 };
 
@@ -102,7 +105,14 @@ void ProjectFileParser::reportError(const std::string & message)
 
 void ProjectFileParser::parseSources()
 {
-	if (getToken() != Token::LCurly)
+	Platform::Type platforms = Platform::All;
+	if (getToken() == Token::Colon)
+	{
+		getToken();
+		platforms = parsePlatformMask();
+	}
+
+	if (m_Token != Token::LCurly)
 		reportError("expected '{'.");
 
 	getToken();
@@ -113,7 +123,9 @@ void ProjectFileParser::parseSources()
 
 		std::string name = m_TokenText;
 		std::string path = pathMakeAbsolute(m_TokenText, m_ProjectPath);
-		m_ProjectFile->addSourceFile(name, path);
+		SourceFilePtr sourceFile = m_ProjectFile->addSourceFile(name, path);
+
+		sourceFile->setPlatforms(platforms);
 
 		getToken();
 	}
@@ -159,6 +171,48 @@ void ProjectFileParser::parseRequires()
 	m_ProjectFile->addRepository(repo);
 }
 
+Platform::Type ProjectFileParser::parsePlatformMask()
+{
+	bool inverse = false;
+	if (m_Token == Token::Exclamation)
+	{
+		inverse = true;
+		getToken();
+	}
+
+	Platform::Type mask = 0;
+	for (;;)
+	{
+		mask |= parsePlatformName();
+		if (m_Token != Token::Comma)
+			break;
+		getToken();
+	}
+
+	return (inverse ? ~mask : mask);
+}
+
+Platform::Type ProjectFileParser::parsePlatformName()
+{
+	if (m_Token != Token::Literal)
+	{
+		reportError("expected platform name.");
+		return Platform::None;
+	}
+
+	try
+	{
+		Platform::Type result = platformFromString(m_TokenText);
+		getToken();
+		return result;
+	}
+	catch (const std::exception & e)
+	{
+		reportError(e.what());
+		return Platform::None;
+	}
+}
+
 ProjectFileParser::Token ProjectFileParser::getToken()
 {
 	#define DIGITS \
@@ -173,7 +227,7 @@ ProjectFileParser::Token ProjectFileParser::getToken()
 		case 'Y': case 'Z'
 
 	#define EXTRA_SYMBOLS \
-			 '_': case '-': case '+': case '/': case '.': case ',': case '~'
+			 '_': case '-': case '+': case '/': case '.': case '~'
 
 	m_TokenText.clear();
 	m_Token = Token::Eof;
@@ -201,6 +255,15 @@ ProjectFileParser::Token ProjectFileParser::getToken()
 
 		case '}':
 			return (m_TokenText = '}', m_Token = Token::RCurly);
+
+		case ':':
+			return (m_TokenText = ':', m_Token = Token::Colon);
+
+		case '!':
+			return (m_TokenText = '!', m_Token = Token::Exclamation);
+
+		case ',':
+			return (m_TokenText = ',', m_Token = Token::Comma);
 
 		case LETTERS:
 		case EXTRA_SYMBOLS:

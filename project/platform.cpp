@@ -50,7 +50,7 @@ static void init()
 Platform::Type platformFromString(const std::string & name)
 {
 	Platform::Type type = platformFromString(name, std::nothrow);
-	if (type != Platform::Unknown)
+	if (type != Platform::None)
 		return type;
 	throw std::runtime_error(fmt() << "invalid platform name '" << name << "'.");
 }
@@ -59,7 +59,7 @@ Platform::Type platformFromString(const std::string & name, const std::nothrow_t
 {
 	init();
 	auto it = g_PlatformMap.find(name);
-	return (it != g_PlatformMap.end() ? it->second : Platform::Unknown);
+	return (it != g_PlatformMap.end() ? it->second : Platform::None);
 }
 
 BuildType buildTypeFromString(const std::string & name)

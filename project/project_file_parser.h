@@ -25,6 +25,7 @@
 
 #include "project_file.h"
 #include "project_config.h"
+#include "platform.h"
 #include <unordered_map>
 #include <string>
 #include <fstream>
@@ -65,6 +66,9 @@ private:
 
 	void parseSources();
 	void parseRequires();
+
+	Platform::Type parsePlatformMask();
+	Platform::Type parsePlatformName();
 
 	Token getToken();
 

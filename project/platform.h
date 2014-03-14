@@ -27,16 +27,18 @@
 
 namespace Platform
 {
-	static const int Unknown = 0;
-	static const int iOS = 0x0001;
-	static const int Android = 0x0002;
-	static const int OSX = 0x0004;
-	static const int WinRT = 0x0008;
-	static const int Qt = 0x0010;
-	static const int Tizen = 0x0020;
-	static const int NaCl = 0x0040;
+	static const unsigned None = 0;
+	static const unsigned All = 0xFFFF;
 
-	typedef int Type;
+	static const unsigned iOS = 0x0001;
+	static const unsigned Android = 0x0002;
+	static const unsigned OSX = 0x0004;
+	static const unsigned WinRT = 0x0008;
+	static const unsigned Qt = 0x0010;
+	static const unsigned Tizen = 0x0020;
+	static const unsigned NaCl = 0x0040;
+
+	typedef unsigned Type;
 };
 
 enum class BuildType

@@ -23,6 +23,7 @@
 #ifndef __cd8034b5cabf20e1be1ba06b0fc20482__
 #define __cd8034b5cabf20e1be1ba06b0fc20482__
 
+#include "platform.h"
 #include "../util/file_type.h"
 #include <string>
 #include <memory>
@@ -39,10 +40,14 @@ public:
 	inline FileType type() const { return m_Type; }
 	inline void setFileType(FileType type) { m_Type = type; }
 
+	inline Platform::Type platforms() const { return m_Platforms; }
+	inline void setPlatforms(Platform::Type flags) { m_Platforms = flags; }
+
 private:
 	std::string m_Name;
 	std::string m_Path;
 	FileType m_Type;
+	Platform::Type m_Platforms;
 
 	SourceFile(const SourceFile &) = delete;
 	SourceFile & operator=(const SourceFile &) = delete;
