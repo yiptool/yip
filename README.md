@@ -1,9 +1,144 @@
 
-YIP
+Yip
 ===
 
-The ultimate replacement for *make*.
+Yip is a tool to generate project files and build executables for various
+platforms. Yip's primary dedication is to cross-platform game development.
 
+For usage information type `yip help` or `yip --help`.
+
+Compiling Yip
+-------------
+
+Yip itself should be compiled with [CMake](http://cmake.org/). Create an
+empty directory somewhere on your filesystem, `cd` into it and type:
+
+      cmake <path-to-yip-sources>
+      cmake --build .
+
+And CMake will do everything for you (don't forget to replace
+`<path-to-yip-sources>` with the actual path to the directory where the source
+code of yip is located).
+
+Please consult the
+[CMake documentation](http://cmake.org/cmake/help/v2.8.12/cmake.html) for more
+information.
+
+Configuration file
+------------------
+
+Configuration file is located in the subdirectory `.yip` of the user's home
+directory and is named `yip.conf`. This file is created automatically at the
+yip's first run.
+
+Project files
+-------------
+
+By default yip expects to find a file named `Yipfile` in the directory where
+it is run (Project file name could be overriden in the configuration file).
+
+### Simplest project file
+
+The format of the `Yipfile` is pretty simple. Here is an example:
+
+      sources {
+         main.cpp
+      }
+
+You could add a suffix to the `sources` command to specify platforms on which
+this source file should be compiled. It could be either a list of allowed
+platforms or a list of disallowed platforms:
+
+      sources:ios {
+         ios.m
+      }
+      
+      sources:android,tizen {
+         android_and_tizen.cpp
+      }
+      
+      sources:!osx {
+         not_osx.cpp
+      }
+      
+      sources:!nacl,tizen {
+         not_nacl_and_tizen.cpp
+      }
+
+File `ios.m` will be compiled only when building for Apple iOS.
+File `android_and_tizen.cpp` will be compiled only for Google Android and
+Samsung Tizen.
+File `not_osx.cpp` will be compiled on all platforms, except Apple Mac OSX.
+File `not_nacl_and_tizen.cpp` will be compiled on all platforms, expect Google
+PNaCl and Samsung Tizen.
+
+### Preprocessor definitions
+
+Preprocessor definitions for C family of languages could be specified using
+the `defines` directive:
+
+      defines {
+         MY_DEFINE
+      }
+
+You could limit defines to particular platforms (the syntax is the same as
+for the `sources` directive). You could also limit defines to debug or
+release builds (use `debug` or `release` as the platform name).
+
+### Importing subprojects
+
+Yip supports importing another projects directly from their git repositories.
+It could be achieved by the `import` directive in the `Yipfile`:
+
+      import zlib
+      import "http://sqlite.org/copyright.html"
+
+Either git URL or alias could be specified. Alises could be added in the
+configuration file.
+
+Imported subprojects will be downloaded only once. To update imported
+subprojects later, use the `yip update` command.
+
+### Public headers
+
+Subprojects could make C++ headers available to the main project. For example,
+the `zlib` project has the `zlib.h` header file that should be available to any
+program using that library.
+
+To handle this case the `public_headers` command could be added to the zlib's
+`Yipfile`:
+
+      public_headers
+      {
+        zlib.h
+      }
+
+Now you can include `zlib.h` in your main program:
+
+      #include <yip-imports/zlib.h>
+
+Working directory
+-----------------
+
+When running `yip` on a project, it will keep all it's files in the `.yip`
+subdirectory of the project's directory. This directory **should not** be
+redistributed or imported into source control systems like git.
+
+Supported platforms
+-------------------
+
+Currently the following platforms are supported:
+
+* Apple Mac OSX (XCode)
+* Apple iOS (XCode)
+
+The following platforms are expected to be supported in the near future:
+
+* Microsoft Windows (WinRT, Visual Studio 2013)
+* Google Android
+* Google PNaCl
+* Samsung Tizen
+* Qt
 
 License
 =======
@@ -114,7 +249,7 @@ freely, subject to the following restrictions:
 
 ---------
 
-The "inih" library is distributed under the New BSD license:
+The *inih* library is distributed under the New BSD license:
 
 Copyright © 2009, Brush Technology
 All rights reserved.
@@ -141,3 +276,15 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---------
+
+The source code of *SQLite3* is in the
+[public domain](http://sqlite.org/copyright.html).
+
+The author disclaims copyright to this source code.  In place of
+a legal notice, here is a blessing:
+
+* May you do good and not evil.
+* May you find forgiveness for yourself and forgive others.
+* May you share freely, never taking more than you give.
