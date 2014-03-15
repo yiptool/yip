@@ -64,7 +64,7 @@ private:
 
 	void parseSources();
 	void parseDefines();
-	void parseRequires();
+	void parseImport();
 
 	Platform::Type parsePlatformMask();
 	Platform::Type parsePlatformName();

@@ -51,8 +51,8 @@ public:
 		BuildType::Value buildTypes = BuildType::All);
 	inline const std::map<std::string, DefinePtr> & defines() const { return m_Defines; }
 
-	inline bool addRequirement(const std::string & req) { return m_Requires.insert(req).second; }
-	inline const std::unordered_set<std::string> & requires() const { return m_Requires; }
+	inline bool addImport(const std::string & req) { return m_Imports.insert(req).second; }
+	inline const std::unordered_set<std::string> & imports() const { return m_Imports; }
 
 	inline void addRepository(const GitRepositoryPtr & repo) { m_Repositories.push_back(repo); }
 	inline const std::vector<GitRepositoryPtr> & repositories() const { return m_Repositories; }
@@ -61,7 +61,7 @@ private:
 	std::string m_ProjectPath;
 	std::map<std::string, SourceFilePtr> m_SourceFiles;
 	std::map<std::string, DefinePtr> m_Defines;
-	std::unordered_set<std::string> m_Requires;
+	std::unordered_set<std::string> m_Imports;
 	std::vector<GitRepositoryPtr> m_Repositories;
 	mutable YipDirectoryPtr m_YipDirectory;
 	bool m_Valid;

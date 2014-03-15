@@ -54,7 +54,7 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const std::st
 
 	m_CommandHandlers.insert(std::make_pair("sources", &ProjectFileParser::parseSources));
 	m_CommandHandlers.insert(std::make_pair("defines", &ProjectFileParser::parseDefines));
-	m_CommandHandlers.insert(std::make_pair("requires", &ProjectFileParser::parseRequires));
+	m_CommandHandlers.insert(std::make_pair("import", &ProjectFileParser::parseImport));
 }
 
 ProjectFileParser::~ProjectFileParser()
@@ -178,16 +178,16 @@ static bool isValidPathPrefix(const std::string & prefix)
 	return true;
 }
 
-void ProjectFileParser::parseRequires()
+void ProjectFileParser::parseImport()
 {
 	if (getToken() != Token::Literal)
-		reportError("expected dependency name after 'requires'.");
+		reportError("expected dependency name after 'import'.");
 
 	auto it = g_Config->repos.find(m_TokenText);
 	std::string url = (it != g_Config->repos.end() ? it->second : m_TokenText);
 	std::string name = (it != g_Config->repos.end() ? it->first : m_TokenText);
 
-	if (!m_Project->addRequirement(url))
+	if (!m_Project->addImport(url))
 		return;
 
 	GitRepositoryPtr repo;
