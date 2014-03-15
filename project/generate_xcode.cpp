@@ -283,6 +283,7 @@ void Gen::initDebugConfiguration()
 		cfgTargetDebug->setCombineHiDpiImages(true);
 	else
 		cfgTargetDebug->setAssetCatalogLaunchImageName("LaunchImage");
+	cfgTargetDebug->addHeaderSearchPath(pathConcat(project->yipDirectory()->path(), ".yip-import-proxies"));
 
 	cfgProjectDebug = xcodeProject->addProjectBuildConfiguration();
 	cfgProjectDebug->setName("Debug");
@@ -309,6 +310,7 @@ void Gen::initReleaseConfiguration()
 		cfgTargetRelease->setCombineHiDpiImages(true);
 	else
 		cfgTargetRelease->setAssetCatalogLaunchImageName("LaunchImage");
+	cfgTargetRelease->addHeaderSearchPath(pathConcat(project->yipDirectory()->path(), ".yip-import-proxies"));
 
 	cfgProjectRelease = xcodeProject->addProjectBuildConfiguration();
 	cfgProjectRelease->setName("Release");

@@ -41,6 +41,8 @@ enum class ProjectFileParser::Token
 
 static bool isValidPathPrefix(const std::string & prefix)
 {
+	if (prefix.length() == 0)
+		return false;
 	for (char ch : prefix)
 	{
 		if (ch >= 'a' && ch <= 'z')
@@ -73,6 +75,7 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const std::st
 		throw std::runtime_error(fmt() << "unable to open file '" << filename << "'.");
 
 	m_CommandHandlers.insert(std::make_pair("sources", &ProjectFileParser::parseSources));
+	m_CommandHandlers.insert(std::make_pair("public_headers", &ProjectFileParser::parsePublicHeaders));
 	m_CommandHandlers.insert(std::make_pair("defines", &ProjectFileParser::parseDefines));
 	m_CommandHandlers.insert(std::make_pair("import", &ProjectFileParser::parseImport));
 }
@@ -99,14 +102,15 @@ void ProjectFileParser::parseFromGit(const ProjectPtr & project, const std::stri
 
 	std::string pathPrefix;
 	if (isValidPathPrefix(name))
-		pathPrefix = "git-" + name;
+		pathPrefix = name;
 	else
 	{
 		pathPrefix = repo->path();
 		if (pathPrefix.length() > 0 && pathIsSeparator(pathPrefix[pathPrefix.length() - 1]))
 			pathPrefix.resize(pathPrefix.length() - 1);
-		pathPrefix = pathGetFileName(pathPrefix);
+		pathConcat(".yip-imports", pathGetFileName(pathPrefix));
 	}
+	pathPrefix = pathConcat(".yip-imports", name);
 
 	ProjectFileParser parser(file, pathPrefix);
 	parser.doParse(project, true);
@@ -178,6 +182,35 @@ void ProjectFileParser::parseSources()
 		SourceFilePtr sourceFile = m_Project->addSourceFile(name, path);
 
 		sourceFile->setPlatforms(platforms);
+
+		getToken();
+	}
+
+	if (m_Token != Token::RCurly)
+		reportError("expected '}'.");
+}
+
+void ProjectFileParser::parsePublicHeaders()
+{
+	if (getToken() != Token::LCurly)
+		reportError("expected '{'.");
+
+	getToken();
+	while (m_Token != Token::RCurly && m_Token != Token::Eof)
+	{
+		if (m_Token != Token::Literal)
+			reportError("expected file name.");
+
+		std::string name = m_TokenText;
+		std::string path = pathMakeAbsolute(m_TokenText, m_ProjectPath);
+		SourceFilePtr sourceFile = m_Project->addSourceFile(pathConcat(m_PathPrefix, name), path);
+
+		if (m_PathPrefix.length() > 0)
+		{
+			std::string proxyName = pathConcat(".yip-import-proxies/yip-imports", name);
+			std::string proxyPath = m_Project->yipDirectory()->writeIncludeWrapper(proxyName, path);
+			m_Project->addSourceFile(pathConcat(".yip-imports-proxies", name), proxyPath);
+		}
 
 		getToken();
 	}

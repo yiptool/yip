@@ -36,7 +36,8 @@ public:
 
 	inline const std::string & path() const { return m_Path; }
 
-	void writeFile(const std::string & path, const std::string & data);
+	std::string writeFile(const std::string & path, const std::string & data);
+	std::string writeIncludeWrapper(const std::string & name, const std::string & originalIncludePath);
 
 	std::string getGitRepositoryPath(const std::string & url);
 	GitRepositoryPtr openGitRepository(const std::string & url, GitProgressPrinter * printer);

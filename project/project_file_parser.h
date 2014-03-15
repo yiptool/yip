@@ -68,6 +68,7 @@ private:
 	void doParse(const ProjectPtr & project, bool resolveImports);
 
 	void parseSources();
+	void parsePublicHeaders();
 	void parseDefines();
 	void parseImport();
 

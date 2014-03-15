@@ -49,8 +49,17 @@ void XCodeTargetBuildConfiguration::writeBuildSettings(std::stringstream & ss) c
 	if (m_Defines.size() > 0)
 	{
 		ss << "\t\t\t\tGCC_PREPROCESSOR_DEFINITIONS = (\n";
-		for (std::vector<std::string>::const_iterator it = m_Defines.begin(); it != m_Defines.end(); ++it)
-			ss << "\t\t\t\t\t" << stringLiteral(*it) << ",\n";
+		for (const std::string & define : m_Defines)
+			ss << "\t\t\t\t\t" << stringLiteral(define) << ",\n";
+		ss << "\t\t\t\t\t\"$(inherited)\",\n";
+		ss << "\t\t\t\t);\n";
+	}
+
+	if (m_HeaderSearchPaths.size() > 0)
+	{
+		ss << "\t\t\t\tHEADER_SEARCH_PATHS = (\n";
+		for (const std::string & path : m_HeaderSearchPaths)
+			ss << "\t\t\t\t\t" << stringLiteral(path) << ",\n";
 		ss << "\t\t\t\t\t\"$(inherited)\",\n";
 		ss << "\t\t\t\t);\n";
 	}

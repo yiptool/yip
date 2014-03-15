@@ -44,7 +44,7 @@ YipDirectory::~YipDirectory()
 {
 }
 
-void YipDirectory::writeFile(const std::string & path, const std::string & data)
+std::string YipDirectory::writeFile(const std::string & path, const std::string & data)
 {
 	std::string file = pathSimplify(pathConcat(m_Path, path));
 	bool has_sha1 = false, write = true;
@@ -89,7 +89,7 @@ void YipDirectory::writeFile(const std::string & path, const std::string & data)
 	if (!write)
 	{
 		std::cout << "keeping " << path << std::endl;
-		return;
+		return file;
 	}
 
 	std::cout << "writing " << path << std::endl;
@@ -138,6 +138,15 @@ void YipDirectory::writeFile(const std::string & path, const std::string & data)
 	m_DB->exec(fmt() << "REPLACE INTO files (path, size, time, sha1) VALUES (?, " << data.size() << ", "
 		<< time(nullptr) << ", ?)", { file, new_sha1 });
 	transaction.commit();
+
+	return file;
+}
+
+std::string YipDirectory::writeIncludeWrapper(const std::string & name, const std::string & originalIncludePath)
+{
+	std::stringstream ss;
+	ss << "#include \"" << pathToUnixSeparators(originalIncludePath) << "\"\n";
+	return writeFile(name, ss.str());
 }
 
 std::string YipDirectory::getGitRepositoryPath(const std::string & url)
