@@ -84,6 +84,7 @@ namespace
 		void createNativeTarget();
 
 		// Auxiliary files
+		void writeDummyResourceFile();
 		void writeInfoPList();
 		void writeImageAssets();
 
@@ -285,6 +286,8 @@ void Gen::initDebugConfiguration()
 
 	cfgProjectDebug = project->addProjectBuildConfiguration();
 	cfgProjectDebug->setName("Debug");
+	if (!iOS)
+		cfgProjectDebug->setArchs("$(ARCHS_STANDARD)");
 	cfgProjectDebug->setGccOptimizationLevel("0");
 	if (iOS)
 		cfgProjectDebug->setIPhoneOSDeploymentTarget("6.1");				// FIXME: make configurable
@@ -309,12 +312,14 @@ void Gen::initReleaseConfiguration()
 
 	cfgProjectRelease = project->addProjectBuildConfiguration();
 	cfgProjectRelease->setName("Release");
+	if (!iOS)
+		cfgProjectRelease->setArchs("$(ARCHS_STANDARD)");
 	cfgProjectRelease->setCopyPhaseStrip(true);
 	cfgProjectRelease->setEnableNSAssertions(false);
 	if (iOS)
-		cfgProjectDebug->setIPhoneOSDeploymentTarget("6.1");				// FIXME: make configurable
+		cfgProjectRelease->setIPhoneOSDeploymentTarget("6.1");				// FIXME: make configurable
 	else
-		cfgProjectDebug->setMacOSXDeploymentTarget("10.8");					// FIXME: make configurable
+		cfgProjectRelease->setMacOSXDeploymentTarget("10.8");					// FIXME: make configurable
 	cfgProjectRelease->setOnlyActiveArch(false);
 	cfgProjectRelease->setSDKRoot(iOS ? "iphoneos" : "macosx");
 	cfgProjectRelease->setTargetedDeviceFamily("");							// FIXME: make configurable
@@ -391,6 +396,21 @@ void Gen::createNativeTarget()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Auxiliary files
 
+void Gen::writeDummyResourceFile()
+{
+	XCodeFileReference * dummyFileRef = project->addFileReference();
+	dummyFileRef->setLastKnownFileType(XCODE_FILETYPE_TEXT);
+	dummyFileRef->setName(".dummy");
+	dummyFileRef->setPath(projectName + "/.dummy");
+	dummyFileRef->setSourceTree("SOURCE_ROOT");
+	resourcesGroup->addChild(dummyFileRef);
+
+	XCodeBuildFile * buildFile = resourcesBuildPhase->addFile();
+	buildFile->setFileRef(dummyFileRef);
+
+	projectFile->config()->writeFile(projectName + "/.dummy", std::string());
+}
+
 void Gen::writeInfoPList()
 {
 	XCodeFileReference * plistFileRef = project->addFileReference();
@@ -440,7 +460,7 @@ void Gen::writeInfoPList()
 		ss << "\t<key>LSMinimumSystemVersion</key>\n";
 		ss << "\t<string>${MACOSX_DEPLOYMENT_TARGET}</string>\n";	// FIXME: make configurable
 		ss << "\t<key>NSHumanReadableCopyright</key>\n";
-		ss << "\t<string>Copyright © 2014. All rights reserved.</string>";	// FIXME: make configurable
+		ss << "\t<string>Copyright © 2014. All rights reserved.</string>\n";	// FIXME: make configurable
 		ss << "\t<key>NSPrincipalClass</key>\n";
 		ss << "\t<string>NSApplication</string>\n";
 	}
@@ -487,48 +507,104 @@ void Gen::writeImageAssets()
 	std::stringstream ss;
 	ss << "{\n";
 	ss << "  \"images\" : [\n";
-//	ss << "    {\n";
-//	ss << "      \"idiom\" : \"iphone\",\n";
-//	ss << "      \"size\" : \"57x57\",\n";
-//	ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 57))\",\n";
-//	ss << "      \"scale\" : \"1x\"\n";
-//	ss << "    },\n";
-//	ss << "    {\n";
-//	ss << "      \"size\" : \"57x57\",\n";
-//	ss << "      \"idiom\" : \"iphone\",\n";
-//	ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 114))\",\n";
-//	ss << "      \"scale\" : \"2x\"\n";
-//	ss << "    },\n";
-//	ss << "    {\n";
-//	ss << "      \"size\" : \"60x60\",\n";
-//	ss << "      \"idiom\" : \"iphone\",\n";
-//	ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 120))\",\n";
-//	ss << "      \"scale\" : \"2x\"\n";
-//	ss << "    },\n";
-//	ss << "    {\n";
-//	ss << "      \"idiom\" : \"ipad\",\n";
-//	ss << "      \"size\" : \"72x72\",\n";
-//	ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 72))\",\n";
-//	ss << "      \"scale\" : \"1x\"\n";
-//	ss << "    },\n";
-//	ss << "    {\n";
-//	ss << "      \"size\" : \"72x72\",\n";
-//	ss << "      \"idiom\" : \"ipad\",\n";
-//	ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 144))\",\n";
-//	ss << "      \"scale\" : \"2x\"\n";
-//	ss << "    },\n";
-//	ss << "    {\n";
-//	ss << "      \"size\" : \"76x76\",\n";
-//	ss << "      \"idiom\" : \"ipad\",\n";
-//	ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 76))\",\n";
-//	ss << "      \"scale\" : \"1x\"\n";
-//	ss << "    },\n";
-//	ss << "    {\n";
-//	ss << "      \"size\" : \"76x76\",\n";
-//	ss << "      \"idiom\" : \"ipad\",\n";
-//	ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 152))\",\n";
-//	ss << "      \"scale\" : \"2x\"\n";
-//	ss << "    }\n";
+	if (iOS)
+	{
+		ss << "    {\n";
+		ss << "      \"idiom\" : \"iphone\",\n";
+		ss << "      \"size\" : \"57x57\",\n";
+//		ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 57))\",\n";
+		ss << "      \"scale\" : \"1x\"\n";
+		ss << "    },\n";
+		ss << "    {\n";
+		ss << "      \"size\" : \"57x57\",\n";
+		ss << "      \"idiom\" : \"iphone\",\n";
+//		ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 114))\",\n";
+		ss << "      \"scale\" : \"2x\"\n";
+		ss << "    },\n";
+		ss << "    {\n";
+		ss << "      \"size\" : \"60x60\",\n";
+		ss << "      \"idiom\" : \"iphone\",\n";
+//		ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 120))\",\n";
+		ss << "      \"scale\" : \"2x\"\n";
+		ss << "    },\n";
+		ss << "    {\n";
+		ss << "      \"idiom\" : \"ipad\",\n";
+		ss << "      \"size\" : \"72x72\",\n";
+//		ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 72))\",\n";
+		ss << "      \"scale\" : \"1x\"\n";
+		ss << "    },\n";
+		ss << "    {\n";
+		ss << "      \"size\" : \"72x72\",\n";
+		ss << "      \"idiom\" : \"ipad\",\n";
+//		ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 144))\",\n";
+		ss << "      \"scale\" : \"2x\"\n";
+		ss << "    },\n";
+		ss << "    {\n";
+		ss << "      \"size\" : \"76x76\",\n";
+		ss << "      \"idiom\" : \"ipad\",\n";
+//		ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 76))\",\n";
+		ss << "      \"scale\" : \"1x\"\n";
+		ss << "    },\n";
+		ss << "    {\n";
+		ss << "      \"size\" : \"76x76\",\n";
+		ss << "      \"idiom\" : \"ipad\",\n";
+//		ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 152))\",\n";
+		ss << "      \"scale\" : \"2x\"\n";
+		ss << "    }\n";
+	}
+	else
+	{
+		ss << "    {\n";
+		ss << "      \"idiom\" : \"mac\",\n";
+		ss << "      \"size\" : \"16x16\",\n";
+		ss << "      \"scale\" : \"1x\"\n";
+		ss << "    },\n";
+		ss << "    {\n";
+		ss << "      \"idiom\" : \"mac\",\n";
+		ss << "      \"size\" : \"16x16\",\n";
+		ss << "      \"scale\" : \"2x\"\n";
+		ss << "    },\n";
+		ss << "    {\n";
+		ss << "      \"idiom\" : \"mac\",\n";
+		ss << "      \"size\" : \"32x32\",\n";
+		ss << "      \"scale\" : \"1x\"\n";
+		ss << "    },\n";
+		ss << "    {\n";
+		ss << "      \"idiom\" : \"mac\",\n";
+		ss << "      \"size\" : \"32x32\",\n";
+		ss << "      \"scale\" : \"2x\"\n";
+		ss << "    },\n";
+		ss << "    {\n";
+		ss << "      \"idiom\" : \"mac\",\n";
+		ss << "      \"size\" : \"128x128\",\n";
+		ss << "      \"scale\" : \"1x\"\n";
+		ss << "    },\n";
+		ss << "    {\n";
+		ss << "      \"idiom\" : \"mac\",\n";
+		ss << "      \"size\" : \"128x128\",\n";
+		ss << "      \"scale\" : \"2x\"\n";
+		ss << "    },\n";
+		ss << "    {\n";
+		ss << "      \"idiom\" : \"mac\",\n";
+		ss << "      \"size\" : \"256x256\",\n";
+		ss << "      \"scale\" : \"1x\"\n";
+		ss << "    },\n";
+		ss << "    {\n";
+		ss << "      \"idiom\" : \"mac\",\n";
+		ss << "      \"size\" : \"256x256\",\n";
+		ss << "      \"scale\" : \"2x\"\n";
+		ss << "    },\n";
+		ss << "    {\n";
+		ss << "      \"idiom\" : \"mac\",\n";
+		ss << "      \"size\" : \"512x512\",\n";
+		ss << "      \"scale\" : \"1x\"\n";
+		ss << "    },\n";
+		ss << "    {\n";
+		ss << "      \"idiom\" : \"mac\",\n";
+		ss << "      \"size\" : \"512x512\",\n";
+		ss << "      \"scale\" : \"2x\"\n";
+		ss << "    }\n";
+	}
 	ss << "  ],\n";
 	ss << "  \"info\" : {\n";
 	ss << "    \"version\" : 1,\n";
@@ -585,7 +661,7 @@ void Gen::writeImageAssets()
 		ss2 << "      \"idiom\" : \"ipad\",\n";
 		ss2 << "      \"extent\" : \"full-screen\",\n";
 		ss2 << "      \"minimum-system-version\" : \"7.0\",\n";
-		ss2 << "//      \"filename\" : \"$(ipad_portrait)\",\n";
+//		ss2 << "      \"filename\" : \"$(ipad_portrait)\",\n";
 		ss2 << "      \"scale\" : \"1x\"\n";
 		ss2 << "    },\n";
 		ss2 << "    {\n";
@@ -646,6 +722,7 @@ void Gen::generate()
 	createConfigurationLists();
 	createNativeTarget();
 
+	writeDummyResourceFile();
 	writeInfoPList();
 	writeImageAssets();
 	writePBXProj();
