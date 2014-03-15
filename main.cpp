@@ -86,7 +86,7 @@ static void usage()
 	    "\n"                                                                          /*|*/
 	    " * generate (gen): Generate project file but do not build.\n"                /*|*/
 	    "\n"                                                                          /*|*/
-	    "     By default, yip generates project file for the current platform only."  /*|*/
+	    "     By default, yip generates project file for the current platform only.\n"/*|*/
 	    "     This can be overriden by specifying one or more of the following options:\n"
 //	    "       -a, --android  Generate project for Android.\n"                       /*|*/
 //	    "       -c, --cmake    Generate project files for CMake.\n"                   /*|*/
@@ -100,6 +100,10 @@ static void usage()
 	    "     (except when generating multiple projects were requested). If this is not\n"
 	    "     intended, then the following option could be specified:\n"              /*|*/
 	    "       -n, --no-open  Do not open project file in the IDE.\n"                /*|*/
+	    "\n"                                                                          /*|*/
+	    "     If you wish to download latest versions of imports before generating,\n"/*|*/
+	    "     add the following option to the command-line:\n"                        /*|*/
+	    "       -u, --update   Update imports.\n"                                     /*|*/
 	    "\n"                                                                          /*|*/
 	    "     All generated project files are stored into the .yip subdirectory in your\n"
 	    "     source directory.\n"                                                    /*|*/
@@ -278,12 +282,14 @@ static int build(int argc, char ** argv)
 static int generate(int argc, char ** argv)
 {
 	Platform::Type platform = Platform::None;
-	bool noOpen = false;
+	bool update = false, noOpen = false;
 
 	for (int i = 0; i < argc; i++)
 	{
 		if (argv[i][0] != '-')
 			throw std::runtime_error(fmt() << "invalid parameter '" << argv[i] << "'.");
+		else if (!strcmp(argv[i], "-u") || !strcmp(argv[i], "--update"))
+			update = true;
 		else if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--osx"))
 			platform |= Platform::OSX;
 		else if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--ios"))
@@ -300,6 +306,12 @@ static int generate(int argc, char ** argv)
 		std::cerr << "unable to determine target platform - please specify one using the command line option "
 			"(try 'yip help' for more information)." << std::endl;
 		return 1;
+	}
+
+	if (update)
+	{
+		ProjectPtr project = loadProject();
+		updateProjectImports(project);
 	}
 
 	ProjectPtr project = loadProject();
