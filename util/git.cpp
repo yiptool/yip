@@ -158,13 +158,10 @@ void GitProgressPrinter::reportGitProgress()
 			pre = ", ";
 		}
 
-		if (m_FetchProgress.received_bytes > 0)
+		if (m_FetchProgress.received_bytes >= 102400)
 		{
 			char buf[256];
-			if (m_FetchProgress.received_bytes < 1048576)
-				sprintf(buf, "%u KB", static_cast<unsigned>(m_FetchProgress.received_bytes) / 1024);
-			else
-				sprintf(buf, "%.1f MB", static_cast<double>(m_FetchProgress.received_bytes) / 1048576.0);
+			sprintf(buf, "%.1f MB", static_cast<double>(m_FetchProgress.received_bytes) / 1048576.0);
 			ss << pre << buf;
 		}
 
