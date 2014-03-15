@@ -119,6 +119,7 @@ void ProjectFileParser::parseFromGit(const ProjectPtr & project, const std::stri
 void ProjectFileParser::reportWarning(const std::string & message)
 {
 	std::cerr << m_FileName << '(' << m_TokenLine << "): " << message << std::endl;
+	m_Project->setValid(false);
 }
 
 void ProjectFileParser::reportError(const std::string & message)
@@ -187,9 +188,16 @@ void ProjectFileParser::parseSources()
 		std::string path = pathMakeAbsolute(m_TokenText, m_ProjectPath);
 		if (m_PathPrefix.length() > 0)
 			name = pathConcat(m_PathPrefix, name);
-		SourceFilePtr sourceFile = m_Project->addSourceFile(name, path);
 
-		sourceFile->setPlatforms(platforms);
+		try
+		{
+			SourceFilePtr sourceFile = m_Project->addSourceFile(name, path);
+			sourceFile->setPlatforms(platforms);
+		}
+		catch (const std::exception & e)
+		{
+			reportWarning(e.what());
+		}
 
 		getToken();
 	}
@@ -211,13 +219,21 @@ void ProjectFileParser::parsePublicHeaders()
 
 		std::string name = m_TokenText;
 		std::string path = pathMakeAbsolute(m_TokenText, m_ProjectPath);
-		SourceFilePtr sourceFile = m_Project->addSourceFile(pathConcat(m_PathPrefix, name), path);
+		try {
+			m_Project->addSourceFile(pathConcat(m_PathPrefix, name), path);
+		} catch (const std::exception & e) {
+			reportWarning(e.what());
+		}
 
 		if (m_PathPrefix.length() > 0)
 		{
 			std::string proxyName = pathConcat(".yip-import-proxies/yip-imports", name);
 			std::string proxyPath = m_Project->yipDirectory()->writeIncludeWrapper(proxyName, path);
-			m_Project->addSourceFile(pathConcat(".yip-imports-proxies", name), proxyPath);
+			try {
+				m_Project->addSourceFile(pathConcat(".yip-imports-proxies", name), proxyPath);
+			} catch (const std::exception & e) {
+				reportWarning(e.what());
+			}
 		}
 
 		getToken();
@@ -270,23 +286,16 @@ void ProjectFileParser::parseImport()
 		return;
 
 	GitRepositoryPtr repo;
-	try
-	{
+	try {
 		repo = m_Project->yipDirectory()->openGitRepository(url);
-	}
-	catch (const std::exception & e)
-	{
+	} catch (const std::exception & e) {
 		throw std::runtime_error(fmt() << "unable to open git repository at '" << url << "': " << e.what());
 	}
 
-	try
-	{
+	try {
 		ProjectFileParser::parseFromGit(m_Project->shared_from_this(), name, repo);
-	}
-	catch (const std::exception & e)
-	{
+	} catch (const std::exception & e) {
 		reportWarning(fmt() << "unable to parse project file in git repository at '" << url << "': " << e.what());
-		m_Project->setValid(false);
 	}
 }
 
