@@ -407,10 +407,18 @@ void Gen::writeInfoPList()
 	ss << "<dict>\n";
 	ss << "\t<key>CFBundleDevelopmentRegion</key>\n";
 	ss << "\t<string>en</string>\n";								// FIXME: make configurable
-	ss << "\t<key>CFBundleDisplayName</key>\n";
-	ss << "\t<string>${PRODUCT_NAME}</string>\n";					// FIXME: make configurable
+	if (iOS)
+	{
+		ss << "\t<key>CFBundleDisplayName</key>\n";
+		ss << "\t<string>${PRODUCT_NAME}</string>\n";				// FIXME: make configurable
+	}
 	ss << "\t<key>CFBundleExecutable</key>\n";
 	ss << "\t<string>${EXECUTABLE_NAME}</string>\n";				// FIXME: make configurable
+	if (!iOS)
+	{
+		ss << "\t<key>CFBundleIconFile</key>\n";
+		ss << "\t<string></string>\n";
+	}
 	ss << "\t<key>CFBundleIdentifier</key>\n";
 	ss << "\t<string>com.zapolnov.${PRODUCT_NAME:rfc1034identifier}</string>\n";	// FIXME: make configurable
 	ss << "\t<key>CFBundleInfoDictionaryVersion</key>\n";
@@ -425,25 +433,39 @@ void Gen::writeInfoPList()
 	ss << "\t<string>\?\?\?\?</string>\n";
 	ss << "\t<key>CFBundleVersion</key>\n";
 	ss << "\t<string>1.0</string>\n";								// FIXME: make configurable
-	ss << "\t<key>LSRequiresIPhoneOS</key>\n";
-	ss << "\t<true/>\n";
-	ss << "\t<key>UIRequiredDeviceCapabilities</key>\n";
-	ss << "\t<array>\n";
-	ss << "\t	<string>armv7</string>\n";							// FIXME: make configurable
-	ss << "\t</array>\n";
-	ss << "\t<key>UISupportedInterfaceOrientations</key>\n";		// FIXME: make configurable
-	ss << "\t<array>\n";
-	ss << "\t\t<string>UIInterfaceOrientationPortrait</string>\n";
-	ss << "\t\t<string>UIInterfaceOrientationLandscapeLeft</string>\n";
-	ss << "\t\t<string>UIInterfaceOrientationLandscapeRight</string>\n";
-	ss << "\t</array>\n";
-	ss << "\t<key>UISupportedInterfaceOrientations~ipad</key>\n";	// FIXME: make configurable
-	ss << "\t<array>\n";
-	ss << "\t\t<string>UIInterfaceOrientationPortrait</string>\n";
-	ss << "\t\t<string>UIInterfaceOrientationPortraitUpsideDown</string>\n";
-	ss << "\t\t<string>UIInterfaceOrientationLandscapeLeft</string>\n";
-	ss << "\t\t<string>UIInterfaceOrientationLandscapeRight</string>\n";
-	ss << "\t</array>\n";
+	if (!iOS)
+	{
+		ss << "\t<key>LSApplicationCategoryType</key>\n";
+		ss << "\t<string>public.app-category.games</string>\n";		// FIXME: make configurable
+		ss << "\t<key>LSMinimumSystemVersion</key>\n";
+		ss << "\t<string>${MACOSX_DEPLOYMENT_TARGET}</string>\n";	// FIXME: make configurable
+		ss << "\t<key>NSHumanReadableCopyright</key>\n";
+		ss << "\t<string>Copyright © 2014. All rights reserved.</string>";	// FIXME: make configurable
+		ss << "\t<key>NSPrincipalClass</key>\n";
+		ss << "\t<string>NSApplication</string>\n";
+	}
+	else
+	{
+		ss << "\t<key>LSRequiresIPhoneOS</key>\n";
+		ss << "\t<true/>\n";
+		ss << "\t<key>UIRequiredDeviceCapabilities</key>\n";
+		ss << "\t<array>\n";
+		ss << "\t	<string>armv7</string>\n";							// FIXME: make configurable
+		ss << "\t</array>\n";
+		ss << "\t<key>UISupportedInterfaceOrientations</key>\n";		// FIXME: make configurable
+		ss << "\t<array>\n";
+		ss << "\t\t<string>UIInterfaceOrientationPortrait</string>\n";
+		ss << "\t\t<string>UIInterfaceOrientationLandscapeLeft</string>\n";
+		ss << "\t\t<string>UIInterfaceOrientationLandscapeRight</string>\n";
+		ss << "\t</array>\n";
+		ss << "\t<key>UISupportedInterfaceOrientations~ipad</key>\n";	// FIXME: make configurable
+		ss << "\t<array>\n";
+		ss << "\t\t<string>UIInterfaceOrientationPortrait</string>\n";
+		ss << "\t\t<string>UIInterfaceOrientationPortraitUpsideDown</string>\n";
+		ss << "\t\t<string>UIInterfaceOrientationLandscapeLeft</string>\n";
+		ss << "\t\t<string>UIInterfaceOrientationLandscapeRight</string>\n";
+		ss << "\t</array>\n";
+	}
 	ss << "</dict>\n";
 	ss << "</plist>\n";
 	projectFile->config()->writeFile(projectName + "/Info.plist", ss.str());
