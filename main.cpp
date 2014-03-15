@@ -257,8 +257,8 @@ static int build(int argc, char ** argv)
 	{
 		std::string projectPath = generateXCode(project, true);
 	  #ifdef __APPLE__
-		bool ok1 = (buildIOS && runXCodeBuild(projectPath, buildType, "iphoneos"));
-		bool ok2 = (buildIOSSimulator && runXCodeBuild(projectPath, buildType, "iphonesimulator"));
+		bool ok1 = (!buildIOS || runXCodeBuild(projectPath, buildType, "iphoneos"));
+		bool ok2 = (!buildIOSSimulator || runXCodeBuild(projectPath, buildType, "iphonesimulator"));
 		if (ok1 && ok2)
 			platform &= ~Platform::iOS;
 	  #else
