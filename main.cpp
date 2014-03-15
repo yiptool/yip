@@ -131,6 +131,43 @@ static Platform::Type defaultTargetPlatform()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Build
 
+#ifdef __APPLE__
+static bool runXCodeBuild(const std::string & projectFile, BuildType::Value buildType, const std::string & sdk)
+{
+	std::string projectName = pathGetFileName(projectFile);
+	std::string projectPath = pathGetDirectory(projectFile);
+
+	std::vector<std::string> confs;
+	if (buildType & BuildType::Debug)
+	{
+		confs.push_back("Debug");
+		buildType &= ~BuildType::Debug;
+	}
+	if (buildType & BuildType::Release)
+	{
+		confs.push_back("Release");
+		buildType &= ~BuildType::Release;
+	}
+
+	if (confs.size() == 0)
+		return false;
+
+	for (const std::string & conf : confs)
+	{
+		std::stringstream ss;
+		ss << "cd " + shellEscapeArgument(projectPath) << " && ";
+		ss << "xcodebuild";
+		ss << " -project " << shellEscapeArgument(projectName);
+		ss << " -configuration " << shellEscapeArgument(conf);
+		if (sdk.length() > 0)
+			ss << " -sdk " << shellEscapeArgument(sdk);
+		shellExec(ss.str());
+	}
+
+	return (buildType == 0);
+}
+#endif
+
 static int build(int argc, char ** argv)
 {
 	BuildType::Value buildType = BuildType::Unspecified;
@@ -177,19 +214,31 @@ static int build(int argc, char ** argv)
 
 	if (platform & Platform::OSX)
 	{
-		generateXCode(projectFile, false);
-		platform &= ~Platform::OSX;
+		std::string projectPath = generateXCode(projectFile, false);
+	  #ifdef __APPLE__
+		if (runXCodeBuild(projectPath, buildType, std::string()))
+			platform &= ~Platform::OSX;
+	  #else
+		(void)projectPath;
+	  #endif
 	}
 
 	if (platform & Platform::iOS)
 	{
-		generateXCode(projectFile, true);
-		platform &= ~Platform::iOS;
+		std::string projectPath = generateXCode(projectFile, true);
+	  #ifdef __APPLE__
+		bool ok1 = (buildIOS && runXCodeBuild(projectPath, buildType, "iphoneos"));
+		bool ok2 = (buildIOSSimulator && runXCodeBuild(projectPath, buildType, "iphonesimulator"));
+		if (ok1 && ok2)
+			platform &= ~Platform::iOS;
+	  #else
+		(void)projectPath;
+	  #endif
 	}
 
 	if (platform != 0)
 	{
-		std::cerr << "Not all platforms were built (0x" << std::hex << std::setw(4) << std::setfill('0')
+		std::cerr << "Not all platforms/targets were built (0x" << std::hex << std::setw(4) << std::setfill('0')
 			<< platform << ")." << std::endl;
 		return 1;
 	}
@@ -247,6 +296,8 @@ static int generate(int argc, char ** argv)
 	  #ifdef __APPLE__
 		if (!noOpen)
 			shellExec("open " + shellEscapeArgument(generatedFile));
+	  #else
+		(void)generatedFile;
 	  #endif
 		platform &= ~Platform::OSX;
 	}
@@ -257,6 +308,8 @@ static int generate(int argc, char ** argv)
 	  #ifdef __APPLE__
 		if (!noOpen)
 			shellExec("open " + shellEscapeArgument(generatedFile));
+	  #else
+		(void)generatedFile;
 	  #endif
 		platform &= ~Platform::iOS;
 	}
