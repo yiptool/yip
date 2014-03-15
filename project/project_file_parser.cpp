@@ -39,6 +39,25 @@ enum class ProjectFileParser::Token
 	Literal,
 };
 
+static bool isValidPathPrefix(const std::string & prefix)
+{
+	for (char ch : prefix)
+	{
+		if (ch >= 'a' && ch <= 'z')
+			continue;
+		if (ch >= 'A' && ch <= 'Z')
+			continue;
+		if (ch >= '0' && ch <= '9')
+			continue;
+		if (ch == '.' || ch == '-' || ch == '_')
+			continue;
+		return false;
+	}
+	return true;
+}
+
+/* ProjectFileParser */
+
 ProjectFileParser::ProjectFileParser(const std::string & filename, const std::string & pathPrefix)
 	: m_FileName(pathMakeAbsolute(filename)),
 	  m_PathPrefix(pathPrefix),
@@ -46,7 +65,8 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const std::st
 	  m_Token(Token::Eof),
 	  m_CurLine(1),
 	  m_TokenLine(1),
-	  m_LastChar(0)
+	  m_LastChar(0),
+	  m_ResolveImports(false)
 {
 	m_Stream.open(filename, std::ios::in);
 	if (!m_Stream.is_open() || m_Stream.fail() || m_Stream.bad())
@@ -61,9 +81,51 @@ ProjectFileParser::~ProjectFileParser()
 {
 }
 
-void ProjectFileParser::parse(const ProjectPtr & project)
+void ProjectFileParser::parse(const ProjectPtr & project, const std::string & filename, bool resolveImports)
+{
+	ProjectFileParser parser(filename);
+	parser.doParse(project, resolveImports);
+}
+
+void ProjectFileParser::parseFromCurrentDirectory(const ProjectPtr & project, bool resolveImports)
+{
+	parse(project, g_Config->projectFileName, resolveImports);
+}
+
+void ProjectFileParser::parseFromGit(const ProjectPtr & project, const std::string & name,
+	const GitRepositoryPtr & repo)
+{
+	std::string file = pathConcat(repo->path(), g_Config->projectFileName);
+
+	std::string pathPrefix;
+	if (isValidPathPrefix(name))
+		pathPrefix = "git-" + name;
+	else
+	{
+		pathPrefix = repo->path();
+		if (pathPrefix.length() > 0 && pathIsSeparator(pathPrefix[pathPrefix.length() - 1]))
+			pathPrefix.resize(pathPrefix.length() - 1);
+		pathPrefix = pathGetFileName(pathPrefix);
+	}
+
+	ProjectFileParser parser(file, pathPrefix);
+	parser.doParse(project, true);
+}
+
+void ProjectFileParser::reportWarning(const std::string & message)
+{
+	std::cerr << m_FileName << '(' << m_TokenLine << "): " << message << std::endl;
+}
+
+void ProjectFileParser::reportError(const std::string & message)
+{
+	throw std::runtime_error(fmt() << m_FileName << '(' << m_TokenLine << "): " << message);
+}
+
+void ProjectFileParser::doParse(const ProjectPtr & project, bool resolveImports)
 {
 	m_Project = project.get();
+	m_ResolveImports = resolveImports;
 
 	for (;;)
 	{
@@ -89,16 +151,6 @@ void ProjectFileParser::parse(const ProjectPtr & project)
 		}
 		break;
 	}
-}
-
-void ProjectFileParser::reportWarning(const std::string & message)
-{
-	std::cerr << m_FileName << '(' << m_TokenLine << "): " << message << std::endl;
-}
-
-void ProjectFileParser::reportError(const std::string & message)
-{
-	throw std::runtime_error(fmt() << m_FileName << '(' << m_TokenLine << "): " << message);
 }
 
 void ProjectFileParser::parseSources()
@@ -161,23 +213,6 @@ void ProjectFileParser::parseDefines()
 		reportError("expected '}'.");
 }
 
-static bool isValidPathPrefix(const std::string & prefix)
-{
-	for (char ch : prefix)
-	{
-		if (ch >= 'a' && ch <= 'z')
-			continue;
-		if (ch >= 'A' && ch <= 'Z')
-			continue;
-		if (ch >= '0' && ch <= '9')
-			continue;
-		if (ch == '.' || ch == '-' || ch == '_')
-			continue;
-		return false;
-	}
-	return true;
-}
-
 void ProjectFileParser::parseImport()
 {
 	if (getToken() != Token::Literal)
@@ -187,7 +222,10 @@ void ProjectFileParser::parseImport()
 	std::string url = (it != g_Config->repos.end() ? it->second : m_TokenText);
 	std::string name = (it != g_Config->repos.end() ? it->first : m_TokenText);
 
-	if (!m_Project->addImport(url))
+	if (!m_Project->addImport(name, url))
+		return;
+
+	if (!m_ResolveImports)
 		return;
 
 	GitRepositoryPtr repo;
@@ -203,29 +241,13 @@ void ProjectFileParser::parseImport()
 
 	try
 	{
-		std::string file = pathConcat(repo->path(), g_Config->projectFileName);
-
-		std::string pathPrefix;
-		if (isValidPathPrefix(name))
-			pathPrefix = "git-" + name;
-		else
-		{
-			pathPrefix = repo->path();
-			if (pathPrefix.length() > 0 && pathIsSeparator(pathPrefix[pathPrefix.length() - 1]))
-				pathPrefix.resize(pathPrefix.length() - 1);
-			pathPrefix = pathGetFileName(pathPrefix);
-		}
-
-		ProjectFileParser parser(file, pathPrefix);
-		parser.parse(m_Project->shared_from_this());
+		ProjectFileParser::parseFromGit(m_Project->shared_from_this(), name, repo);
 	}
 	catch (const std::exception & e)
 	{
 		reportWarning(fmt() << "unable to parse project file in git repository at '" << url << "': " << e.what());
 		m_Project->setValid(false);
 	}
-
-	m_Project->addRepository(repo);
 }
 
 Platform::Type ProjectFileParser::parsePlatformMask()

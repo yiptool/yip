@@ -112,9 +112,7 @@ static ProjectPtr loadProject()
 	XCodeUniqueID::setSeed(projectPath);
 
 	ProjectPtr project = std::make_shared<Project>(projectPath);
-
-	ProjectFileParser parser(g_Config->projectFileName);
-	parser.parse(project);
+	ProjectFileParser::parseFromCurrentDirectory(project, true);
 
 	return project;
 }
@@ -331,15 +329,18 @@ static int update(int, char **)
 {
 	ProjectPtr project = loadProject();
 
-	if (project->repositories().size() == 0)
+	if (project->imports().size() == 0)
 	{
 		std::cout << "nothing to update." << std::endl;
 		return 0;
 	}
 
 	GitProgressPrinter printer;
-	for (const GitRepositoryPtr & repo : project->repositories())
+	for (auto it : project->imports())
+	{
+		GitRepositoryPtr repo = project->yipDirectory()->openGitRepository(it.second, &printer);
 		repo->updateHeadToRemote("origin", &printer);
+	}
 
 	return 0;
 }

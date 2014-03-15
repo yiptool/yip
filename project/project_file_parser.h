@@ -34,10 +34,9 @@
 class ProjectFileParser
 {
 public:
-	ProjectFileParser(const std::string & filename, const std::string & pathPrefix = std::string());
-	~ProjectFileParser();
-
-	void parse(const ProjectPtr & project);
+	static void parse(const ProjectPtr & project, const std::string & filename, bool resolveImports);
+	static void parseFromCurrentDirectory(const ProjectPtr & project, bool resolveImports);
+	static void parseFromGit(const ProjectPtr & project, const std::string & name, const GitRepositoryPtr & repo);
 
 protected:
 	inline const std::string & fileName() const { return m_FileName; }
@@ -61,6 +60,12 @@ private:
 	int m_CurLine;
 	int m_TokenLine;
 	int m_LastChar;
+	bool m_ResolveImports;
+
+	ProjectFileParser(const std::string & filename, const std::string & pathPrefix = std::string());
+	~ProjectFileParser();
+
+	void doParse(const ProjectPtr & project, bool resolveImports);
 
 	void parseSources();
 	void parseDefines();

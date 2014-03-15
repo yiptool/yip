@@ -140,17 +140,21 @@ void YipDirectory::writeFile(const std::string & path, const std::string & data)
 	transaction.commit();
 }
 
-GitRepositoryPtr YipDirectory::openGitRepository(const std::string & url, GitProgressPrinter && printer)
+std::string YipDirectory::getGitRepositoryPath(const std::string & url)
 {
-	std::string shortDirName = "git-" + sha1(url).substr(1, 10);
-	std::string dirName = pathConcat(m_Path, shortDirName);
+	return pathConcat(m_Path, "git-" + sha1(url).substr(1, 10));
+}
+
+GitRepositoryPtr YipDirectory::openGitRepository(const std::string & url, GitProgressPrinter * printer)
+{
+	std::string dirName = getGitRepositoryPath(url);
 
 	// Open the repository
 	GitRepositoryPtr repo;
 	try {
 		repo = GitRepository::openEx(dirName, GIT_REPOSITORY_OPEN_NO_SEARCH);
 	} catch (const GitError &) {
-		repo = GitRepository::clone(dirName, url, &printer);
+		repo = GitRepository::clone(dirName, url, printer);
 	}
 
 	return repo;

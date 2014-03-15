@@ -28,7 +28,6 @@
 #include "yip_directory.h"
 #include "../util/git.h"
 #include <vector>
-#include <unordered_set>
 #include <map>
 #include <memory>
 
@@ -51,18 +50,15 @@ public:
 		BuildType::Value buildTypes = BuildType::All);
 	inline const std::map<std::string, DefinePtr> & defines() const { return m_Defines; }
 
-	inline bool addImport(const std::string & req) { return m_Imports.insert(req).second; }
-	inline const std::unordered_set<std::string> & imports() const { return m_Imports; }
-
-	inline void addRepository(const GitRepositoryPtr & repo) { m_Repositories.push_back(repo); }
-	inline const std::vector<GitRepositoryPtr> & repositories() const { return m_Repositories; }
+	inline bool addImport(const std::string & name, const std::string & url)
+		{ return m_Imports.insert(std::make_pair(name, url)).second; }
+	inline const std::map<std::string, std::string> & imports() const { return m_Imports; }
 
 private:
 	std::string m_ProjectPath;
 	std::map<std::string, SourceFilePtr> m_SourceFiles;
 	std::map<std::string, DefinePtr> m_Defines;
-	std::unordered_set<std::string> m_Imports;
-	std::vector<GitRepositoryPtr> m_Repositories;
+	std::map<std::string, std::string> m_Imports;
 	mutable YipDirectoryPtr m_YipDirectory;
 	bool m_Valid;
 

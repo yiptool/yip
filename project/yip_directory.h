@@ -38,8 +38,10 @@ public:
 
 	void writeFile(const std::string & path, const std::string & data);
 
-	GitRepositoryPtr openGitRepository(const std::string & url,
-		GitProgressPrinter && printer = GitProgressPrinter());
+	std::string getGitRepositoryPath(const std::string & url);
+	GitRepositoryPtr openGitRepository(const std::string & url, GitProgressPrinter * printer);
+	GitRepositoryPtr openGitRepository(const std::string & url, GitProgressPrinter && prn = GitProgressPrinter())
+		{ return openGitRepository(url, &prn); }
 
 private:
 	std::string m_Path;
