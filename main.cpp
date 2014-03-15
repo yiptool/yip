@@ -80,6 +80,10 @@ static void usage()
 	    "       -d, --debug    Build the debug build.\n"                              /*|*/
 	    "       -r, --release  Build the release build.\n"                            /*|*/
 	    "\n"                                                                          /*|*/
+	    "     If you wish to download latest versions of imports before performing the\n"
+	    "     build, add the following option to the command-line:\n"                 /*|*/
+	    "       -u, --update   Update imports.\n"                                     /*|*/
+	    "\n"                                                                          /*|*/
 	    " * generate (gen): Generate project file but do not build.\n"                /*|*/
 	    "\n"                                                                          /*|*/
 	    "     By default, yip generates project file for the current platform only."  /*|*/
@@ -100,7 +104,7 @@ static void usage()
 	    "     All generated project files are stored into the .yip subdirectory in your\n"
 	    "     source directory.\n"                                                    /*|*/
 	    "\n"                                                                          /*|*/
-	    " * update (up): Download latest versions of dependencies.\n"                 /*|*/
+	    " * update (up): Download latest versions of imports.\n"                      /*|*/
 	    "\n"                                                                          /*|*/
 	    " * help: Display this help message.\n"                                       /*|*/
 	    << std::endl;
@@ -115,6 +119,22 @@ static ProjectPtr loadProject()
 	ProjectFileParser::parseFromCurrentDirectory(project, true);
 
 	return project;
+}
+
+static void updateProjectImports(const ProjectPtr & project)
+{
+	if (project->imports().size() == 0)
+	{
+		std::cout << "nothing to update." << std::endl;
+		return;
+	}
+
+	GitProgressPrinter printer;
+	for (auto it : project->imports())
+	{
+		GitRepositoryPtr repo = project->yipDirectory()->openGitRepository(it.second, &printer);
+		repo->updateHeadToRemote("origin", &printer);
+	}
 }
 
 static Platform::Type defaultTargetPlatform()
@@ -168,14 +188,16 @@ static bool runXCodeBuild(const std::string & projectFile, BuildType::Value buil
 
 static int build(int argc, char ** argv)
 {
+	bool update = false, buildIOS = false, buildIOSSimulator = false;
 	BuildType::Value buildType = BuildType::Unspecified;
-	bool buildIOS = false, buildIOSSimulator = false;
 	Platform::Type platform = Platform::None;
 
 	for (int i = 0; i < argc; i++)
 	{
 		if (argv[i][0] != '-')
 			throw std::runtime_error(fmt() << "invalid parameter '" << argv[i] << "'.");
+		else if (!strcmp(argv[i], "-u") || !strcmp(argv[i], "--update"))
+			update = true;
 		else if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--debug"))
 			buildType |= BuildType::Debug;
 		else if (!strcmp(argv[i], "-r") || !strcmp(argv[i], "--release"))
@@ -204,6 +226,12 @@ static int build(int argc, char ** argv)
 		std::cerr << "unable to determine target platform - please specify one using the command line option "
 			"(try 'yip help' for more information)." << std::endl;
 		return 1;
+	}
+
+	if (update)
+	{
+		ProjectPtr project = loadProject();
+		updateProjectImports(project);
 	}
 
 	ProjectPtr project = loadProject();
@@ -327,21 +355,7 @@ static int generate(int argc, char ** argv)
 
 static int update(int, char **)
 {
-	ProjectPtr project = loadProject();
-
-	if (project->imports().size() == 0)
-	{
-		std::cout << "nothing to update." << std::endl;
-		return 0;
-	}
-
-	GitProgressPrinter printer;
-	for (auto it : project->imports())
-	{
-		GitRepositoryPtr repo = project->yipDirectory()->openGitRepository(it.second, &printer);
-		repo->updateHeadToRemote("origin", &printer);
-	}
-
+	updateProjectImports(loadProject());
 	return 0;
 }
 
