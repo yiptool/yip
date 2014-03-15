@@ -39,8 +39,9 @@ enum class ProjectFileParser::Token
 	Literal,
 };
 
-ProjectFileParser::ProjectFileParser(const std::string & filename)
+ProjectFileParser::ProjectFileParser(const std::string & filename, const std::string & pathPrefix)
 	: m_FileName(pathMakeAbsolute(filename)),
+	  m_PathPrefix(pathPrefix),
 	  m_ProjectPath(pathGetDirectory(m_FileName)),
 	  m_Token(Token::Eof),
 	  m_CurLine(1),
@@ -120,6 +121,8 @@ void ProjectFileParser::parseSources()
 
 		std::string name = m_TokenText;
 		std::string path = pathMakeAbsolute(m_TokenText, m_ProjectPath);
+		if (m_PathPrefix.length() > 0)
+			name = pathConcat(m_PathPrefix, name);
 		SourceFilePtr sourceFile = m_ProjectFile->addSourceFile(name, path);
 
 		sourceFile->setPlatforms(platforms);
@@ -158,6 +161,23 @@ void ProjectFileParser::parseDefines()
 		reportError("expected '}'.");
 }
 
+static bool isValidPathPrefix(const std::string & prefix)
+{
+	for (char ch : prefix)
+	{
+		if (ch >= 'a' && ch <= 'z')
+			continue;
+		if (ch >= 'A' && ch <= 'Z')
+			continue;
+		if (ch >= '0' && ch <= '9')
+			continue;
+		if (ch == '.' || ch == '-' || ch == '_')
+			continue;
+		return false;
+	}
+	return true;
+}
+
 void ProjectFileParser::parseRequires()
 {
 	if (getToken() != Token::Literal)
@@ -165,6 +185,7 @@ void ProjectFileParser::parseRequires()
 
 	auto it = g_Config->repos.find(m_TokenText);
 	std::string url = (it != g_Config->repos.end() ? it->second : m_TokenText);
+	std::string name = (it != g_Config->repos.end() ? it->first : m_TokenText);
 
 	if (!m_ProjectFile->addRequirement(url))
 		return;
@@ -183,7 +204,19 @@ void ProjectFileParser::parseRequires()
 	try
 	{
 		std::string file = pathConcat(repo->path(), g_Config->projectFileName);
-		ProjectFileParser parser(file);
+
+		std::string pathPrefix;
+		if (isValidPathPrefix(name))
+			pathPrefix = "git-" + name;
+		else
+		{
+			pathPrefix = repo->path();
+			if (pathPrefix.length() > 0 && pathIsSeparator(pathPrefix[pathPrefix.length() - 1]))
+				pathPrefix.resize(pathPrefix.length() - 1);
+			pathPrefix = pathGetFileName(pathPrefix);
+		}
+
+		ProjectFileParser parser(file, pathPrefix);
 		parser.parse(m_ProjectFile->shared_from_this());
 	}
 	catch (const std::exception & e)

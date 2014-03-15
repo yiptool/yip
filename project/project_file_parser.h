@@ -34,7 +34,7 @@
 class ProjectFileParser
 {
 public:
-	ProjectFileParser(const std::string & filename);
+	ProjectFileParser(const std::string & filename, const std::string & pathPrefix = std::string());
 	~ProjectFileParser();
 
 	void parse(const ProjectFilePtr & projectFile);
@@ -53,6 +53,7 @@ private:
 	ProjectFile * m_ProjectFile;
 	std::unordered_map<std::string, void (ProjectFileParser::*)()> m_CommandHandlers;
 	std::string m_FileName;
+	std::string m_PathPrefix;
 	std::string m_ProjectPath;
 	std::stringstream m_Buffer;
 	std::string m_TokenText;
