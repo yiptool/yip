@@ -142,7 +142,15 @@ void ProjectFileParser::doParse(const ProjectPtr & project, bool resolveImports)
 			auto it = m_CommandHandlers.find(m_TokenText);
 			if (it != m_CommandHandlers.end())
 			{
-				(this->*(it->second))();
+				try
+				{
+					(this->*(it->second))();
+				}
+				catch (const std::exception & e)
+				{
+					reportError(e.what());
+					return;
+				}
 				continue;
 			}
 			goto unexpected;
@@ -268,8 +276,7 @@ void ProjectFileParser::parseImport()
 	}
 	catch (const std::exception & e)
 	{
-		reportError(fmt() << "unable to open git repository at '" << url << "': " << e.what());
-		return;
+		throw std::runtime_error(fmt() << "unable to open git repository at '" << url << "': " << e.what());
 	}
 
 	try
@@ -312,17 +319,10 @@ Platform::Type ProjectFileParser::parsePlatformName()
 		return Platform::None;
 	}
 
-	try
-	{
-		Platform::Type result = platformFromString(m_TokenText);
-		getToken();
-		return result;
-	}
-	catch (const std::exception & e)
-	{
-		reportError(e.what());
-		return Platform::None;
-	}
+	Platform::Type result = platformFromString(m_TokenText);
+	getToken();
+
+	return result;
 }
 
 void ProjectFileParser::parsePlatformOrBuildTypeMask(Platform::Type & platforms, BuildType::Value & buildTypes)
