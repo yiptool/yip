@@ -27,11 +27,11 @@
 #include <cstdlib>
 #include <cstring>
 #include <vector>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #ifndef _WIN32
  #include <unistd.h>
- #include <sys/stat.h>
- #include <sys/types.h>
  #include <pwd.h>
 #else
  #ifndef WIN32_LEAN_AND_MEAN
