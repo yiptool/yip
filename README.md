@@ -45,6 +45,9 @@ The format of the `Yipfile` is pretty simple. Here is an example:
          main.cpp
       }
 
+Paths could be either absolute (not recommended) or relative to the directory
+where `Yipfile` is located.
+
 You could add a suffix to the `sources` command to specify platforms on which
 this source file should be compiled. It could be either a list of allowed
 platforms or a list of disallowed platforms:
@@ -116,6 +119,27 @@ To handle this case the `public_headers` command could be added to the zlib's
 Now you can include `zlib.h` in your main program:
 
       #include <yip-imports/zlib.h>
+
+### Frameworks on Apple platforms
+
+Frameworks on OSX and iOS could be linked using the `ios:framework` and
+`osx:framework` commands respectively. These commands have multiple variants
+of syntax:
+
+      osx:framework OpenGL.framework
+      osx:framework (libexpat.dylib => "$/usr/lib/libexpat.dylib")
+      osx:framework (FacebookSDK.framework => "this/FacebookSDK.framework")
+
+First variant links with the system-provided framework (the ".framework"
+suffix in this variant is not necessary and could be omitted). The default
+search path is used.
+
+Second variant links with the system-provided framework at the specified path.
+The dollar sign at the beginning of the path means *SDKROOT*.
+
+Third variant links with the user-provided framework at the specified path.
+Path could be either absolute or relative to the directory where `Yipfile`
+is located.
 
 Working directory
 -----------------

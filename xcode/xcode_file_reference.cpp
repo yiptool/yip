@@ -26,6 +26,7 @@
 const std::string XCODE_FILETYPE_WRAPPER_APPLICATION = "wrapper.application";
 const std::string XCODE_FILETYPE_WRAPPER_FRAMEWORK = "wrapper.framework";
 const std::string XCODE_FILETYPE_COMPILED_MACHO_EXECUTABLE = "compiled.mach-o.executable";
+const std::string XCODE_FILETYPE_COMPILED_MACHO_DYLIB = "compiled.mach-o.dylib";
 const std::string XCODE_FILETYPE_TEXT = "text";
 const std::string XCODE_FILETYPE_TEXT_PLIST_XML = "text.plist.xml";
 const std::string XCODE_FILETYPE_TEXT_PLIST_STRINGS = "text.plist.strings";

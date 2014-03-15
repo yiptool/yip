@@ -71,6 +71,7 @@ private:
 	void parsePublicHeaders();
 	void parseDefines();
 	void parseImport();
+	void parseIOSorOSX();
 
 	Platform::Type parsePlatformMask();
 	Platform::Type parsePlatformName();

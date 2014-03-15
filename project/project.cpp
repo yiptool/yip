@@ -65,3 +65,37 @@ DefinePtr Project::addDefine(const std::string & name, Platform::Type platforms,
 	}
 	return define;
 }
+
+void Project::osxAddFramework(const std::string & name, const std::string & path)
+{
+	addFramework(m_OSXFrameworks, name, path, "OSX");
+}
+
+void Project::iosAddFramework(const std::string & name, const std::string & path)
+{
+	addFramework(m_IOSFrameworks, name, path, "iOS");
+}
+
+void Project::addFramework(std::map<std::string, std::string> & map, const std::string & name,
+	const std::string & path, const char * what)
+{
+	auto it = map.insert(std::make_pair(name, path));
+
+	if (it.second)
+		return;
+
+	if (it.first->second != path)
+	{
+		if (path.empty())
+			return;
+
+		if (it.first->second.empty())
+		{
+			it.first->second = path;
+			return;
+		}
+
+		throw std::runtime_error(fmt() << "conflicting declaration for " << what << " framework '" << name
+			<< "' (was '" << it.first->second << "', now '" << path << "').");
+	}
+}

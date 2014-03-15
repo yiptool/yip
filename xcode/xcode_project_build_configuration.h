@@ -144,6 +144,8 @@ public:
 	inline bool validateProduct() const { return m_ValidateProduct; }
 	inline void setValidateProduct(bool flag) { m_ValidateProduct = flag; }
 
+	inline void addLibrarySearchPath(const std::string & path) { m_LibrarySearchPaths.push_back(path); }
+
 	inline void addPreprocessorDefinition(const std::string & def) { m_Defines.push_back(def); }
 
 	inline void setCodeSignIdentity(const std::string & sdk, const std::string & value)
@@ -188,6 +190,7 @@ private:
 	std::string m_SDKRoot;
 	std::string m_TargetedDeviceFamily;
 	bool m_ValidateProduct;
+	std::vector<std::string> m_LibrarySearchPaths;
 	std::vector<std::string> m_Defines;
 	std::string m_CodeSignIdentitySDK;
 	std::string m_CodeSignIdentityValue;

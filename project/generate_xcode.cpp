@@ -48,6 +48,7 @@ namespace
 		XCodeBuildPhase * resourcesBuildPhase = nullptr;
 		XCodeGroup * mainGroup = nullptr;
 		XCodeGroup * sourcesGroup = nullptr;
+		XCodeGroup * frameworksGroup = nullptr;
 		XCodeGroup * generatedGroup = nullptr;
 		XCodeGroup * productsGroup = nullptr;
 		XCodeGroup * resourcesGroup = nullptr;
@@ -82,6 +83,9 @@ namespace
 
 		// Native target
 		void createNativeTarget();
+
+		// Frameworks
+		void addFrameworks();
 
 		// Auxiliary files
 		void writeDummyResourceFile();
@@ -126,6 +130,7 @@ static std::string fileTypeForXCode(FileType type)
 	case FILE_BINARY_SHARED_OBJECT: return XCODE_FILETYPE_TEXT;	// FIXME
 	case FILE_BINARY_ARCHIVE: return XCODE_FILETYPE_TEXT;		// FIXME
 	case FILE_BINARY_APPLE_FRAMEWORK: return XCODE_FILETYPE_WRAPPER_FRAMEWORK;
+	case FILE_BINARY_APPLE_DYNAMIC_LIB: return XCODE_FILETYPE_COMPILED_MACHO_DYLIB;
 	case FILE_SOURCE_C: return XCODE_FILETYPE_SOURCECODE_C_C;
 	case FILE_SOURCE_CXX: return XCODE_FILETYPE_SOURCECODE_CPP_CPP;
 	case FILE_SOURCE_C_HEADER: return XCODE_FILETYPE_SOURCECODE_C_H;
@@ -183,6 +188,10 @@ void Gen::createGroups()
 {
 	mainGroup = xcodeProject->addGroup();
 	xcodeProject->setMainGroup(mainGroup);
+
+	frameworksGroup = xcodeProject->addGroup();
+	frameworksGroup->setName("Frameworks");
+	mainGroup->addChild(frameworksGroup);
 
 	generatedGroup = xcodeProject->addGroup();
 	generatedGroup->setName("Generated");
@@ -393,6 +402,52 @@ void Gen::createNativeTarget()
 	target->addBuildPhase(sourcesBuildPhase);
 	target->addBuildPhase(frameworksBuildPhase);
 	target->addBuildPhase(resourcesBuildPhase);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Frameworks
+
+void Gen::addFrameworks()
+{
+	std::set<std::string> libraryPaths;
+	for (auto it : (iOS ? project->iosFrameworks() : project->osxFrameworks()))
+	{
+		std::string name = it.first;
+		std::string path = it.second;
+		bool sdkRoot = true;
+
+		if (path.empty())
+			path = pathConcat("System/Library/Frameworks", name);
+		else if (path.length() >= 2 && path[0] == '$' && pathIsSeparator(path[1]))
+			path = path.substr(2);
+		else
+			sdkRoot = false;
+
+		XCodeFileReference * fileRef = xcodeProject->addFileReference();
+		fileRef->setLastKnownFileType(fileTypeForXCode(determineFileType(name)));
+		fileRef->setName(name);
+		fileRef->setPath(path);
+		fileRef->setSourceTree(sdkRoot ? "SDKROOT" : "<absolute>");
+		frameworksGroup->addChild(fileRef);
+
+		XCodeBuildFile * buildFile = frameworksBuildPhase->addFile();
+		buildFile->setFileRef(fileRef);
+
+		if (pathGetShortFileExtension(name) == ".dylib")
+		{
+			std::string dir = pathSimplify(pathGetDirectory(path));
+			if (!dir.empty())
+			{
+				if (sdkRoot)
+					dir = pathConcat("$(SDKROOT)", dir);
+				if (dir != "$(SDKROOT)/usr/lib" && libraryPaths.insert(dir).second)
+				{
+					cfgProjectDebug->addLibrarySearchPath(dir);
+					cfgProjectRelease->addLibrarySearchPath(dir);
+				}
+			}
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -724,6 +779,7 @@ void Gen::generate()
 	addDefines();
 	createConfigurationLists();
 	createNativeTarget();
+	addFrameworks();
 
 	writeDummyResourceFile();
 	writeInfoPList();

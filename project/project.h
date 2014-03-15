@@ -54,13 +54,28 @@ public:
 		{ return m_Imports.insert(std::make_pair(name, url)).second; }
 	inline const std::map<std::string, std::string> & imports() const { return m_Imports; }
 
+	// OSX
+
+	void osxAddFramework(const std::string & name, const std::string & path);
+	inline const std::map<std::string, std::string> & osxFrameworks() const { return m_OSXFrameworks; }
+
+	// iOS
+
+	void iosAddFramework(const std::string & name, const std::string & path);
+	inline const std::map<std::string, std::string> & iosFrameworks() const { return m_IOSFrameworks; }
+
 private:
 	std::string m_ProjectPath;
 	std::map<std::string, SourceFilePtr> m_SourceFiles;
 	std::map<std::string, DefinePtr> m_Defines;
 	std::map<std::string, std::string> m_Imports;
+	std::map<std::string, std::string> m_OSXFrameworks;
+	std::map<std::string, std::string> m_IOSFrameworks;
 	mutable YipDirectoryPtr m_YipDirectory;
 	bool m_Valid;
+
+	void addFramework(std::map<std::string, std::string> & map, const std::string & name,
+		const std::string & path, const char * what);
 
 	Project(const Project &) = delete;
 	Project & operator=(const Project &) = delete;

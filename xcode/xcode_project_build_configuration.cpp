@@ -114,6 +114,15 @@ void XCodeProjectBuildConfiguration::writeBuildSettings(std::stringstream & ss) 
 	if (m_IPhoneOSDeploymentTarget.length() > 0)
 		ss << "\t\t\t\tIPHONEOS_DEPLOYMENT_TARGET = " << stringLiteral(m_IPhoneOSDeploymentTarget) << ";\n";
 
+	if (m_LibrarySearchPaths.size() > 0)
+	{
+		ss << "\t\t\t\tLIBRARY_SEARCH_PATHS = (\n";
+		for (const std::string & path : m_LibrarySearchPaths)
+			ss << "\t\t\t\t\t" << stringLiteral(path) << ",\n";
+		ss << "\t\t\t\t\t\"$(inherited)\",\n";
+		ss << "\t\t\t\t);\n";
+	}
+
 	if (m_MacOSXDeploymentTarget.length() > 0)
 		ss << "\t\t\t\tMACOSX_DEPLOYMENT_TARGET = " << stringLiteral(m_MacOSXDeploymentTarget) << ";\n";
 

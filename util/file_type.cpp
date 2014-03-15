@@ -56,6 +56,7 @@ FileType determineFileType(const std::string & path)
 		g_ExtMap.insert(std::make_pair(".so", FILE_BINARY_SHARED_OBJECT));
 		g_ExtMap.insert(std::make_pair(".a", FILE_BINARY_ARCHIVE));
 		g_ExtMap.insert(std::make_pair(".framework", FILE_BINARY_APPLE_FRAMEWORK));
+		g_ExtMap.insert(std::make_pair(".dylib", FILE_BINARY_APPLE_DYNAMIC_LIB));
 		g_ExtMap.insert(std::make_pair(".c", FILE_SOURCE_C));
 		g_ExtMap.insert(std::make_pair(".C", FILE_SOURCE_CXX));
 		g_ExtMap.insert(std::make_pair(".cc", FILE_SOURCE_CXX));

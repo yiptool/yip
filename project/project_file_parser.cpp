@@ -33,10 +33,14 @@ enum class ProjectFileParser::Token
 	Eof = 0,
 	LCurly,
 	RCurly,
+	LParen,
+	RParen,
 	Colon,
 	Exclamation,
 	Comma,
 	Literal,
+	Equal,
+	Arrow
 };
 
 static bool isValidPathPrefix(const std::string & prefix)
@@ -78,6 +82,8 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const std::st
 	m_CommandHandlers.insert(std::make_pair("public_headers", &ProjectFileParser::parsePublicHeaders));
 	m_CommandHandlers.insert(std::make_pair("defines", &ProjectFileParser::parseDefines));
 	m_CommandHandlers.insert(std::make_pair("import", &ProjectFileParser::parseImport));
+	m_CommandHandlers.insert(std::make_pair("ios", &ProjectFileParser::parseIOSorOSX));
+	m_CommandHandlers.insert(std::make_pair("osx", &ProjectFileParser::parseIOSorOSX));
 }
 
 ProjectFileParser::~ProjectFileParser()
@@ -299,6 +305,63 @@ void ProjectFileParser::parseImport()
 	}
 }
 
+void ProjectFileParser::parseIOSorOSX()
+{
+	const std::string & prefix = m_TokenText;
+	bool iOS = (prefix == "ios");
+
+	if (getToken() != Token::Colon)
+		{ reportError(fmt() << "expected ':' after '" << prefix << "'."); return; }
+
+	if (getToken() != Token::Literal)
+		{ reportError(fmt() << "expected variable name after '" << prefix << ":'."); return; }
+
+	if (m_TokenText == "framework")
+	{
+		std::string name, path;
+		if (getToken() != Token::LParen)
+		{
+			if (m_Token != Token::Literal)
+				{ reportError(fmt() << "expected framework name after '" << prefix << ":framework'."); return; }
+			name = m_TokenText;
+			if (pathGetShortFileExtension(name) == "")
+				name += ".framework";
+		}
+		else
+		{
+			if (getToken() != Token::Literal)
+				{ reportError("expected framework name after '('."); return; }
+			name = m_TokenText;
+			if (getToken() != Token::Arrow)
+				{ reportError("expected '=>'."); return; }
+			if (getToken() != Token::Literal)
+				{ reportError(fmt() << "expected framework path after '=>'."); return; }
+			path = m_TokenText;
+			if (getToken() != Token::RParen)
+				{ reportError("expected ')'."); return; }
+
+			if (path.length() < 2 || path[0] != '$' || !pathIsSeparator(path[1]))
+				path = pathMakeAbsolute(path, m_ProjectPath);
+		}
+
+		try
+		{
+			if (iOS)
+				m_Project->iosAddFramework(name, path);
+			else
+				m_Project->osxAddFramework(name, path);
+		}
+		catch (const std::exception & e)
+		{
+			reportWarning(e.what());
+		}
+
+		return;
+	}
+
+	reportError(fmt() << "invalid variable '" << prefix << ":" << m_TokenText << "'.");
+}
+
 Platform::Type ProjectFileParser::parsePlatformMask()
 {
 	bool inverse = false;
@@ -414,6 +477,12 @@ ProjectFileParser::Token ProjectFileParser::getToken()
 		case '}':
 			return (m_TokenText = '}', m_Token = Token::RCurly);
 
+		case '(':
+			return (m_TokenText = '(', m_Token = Token::LParen);
+
+		case ')':
+			return (m_TokenText = ')', m_Token = Token::RParen);
+
 		case ':':
 			return (m_TokenText = ':', m_Token = Token::Colon);
 
@@ -422,6 +491,13 @@ ProjectFileParser::Token ProjectFileParser::getToken()
 
 		case ',':
 			return (m_TokenText = ',', m_Token = Token::Comma);
+
+		case '=':
+			ch = getChar();
+			if (ch == '>')
+				return (m_TokenText = "=>", m_Token = Token::Arrow);
+			ungetChar();
+			return (m_TokenText = '=', m_Token = Token::Equal);
 
 		case LETTERS:
 		case EXTRA_SYMBOLS:
