@@ -50,6 +50,7 @@ Config::Config()
 {
 	repos.insert(std::make_pair("zlib", "https://github.com/oss-forks/zlib.git"));
 	repos.insert(std::make_pair("tinyxml", "https://github.com/oss-forks/tinyxml.git"));
+	repos.insert(std::make_pair("sqlite3", "https://github.com/oss-forks/sqlite3.git"));
 }
 
 struct Context
