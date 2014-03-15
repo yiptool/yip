@@ -23,9 +23,9 @@
 #ifndef __0f566a2e6d890e2e552e488bfb5c22aa__
 #define __0f566a2e6d890e2e552e488bfb5c22aa__
 
-#include "project_file.h"
+#include "project.h"
 
 // Returns path to the generated project
-std::string generateXCode(const ProjectFilePtr & projectFile, bool iOS);
+std::string generateXCode(const ProjectPtr & project, bool iOS);
 
 #endif

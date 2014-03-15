@@ -6,12 +6,12 @@ ADD_LIBRARY(project STATIC
 	generate_xcode.h
 	platform.cpp
 	platform.h
-	project_config.cpp
-	project_config.h
-	project_file.cpp
-	project_file.h
+	project.cpp
+	project.h
 	project_file_parser.cpp
 	project_file_parser.h
 	source_file.cpp
 	source_file.h
+	yip_directory.cpp
+	yip_directory.h
 )

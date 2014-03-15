@@ -106,17 +106,17 @@ static void usage()
 	    << std::endl;
 }
 
-static ProjectFilePtr loadProjectFile()
+static ProjectPtr loadProject()
 {
 	std::string projectPath = pathGetDirectory(pathMakeAbsolute(g_Config->projectFileName));
 	XCodeUniqueID::setSeed(projectPath);
 
-	ProjectFilePtr projectFile = std::make_shared<ProjectFile>(projectPath);
+	ProjectPtr project = std::make_shared<Project>(projectPath);
 
 	ProjectFileParser parser(g_Config->projectFileName);
-	parser.parse(projectFile);
+	parser.parse(project);
 
-	return projectFile;
+	return project;
 }
 
 static Platform::Type defaultTargetPlatform()
@@ -208,13 +208,13 @@ static int build(int argc, char ** argv)
 		return 1;
 	}
 
-	ProjectFilePtr projectFile = loadProjectFile();
-	if (!projectFile->isValid())
+	ProjectPtr project = loadProject();
+	if (!project->isValid())
 		return 1;
 
 	if (platform & Platform::OSX)
 	{
-		std::string projectPath = generateXCode(projectFile, false);
+		std::string projectPath = generateXCode(project, false);
 	  #ifdef __APPLE__
 		if (runXCodeBuild(projectPath, buildType, std::string()))
 			platform &= ~Platform::OSX;
@@ -225,7 +225,7 @@ static int build(int argc, char ** argv)
 
 	if (platform & Platform::iOS)
 	{
-		std::string projectPath = generateXCode(projectFile, true);
+		std::string projectPath = generateXCode(project, true);
 	  #ifdef __APPLE__
 		bool ok1 = (buildIOS && runXCodeBuild(projectPath, buildType, "iphoneos"));
 		bool ok2 = (buildIOSSimulator && runXCodeBuild(projectPath, buildType, "iphonesimulator"));
@@ -276,8 +276,8 @@ static int generate(int argc, char ** argv)
 		return 1;
 	}
 
-	ProjectFilePtr projectFile = loadProjectFile();
-	if (!projectFile->isValid())
+	ProjectPtr project = loadProject();
+	if (!project->isValid())
 		return 1;
 
 	size_t numPlatforms = 0;
@@ -292,7 +292,7 @@ static int generate(int argc, char ** argv)
 
 	if (platform & Platform::OSX)
 	{
-		std::string generatedFile = generateXCode(projectFile, false);
+		std::string generatedFile = generateXCode(project, false);
 	  #ifdef __APPLE__
 		if (!noOpen)
 			shellExec("open " + shellEscapeArgument(generatedFile));
@@ -304,7 +304,7 @@ static int generate(int argc, char ** argv)
 
 	if (platform & Platform::iOS)
 	{
-		std::string generatedFile = generateXCode(projectFile, true);
+		std::string generatedFile = generateXCode(project, true);
 	  #ifdef __APPLE__
 		if (!noOpen)
 			shellExec("open " + shellEscapeArgument(generatedFile));
@@ -329,16 +329,16 @@ static int generate(int argc, char ** argv)
 
 static int update(int, char **)
 {
-	ProjectFilePtr projectFile = loadProjectFile();
+	ProjectPtr project = loadProject();
 
-	if (projectFile->repositories().size() == 0)
+	if (project->repositories().size() == 0)
 	{
 		std::cout << "nothing to update." << std::endl;
 		return 0;
 	}
 
 	GitProgressPrinter printer;
-	for (const GitRepositoryPtr & repo : projectFile->repositories())
+	for (const GitRepositoryPtr & repo : project->repositories())
 		repo->updateHeadToRemote("origin", &printer);
 
 	return 0;

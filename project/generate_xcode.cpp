@@ -34,7 +34,7 @@ namespace
 	struct Gen
 	{
 		// Input
-		ProjectFilePtr projectFile;
+		ProjectPtr project;
 		bool iOS;
 
 		// Output
@@ -42,7 +42,7 @@ namespace
 
 		// Private
 		std::string projectName;
-		std::shared_ptr<XCodeProject> project;
+		std::shared_ptr<XCodeProject> xcodeProject;
 		XCodeBuildPhase * frameworksBuildPhase = nullptr;
 		XCodeBuildPhase * sourcesBuildPhase = nullptr;
 		XCodeBuildPhase * resourcesBuildPhase = nullptr;
@@ -171,9 +171,9 @@ static bool isCompilableFileType(FileType type)
 
 void Gen::createBuildPhases()
 {
-	frameworksBuildPhase = project->addFrameworksBuildPhase();
-	sourcesBuildPhase = project->addSourcesBuildPhase();
-	resourcesBuildPhase = project->addResourcesBuildPhase();
+	frameworksBuildPhase = xcodeProject->addFrameworksBuildPhase();
+	sourcesBuildPhase = xcodeProject->addSourcesBuildPhase();
+	resourcesBuildPhase = xcodeProject->addResourcesBuildPhase();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -181,23 +181,23 @@ void Gen::createBuildPhases()
 
 void Gen::createGroups()
 {
-	mainGroup = project->addGroup();
-	project->setMainGroup(mainGroup);
+	mainGroup = xcodeProject->addGroup();
+	xcodeProject->setMainGroup(mainGroup);
 
-	generatedGroup = project->addGroup();
+	generatedGroup = xcodeProject->addGroup();
 	generatedGroup->setName("Generated");
 	mainGroup->addChild(generatedGroup);
 
-	productsGroup = project->addGroup();
+	productsGroup = xcodeProject->addGroup();
 	productsGroup->setName("Products");
-	project->setProductRefGroup(productsGroup);
+	xcodeProject->setProductRefGroup(productsGroup);
 	mainGroup->addChild(productsGroup);
 
-	resourcesGroup = project->addGroup();
+	resourcesGroup = xcodeProject->addGroup();
 	resourcesGroup->setName("Resources");
 	mainGroup->addChild(resourcesGroup);
 
-	sourcesGroup = project->addGroup();
+	sourcesGroup = xcodeProject->addGroup();
 	sourcesGroup->setName("Sources");
 	mainGroup->addChild(sourcesGroup);
 }
@@ -213,7 +213,7 @@ XCodeGroup * Gen::groupForPath(XCodeGroup * rootGroup, const std::string & path)
 	if (dir.length() > 0)
 		rootGroup = groupForPath(rootGroup, dir);
 
-	XCodeGroup * childGroup = project->addGroup();
+	XCodeGroup * childGroup = xcodeProject->addGroup();
 	childGroup->setName(pathGetFileName(path));
 	childGroup->setSourceTree("<group>");
 	rootGroup->addChild(childGroup);
@@ -228,7 +228,7 @@ XCodeGroup * Gen::groupForPath(XCodeGroup * rootGroup, const std::string & path)
 
 void Gen::addSourceFile(XCodeGroup * group, XCodeBuildPhase * phase, const SourceFilePtr & file)
 {
-	XCodeFileReference * ref = project->addFileReference();
+	XCodeFileReference * ref = xcodeProject->addFileReference();
 	ref->setPath(file->path());
 	ref->setSourceTree("<absolute>");
 
@@ -261,7 +261,7 @@ void Gen::addSourceFile(XCodeGroup * group, XCodeBuildPhase * phase, const Sourc
 
 void Gen::addSourceFiles()
 {
-	for (auto it : projectFile->sourceFiles())
+	for (auto it : project->sourceFiles())
 	{
 		const SourceFilePtr & file = it.second;
 		if (!(file->platforms() & (iOS ? Platform::iOS : Platform::OSX)))
@@ -275,7 +275,7 @@ void Gen::addSourceFiles()
 
 void Gen::initDebugConfiguration()
 {
-	cfgTargetDebug = project->addTargetBuildConfiguration();
+	cfgTargetDebug = xcodeProject->addTargetBuildConfiguration();
 	cfgTargetDebug->setName("Debug");
 	cfgTargetDebug->setInfoPListFile(projectName + "/Info.plist");
 	cfgTargetDebug->setAssetCatalogAppIconName("AppIcon");
@@ -284,7 +284,7 @@ void Gen::initDebugConfiguration()
 	else
 		cfgTargetDebug->setAssetCatalogLaunchImageName("LaunchImage");
 
-	cfgProjectDebug = project->addProjectBuildConfiguration();
+	cfgProjectDebug = xcodeProject->addProjectBuildConfiguration();
 	cfgProjectDebug->setName("Debug");
 	if (!iOS)
 		cfgProjectDebug->setArchs("$(ARCHS_STANDARD)");
@@ -301,7 +301,7 @@ void Gen::initDebugConfiguration()
 
 void Gen::initReleaseConfiguration()
 {
-	cfgTargetRelease = project->addTargetBuildConfiguration();
+	cfgTargetRelease = xcodeProject->addTargetBuildConfiguration();
 	cfgTargetRelease->setName("Release");
 	cfgTargetRelease->setInfoPListFile(projectName + "/Info.plist");
 	cfgTargetRelease->setAssetCatalogAppIconName("AppIcon");
@@ -310,7 +310,7 @@ void Gen::initReleaseConfiguration()
 	else
 		cfgTargetRelease->setAssetCatalogLaunchImageName("LaunchImage");
 
-	cfgProjectRelease = project->addProjectBuildConfiguration();
+	cfgProjectRelease = xcodeProject->addProjectBuildConfiguration();
 	cfgProjectRelease->setName("Release");
 	if (!iOS)
 		cfgProjectRelease->setArchs("$(ARCHS_STANDARD)");
@@ -331,16 +331,16 @@ void Gen::initReleaseConfiguration()
 
 void Gen::createConfigurationLists()
 {
-	targetCfgList = project->addConfigurationList();
+	targetCfgList = xcodeProject->addConfigurationList();
 	targetCfgList->setDefaultConfigurationName("Release");
 	targetCfgList->addConfiguration(cfgTargetDebug);
 	targetCfgList->addConfiguration(cfgTargetRelease);
 
-	projectCfgList = project->addConfigurationList();
+	projectCfgList = xcodeProject->addConfigurationList();
 	projectCfgList->setDefaultConfigurationName("Release");
 	projectCfgList->addConfiguration(cfgProjectDebug);
 	projectCfgList->addConfiguration(cfgProjectRelease);
-	project->setBuildConfigurationList(projectCfgList);
+	xcodeProject->setBuildConfigurationList(projectCfgList);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -348,7 +348,7 @@ void Gen::createConfigurationLists()
 
 void Gen::addDefines()
 {
-	for (auto it : projectFile->defines())
+	for (auto it : project->defines())
 	{
 		const DefinePtr & define = it.second;
 		if (!(define->platforms() & (iOS ? Platform::iOS : Platform::OSX)))
@@ -376,14 +376,14 @@ void Gen::addDefines()
 
 void Gen::createNativeTarget()
 {
-	XCodeFileReference * productRef = project->addFileReference();
+	XCodeFileReference * productRef = xcodeProject->addFileReference();
 	productRef->setExplicitFileType(XCODE_FILETYPE_WRAPPER_APPLICATION);
 	productRef->setIncludeInIndex(false);
 	productRef->setPath(projectName + ".app");
 	productRef->setSourceTree("BUILT_PRODUCTS_DIR");
 	productsGroup->addChild(productRef);
 
-	XCodeNativeTarget * target = project->addNativeTarget();
+	XCodeNativeTarget * target = xcodeProject->addNativeTarget();
 	target->setName(projectName);
 	target->setBuildConfigurationList(targetCfgList);
 	target->setProductName(projectName);
@@ -398,7 +398,7 @@ void Gen::createNativeTarget()
 
 void Gen::writeDummyResourceFile()
 {
-	XCodeFileReference * dummyFileRef = project->addFileReference();
+	XCodeFileReference * dummyFileRef = xcodeProject->addFileReference();
 	dummyFileRef->setLastKnownFileType(XCODE_FILETYPE_TEXT);
 	dummyFileRef->setName(".dummy");
 	dummyFileRef->setPath(projectName + "/.dummy");
@@ -408,12 +408,12 @@ void Gen::writeDummyResourceFile()
 	XCodeBuildFile * buildFile = resourcesBuildPhase->addFile();
 	buildFile->setFileRef(dummyFileRef);
 
-	projectFile->config()->writeFile(projectName + "/.dummy", std::string());
+	project->yipDirectory()->writeFile(projectName + "/.dummy", std::string());
 }
 
 void Gen::writeInfoPList()
 {
-	XCodeFileReference * plistFileRef = project->addFileReference();
+	XCodeFileReference * plistFileRef = xcodeProject->addFileReference();
 	plistFileRef->setLastKnownFileType(XCODE_FILETYPE_TEXT_PLIST_XML);
 	plistFileRef->setName("Info.plist");
 	plistFileRef->setPath(projectName + "/Info.plist");
@@ -488,12 +488,12 @@ void Gen::writeInfoPList()
 	}
 	ss << "</dict>\n";
 	ss << "</plist>\n";
-	projectFile->config()->writeFile(projectName + "/Info.plist", ss.str());
+	project->yipDirectory()->writeFile(projectName + "/Info.plist", ss.str());
 }
 
 void Gen::writeImageAssets()
 {
-	XCodeFileReference * assetsFileRef = project->addFileReference();
+	XCodeFileReference * assetsFileRef = xcodeProject->addFileReference();
 	assetsFileRef->setLastKnownFileType(XCODE_FILETYPE_FOLDER_ASSETCATALOG);
 	assetsFileRef->setName("Images.xcassets");
 	assetsFileRef->setPath(projectName + "/Images.xcassets");
@@ -611,7 +611,8 @@ void Gen::writeImageAssets()
 	ss << "    \"author\" : \"xcode\"\n";
 	ss << "  }\n";
 	ss << "}\n";
-	projectFile->config()->writeFile(projectName + "/Images.xcassets/AppIcon.appiconset/Contents.json", ss.str());
+	project->yipDirectory()
+		->writeFile(projectName + "/Images.xcassets/AppIcon.appiconset/Contents.json", ss.str());
 
 	if (iOS)
 	{
@@ -692,7 +693,7 @@ void Gen::writeImageAssets()
 		ss2 << "    \"author\" : \"xcode\"\n";
 		ss2 << "  }\n";
 		ss2 << "}\n";
-		projectFile->config()
+		project->yipDirectory()
 			->writeFile(projectName + "/Images.xcassets/LaunchImage.launchimage/Contents.json", ss2.str());
 	}
 }
@@ -702,16 +703,16 @@ void Gen::writeImageAssets()
 
 void Gen::writePBXProj()
 {
-	projectFile->config()->writeFile(projectName + ".xcodeproj/project.pbxproj", project->toString());
+	project->yipDirectory()->writeFile(projectName + ".xcodeproj/project.pbxproj", xcodeProject->toString());
 }
 
 void Gen::generate()
 {
 	projectName = (iOS ? "ios" : "osx");
-	projectPath = pathConcat(projectFile->config()->path(), projectName) + ".xcodeproj";
+	projectPath = pathConcat(project->yipDirectory()->path(), projectName) + ".xcodeproj";
 
-	project = std::make_shared<XCodeProject>();
-	project->setOrganizationName("");										// FIXME: make configurable
+	xcodeProject = std::make_shared<XCodeProject>();
+	xcodeProject->setOrganizationName("");									// FIXME: make configurable
 
 	createBuildPhases();
 	createGroups();
@@ -728,10 +729,10 @@ void Gen::generate()
 	writePBXProj();
 }
 
-std::string generateXCode(const ProjectFilePtr & projectFile, bool iOS)
+std::string generateXCode(const ProjectPtr & project, bool iOS)
 {
 	Gen gen;
-	gen.projectFile = projectFile;
+	gen.project = project;
 	gen.iOS = iOS;
 	gen.generate();
 	return gen.projectPath;

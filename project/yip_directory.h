@@ -28,14 +28,13 @@
 #include <memory>
 #include <string>
 
-class ProjectConfig
+class YipDirectory
 {
 public:
-	ProjectConfig(const std::string & projectPath);
-	~ProjectConfig();
+	YipDirectory(const std::string & projectPath);
+	~YipDirectory();
 
 	inline const std::string & path() const { return m_Path; }
-	inline const std::string & projectPath() const { return m_ProjectPath; }
 
 	void writeFile(const std::string & path, const std::string & data);
 
@@ -44,15 +43,14 @@ public:
 
 private:
 	std::string m_Path;
-	std::string m_ProjectPath;
 	SQLiteDatabasePtr m_DB;
 
 	void initDB();
 
-	ProjectConfig(const ProjectConfig &) = delete;
-	ProjectConfig & operator=(const ProjectConfig &) = delete;
+	YipDirectory(const YipDirectory &) = delete;
+	YipDirectory & operator=(const YipDirectory &) = delete;
 };
 
-typedef std::shared_ptr<ProjectConfig> ProjectConfigPtr;
+typedef std::shared_ptr<YipDirectory> YipDirectoryPtr;
 
 #endif

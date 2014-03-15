@@ -20,34 +20,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "project_file.h"
+#include "project.h"
 #include "../util/fmt.h"
 
-ProjectFile::ProjectFile(const std::string & prjPath)
+Project::Project(const std::string & prjPath)
 	: m_ProjectPath(prjPath),
 	  m_Valid(true)
 {
 }
 
-ProjectFile::ProjectFile(const ProjectConfigPtr & prjConfig)
-	: m_ProjectPath(prjConfig->projectPath()),
-	  m_Config(prjConfig),
-	  m_Valid(true)
+Project::~Project()
 {
 }
 
-ProjectFile::~ProjectFile()
+const YipDirectoryPtr & Project::yipDirectory() const
 {
+	if (!m_YipDirectory)
+		m_YipDirectory = std::make_shared<YipDirectory>(m_ProjectPath);
+	return m_YipDirectory;
 }
 
-const ProjectConfigPtr & ProjectFile::config() const
-{
-	if (!m_Config)
-		m_Config = std::make_shared<ProjectConfig>(m_ProjectPath);
-	return m_Config;
-}
-
-SourceFilePtr ProjectFile::addSourceFile(const std::string & name, const std::string & path)
+SourceFilePtr Project::addSourceFile(const std::string & name, const std::string & path)
 {
 	SourceFilePtr file = std::make_shared<SourceFile>(name, path);
 	if (!m_SourceFiles.insert(std::make_pair(name, file)).second)
@@ -55,7 +48,7 @@ SourceFilePtr ProjectFile::addSourceFile(const std::string & name, const std::st
 	return file;
 }
 
-DefinePtr ProjectFile::addDefine(const std::string & name, Platform::Type platforms, BuildType::Value buildTypes)
+DefinePtr Project::addDefine(const std::string & name, Platform::Type platforms, BuildType::Value buildTypes)
 {
 	DefinePtr define = std::make_shared<Define>(name);
 	auto r = m_Defines.insert(std::make_pair(name, define));

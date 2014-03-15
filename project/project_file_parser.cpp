@@ -61,9 +61,9 @@ ProjectFileParser::~ProjectFileParser()
 {
 }
 
-void ProjectFileParser::parse(const ProjectFilePtr & projectFile)
+void ProjectFileParser::parse(const ProjectPtr & project)
 {
-	m_ProjectFile = projectFile.get();
+	m_Project = project.get();
 
 	for (;;)
 	{
@@ -123,7 +123,7 @@ void ProjectFileParser::parseSources()
 		std::string path = pathMakeAbsolute(m_TokenText, m_ProjectPath);
 		if (m_PathPrefix.length() > 0)
 			name = pathConcat(m_PathPrefix, name);
-		SourceFilePtr sourceFile = m_ProjectFile->addSourceFile(name, path);
+		SourceFilePtr sourceFile = m_Project->addSourceFile(name, path);
 
 		sourceFile->setPlatforms(platforms);
 
@@ -153,7 +153,7 @@ void ProjectFileParser::parseDefines()
 	{
 		if (m_Token != Token::Literal)
 			reportError("expected preprocessor definition.");
-		m_ProjectFile->addDefine(m_TokenText, platforms, buildTypes);
+		m_Project->addDefine(m_TokenText, platforms, buildTypes);
 		getToken();
 	}
 
@@ -187,13 +187,13 @@ void ProjectFileParser::parseRequires()
 	std::string url = (it != g_Config->repos.end() ? it->second : m_TokenText);
 	std::string name = (it != g_Config->repos.end() ? it->first : m_TokenText);
 
-	if (!m_ProjectFile->addRequirement(url))
+	if (!m_Project->addRequirement(url))
 		return;
 
 	GitRepositoryPtr repo;
 	try
 	{
-		repo = m_ProjectFile->config()->openGitRepository(url);
+		repo = m_Project->yipDirectory()->openGitRepository(url);
 	}
 	catch (const std::exception & e)
 	{
@@ -217,15 +217,15 @@ void ProjectFileParser::parseRequires()
 		}
 
 		ProjectFileParser parser(file, pathPrefix);
-		parser.parse(m_ProjectFile->shared_from_this());
+		parser.parse(m_Project->shared_from_this());
 	}
 	catch (const std::exception & e)
 	{
 		reportWarning(fmt() << "unable to parse project file in git repository at '" << url << "': " << e.what());
-		m_ProjectFile->setValid(false);
+		m_Project->setValid(false);
 	}
 
-	m_ProjectFile->addRepository(repo);
+	m_Project->addRepository(repo);
 }
 
 Platform::Type ProjectFileParser::parsePlatformMask()

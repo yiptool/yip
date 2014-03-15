@@ -23,8 +23,8 @@
 #ifndef __75611f4e5912eed939ce360c67631442__
 #define __75611f4e5912eed939ce360c67631442__
 
-#include "project_file.h"
-#include "project_config.h"
+#include "project.h"
+#include "yip_directory.h"
 #include "platform.h"
 #include <unordered_map>
 #include <string>
@@ -37,7 +37,7 @@ public:
 	ProjectFileParser(const std::string & filename, const std::string & pathPrefix = std::string());
 	~ProjectFileParser();
 
-	void parse(const ProjectFilePtr & projectFile);
+	void parse(const ProjectPtr & project);
 
 protected:
 	inline const std::string & fileName() const { return m_FileName; }
@@ -50,7 +50,7 @@ private:
 	enum class Token : int;
 
 	std::ifstream m_Stream;
-	ProjectFile * m_ProjectFile;
+	Project * m_Project;
 	std::unordered_map<std::string, void (ProjectFileParser::*)()> m_CommandHandlers;
 	std::string m_FileName;
 	std::string m_PathPrefix;

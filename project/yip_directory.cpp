@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "project_config.h"
+#include "yip_directory.h"
 #include "../util/fmt.h"
 #include "../util/path.h"
 #include "../util/sha1.h"
@@ -30,9 +30,8 @@
 
 #define DATABASE_VERSION 1
 
-ProjectConfig::ProjectConfig(const std::string & prjPath)
-	: m_Path(pathConcat(prjPath, ".yip")),
-	  m_ProjectPath(prjPath)
+YipDirectory::YipDirectory(const std::string & prjPath)
+	: m_Path(pathConcat(prjPath, ".yip"))
 {
 	pathCreate(m_Path);
 	m_Path = pathMakeCanonical(m_Path);
@@ -41,11 +40,11 @@ ProjectConfig::ProjectConfig(const std::string & prjPath)
 	initDB();
 }
 
-ProjectConfig::~ProjectConfig()
+YipDirectory::~YipDirectory()
 {
 }
 
-void ProjectConfig::writeFile(const std::string & path, const std::string & data)
+void YipDirectory::writeFile(const std::string & path, const std::string & data)
 {
 	std::string file = pathSimplify(pathConcat(m_Path, path));
 	bool has_sha1 = false, write = true;
@@ -141,7 +140,7 @@ void ProjectConfig::writeFile(const std::string & path, const std::string & data
 	transaction.commit();
 }
 
-GitRepositoryPtr ProjectConfig::openGitRepository(const std::string & url, GitProgressPrinter && printer)
+GitRepositoryPtr YipDirectory::openGitRepository(const std::string & url, GitProgressPrinter && printer)
 {
 	std::string shortDirName = "git-" + sha1(url).substr(1, 10);
 	std::string dirName = pathConcat(m_Path, shortDirName);
@@ -157,7 +156,7 @@ GitRepositoryPtr ProjectConfig::openGitRepository(const std::string & url, GitPr
 	return repo;
 }
 
-void ProjectConfig::initDB()
+void YipDirectory::initDB()
 {
 	// Create tables
 	m_DB->exec("CREATE TABLE IF NOT EXISTS version (id INTEGER PRIMARY KEY, value INTEGER);");

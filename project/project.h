@@ -25,25 +25,24 @@
 
 #include "source_file.h"
 #include "define.h"
-#include "project_config.h"
+#include "yip_directory.h"
 #include "../util/git.h"
 #include <vector>
 #include <unordered_set>
 #include <map>
 #include <memory>
 
-class ProjectFile : public std::enable_shared_from_this<ProjectFile>
+class Project : public std::enable_shared_from_this<Project>
 {
 public:
-	ProjectFile(const std::string & prjPath);
-	ProjectFile(const ProjectConfigPtr & prjConfig);
-	~ProjectFile();
+	Project(const std::string & prjPath);
+	~Project();
 
 	inline bool isValid() const { return m_Valid; }
 	inline void setValid(bool flag) { m_Valid = flag; }
 
 	inline const std::string & projectPath() const { return m_ProjectPath; }
-	const ProjectConfigPtr & config() const;
+	const YipDirectoryPtr & yipDirectory() const;
 
 	SourceFilePtr addSourceFile(const std::string & name, const std::string & path);
 	inline const std::map<std::string, SourceFilePtr> & sourceFiles() const { return m_SourceFiles; }
@@ -64,13 +63,13 @@ private:
 	std::map<std::string, DefinePtr> m_Defines;
 	std::unordered_set<std::string> m_Requires;
 	std::vector<GitRepositoryPtr> m_Repositories;
-	mutable ProjectConfigPtr m_Config;
+	mutable YipDirectoryPtr m_YipDirectory;
 	bool m_Valid;
 
-	ProjectFile(const ProjectFile &) = delete;
-	ProjectFile & operator=(const ProjectFile &) = delete;
+	Project(const Project &) = delete;
+	Project & operator=(const Project &) = delete;
 };
 
-typedef std::shared_ptr<ProjectFile> ProjectFilePtr;
+typedef std::shared_ptr<Project> ProjectPtr;
 
 #endif
