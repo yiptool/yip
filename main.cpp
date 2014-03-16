@@ -395,7 +395,15 @@ static int xcodePrebuild(int argc, char ** argv)
 	else
 		throw std::runtime_error("invalid command-line arguments.");
 
-	// FIXME
+	ProjectPtr project = loadProject();
+	if (!project->isValid())
+		return 1;
+
+	bool changed = false;
+	generateXCode(project, iOS, &changed);
+
+	if (changed)
+		return 1;
 
 	return 0;
 }

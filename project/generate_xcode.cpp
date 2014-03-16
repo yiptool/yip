@@ -44,6 +44,7 @@ namespace
 		// Private
 		std::string projectName;
 		std::shared_ptr<XCodeProject> xcodeProject;
+		bool somethingChanged = false;
 		XCodeBuildPhase * frameworksBuildPhase = nullptr;
 		XCodeBuildPhase * sourcesBuildPhase = nullptr;
 		XCodeBuildPhase * resourcesBuildPhase = nullptr;
@@ -504,7 +505,9 @@ void Gen::writeDummyResourceFile()
 	XCodeBuildFile * buildFile = resourcesBuildPhase->addFile();
 	buildFile->setFileRef(dummyFileRef);
 
-	project->yipDirectory()->writeFile(projectName + "/.dummy", std::string());
+	bool changed = false;
+	project->yipDirectory()->writeFile(projectName + "/.dummy", std::string(), &changed);
+	somethingChanged = somethingChanged || changed;
 }
 
 void Gen::writeInfoPList()
@@ -584,7 +587,10 @@ void Gen::writeInfoPList()
 	}
 	ss << "</dict>\n";
 	ss << "</plist>\n";
-	project->yipDirectory()->writeFile(projectName + "/Info.plist", ss.str());
+
+	bool changed = false;
+	project->yipDirectory()->writeFile(projectName + "/Info.plist", ss.str(), &changed);
+	somethingChanged = somethingChanged || changed;
 }
 
 void Gen::writeImageAssets()
@@ -707,8 +713,11 @@ void Gen::writeImageAssets()
 	ss << "    \"author\" : \"xcode\"\n";
 	ss << "  }\n";
 	ss << "}\n";
+
+	bool changed = false;
 	project->yipDirectory()
-		->writeFile(projectName + "/Images.xcassets/AppIcon.appiconset/Contents.json", ss.str());
+		->writeFile(projectName + "/Images.xcassets/AppIcon.appiconset/Contents.json", ss.str(), &changed);
+	somethingChanged = somethingChanged || changed;
 
 	if (iOS)
 	{
@@ -789,8 +798,11 @@ void Gen::writeImageAssets()
 		ss2 << "    \"author\" : \"xcode\"\n";
 		ss2 << "  }\n";
 		ss2 << "}\n";
+
+		bool chgd = false;
 		project->yipDirectory()
-			->writeFile(projectName + "/Images.xcassets/LaunchImage.launchimage/Contents.json", ss2.str());
+			->writeFile(projectName + "/Images.xcassets/LaunchImage.launchimage/Contents.json", ss2.str(), &chgd);
+		somethingChanged = somethingChanged || chgd;
 	}
 }
 
@@ -799,7 +811,9 @@ void Gen::writeImageAssets()
 
 void Gen::writePBXProj()
 {
-	project->yipDirectory()->writeFile(projectName + ".xcodeproj/project.pbxproj", xcodeProject->toString());
+	bool chd = false;
+	project->yipDirectory()->writeFile(projectName + ".xcodeproj/project.pbxproj", xcodeProject->toString(), &chd);
+	somethingChanged = somethingChanged || chd;
 }
 
 void Gen::generate()
@@ -827,11 +841,13 @@ void Gen::generate()
 	writePBXProj();
 }
 
-std::string generateXCode(const ProjectPtr & project, bool iOS)
+std::string generateXCode(const ProjectPtr & project, bool iOS, bool * changed)
 {
 	Gen gen;
 	gen.project = project;
 	gen.iOS = iOS;
 	gen.generate();
+	if (changed)
+		*changed = gen.somethingChanged;
 	return gen.projectPath;
 }

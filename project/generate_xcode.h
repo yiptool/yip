@@ -26,6 +26,6 @@
 #include "project.h"
 
 // Returns path to the generated project
-std::string generateXCode(const ProjectPtr & project, bool iOS);
+std::string generateXCode(const ProjectPtr & project, bool iOS, bool * changed = nullptr);
 
 #endif

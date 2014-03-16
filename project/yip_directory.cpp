@@ -44,7 +44,7 @@ YipDirectory::~YipDirectory()
 {
 }
 
-std::string YipDirectory::writeFile(const std::string & path, const std::string & data)
+std::string YipDirectory::writeFile(const std::string & path, const std::string & data, bool * changed)
 {
 	std::string file = pathSimplify(pathConcat(m_Path, path));
 	bool has_sha1 = false, write = true;
@@ -89,10 +89,14 @@ std::string YipDirectory::writeFile(const std::string & path, const std::string 
 	if (!write)
 	{
 		std::cout << "keeping " << path << std::endl;
+		if (changed)
+			*changed = false;
 		return file;
 	}
 
 	std::cout << "writing " << path << std::endl;
+	if (changed)
+		*changed = true;
 
 	// Calculate SHA1 sum of the file
 	if (!has_sha1)

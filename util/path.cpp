@@ -524,7 +524,7 @@ std::string pathGetThisExecutableFile()
 {
   #ifdef _WIN32
 	char buf[MAX_PATH];
-	if (!GetModuleFileNameA(NULL, buf, sizeof(buf)))
+	if (!GetModuleFileNameA(nullptr, buf, sizeof(buf)))
 	{
 		DWORD err = GetLastError();
 		throw std::runtime_error(fmt()
@@ -561,7 +561,7 @@ std::string pathGetThisExecutableFile()
 		-1
 	};
 	std::vector<char> buf(PATH_MAX + 1);
-	if (sysctl(mib, 4, buf, PATH_MAX, NULL, 0) < 0)
+	if (sysctl(mib, 4, buf, PATH_MAX, nullptr, 0) < 0)
 	{
 		int err = errno;
 		throw std::runtime_error(fmt()
