@@ -46,6 +46,9 @@ public:
 	SourceFilePtr addSourceFile(const std::string & name, const std::string & path);
 	inline const std::map<std::string, SourceFilePtr> & sourceFiles() const { return m_SourceFiles; }
 
+	SourceFilePtr addResourceFile(const std::string & name, const std::string & path);
+	inline const std::map<std::string, SourceFilePtr> & resourceFiles() const { return m_ResourceFiles; }
+
 	DefinePtr addDefine(const std::string & name, Platform::Type platforms = Platform::All,
 		BuildType::Value buildTypes = BuildType::All);
 	inline const std::map<std::string, DefinePtr> & defines() const { return m_Defines; }
@@ -67,6 +70,7 @@ public:
 private:
 	std::string m_ProjectPath;
 	std::map<std::string, SourceFilePtr> m_SourceFiles;
+	std::map<std::string, SourceFilePtr> m_ResourceFiles;
 	std::map<std::string, DefinePtr> m_Defines;
 	std::map<std::string, std::string> m_Imports;
 	std::map<std::string, std::string> m_OSXFrameworks;

@@ -67,6 +67,10 @@ XCodeProject::~XCodeProject()
 		delete *it;
 
 	for (std::vector<XCodeBuildPhase *>::const_iterator
+			it = m_CopyFilesBuildPhase.begin(); it != m_CopyFilesBuildPhase.end(); ++it)
+		delete *it;
+
+	for (std::vector<XCodeBuildPhase *>::const_iterator
 			it = m_ShellScriptBuildPhase.begin(); it != m_ShellScriptBuildPhase.end(); ++it)
 		delete *it;
 
@@ -157,6 +161,13 @@ XCodeBuildPhase * XCodeProject::addResourcesBuildPhase()
 	return phase;
 }
 
+XCodeBuildPhase * XCodeProject::addCopyFilesBuildPhase()
+{
+	XCodeBuildPhase * phase = new XCodeBuildPhase(this, XCodeBuildPhase::CopyFiles);
+	m_CopyFilesBuildPhase.push_back(phase);
+	return phase;
+}
+
 XCodeBuildPhase * XCodeProject::addShellScriptBuildPhase()
 {
 	XCodeBuildPhase * phase = new XCodeBuildPhase(this, XCodeBuildPhase::ShellScript);
@@ -210,17 +221,24 @@ std::string XCodeProject::toString() const
 	ss << "/* End PBXBuildFile section */\n";
 	ss << '\n';
 
-	ss << "/* Begin PBXFileReference section */\n";
-	for (std::vector<XCodeFileReference *>::const_iterator it = m_FileRefs.begin(); it != m_FileRefs.end(); ++it)
-		ss << "\t\t" << (*it)->toString() << '\n';
-	ss << "/* End PBXFileReference section */\n";
-	ss << '\n';
-
 	ss << "/* Begin PBXContainerItemProxy section */\n";
 	for (std::vector<XCodeContainerItemProxy *>::const_iterator
 			it = m_Proxies.begin(); it != m_Proxies.end(); ++it)
 		ss << (*it)->toString();
 	ss << "/* End PBXContainerItemProxy section */\n";
+	ss << '\n';
+
+	ss << "/* Begin PBXCopyFilesBuildPhase section */\n";
+	for (std::vector<XCodeBuildPhase *>::const_iterator
+			it = m_CopyFilesBuildPhase.begin(); it != m_CopyFilesBuildPhase.end(); ++it)
+		ss << (*it)->toString();
+	ss << "/* End PBXCopyFilesBuildPhase section */\n";
+	ss << '\n';
+
+	ss << "/* Begin PBXFileReference section */\n";
+	for (std::vector<XCodeFileReference *>::const_iterator it = m_FileRefs.begin(); it != m_FileRefs.end(); ++it)
+		ss << "\t\t" << (*it)->toString() << '\n';
+	ss << "/* End PBXFileReference section */\n";
 	ss << '\n';
 
 	ss << "/* Begin PBXFrameworksBuildPhase section */\n";

@@ -120,6 +120,22 @@ Now you can include `zlib.h` in your main program:
 
       #include <yip-imports/zlib.h>
 
+### Resources
+
+Resources could be added into projects using the `resources` directive. Syntax
+is the same as for `sources`, even the platform specification suffix is allowed:
+
+      resources
+      {
+        image.png
+        music/cool.ogg
+      }
+      
+      resources:ios
+      {
+        ios_logo.png
+      }
+
 ### Frameworks on Apple platforms
 
 Frameworks on OSX and iOS could be linked using the `ios:framework` and

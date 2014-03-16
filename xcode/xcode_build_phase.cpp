@@ -31,6 +31,7 @@ XCodeBuildPhase::XCodeBuildPhase(XCodeProject * project, Type buildPhaseType)
 	  m_Type(buildPhaseType),
 	  m_BuildActionMask(2147483647),
 	  m_RunOnlyForDeploymentPostProcessing(false),
+	  m_DstSubfolderSpec(Subfolder_Resources),
 	  m_ShellPath("/bin/sh"),
 	  m_ShellScript("exit 0"),
 	  m_ShowEnvVarsInLog(false)
@@ -55,6 +56,11 @@ std::string XCodeBuildPhase::toString() const
 	ss << "\t\t" << objectID(this) << " = {\n";
 	ss << "\t\t\tisa = " << className() << ";\n";
 	ss << "\t\t\tbuildActionMask = " << m_BuildActionMask << ";\n";
+	if (m_Type == CopyFiles)
+	{
+		ss << "\t\t\tdstPath = " << stringLiteral(m_DstPath) << ";\n";
+		ss << "\t\t\tdstSubfolderSpec = " << static_cast<int>(m_DstSubfolderSpec) << ";\n";
+	}
 	ss << "\t\t\tfiles = (\n";
 	for (std::vector<XCodeBuildFile *>::const_iterator it = m_Files.begin(); it != m_Files.end(); ++it)
 		ss << "\t\t\t\t" << objectID(*it) << ",\n";
@@ -85,6 +91,7 @@ std::string XCodeBuildPhase::phaseName(Type type)
 	case Frameworks: return "Frameworks";
 	case Sources: return "Sources";
 	case Resources: return "Resources";
+	case CopyFiles: return "CopyFiles";
 	case ShellScript: return "Shell Scripts";
 	}
 	throw std::runtime_error("invalid build phase.");
@@ -97,6 +104,7 @@ std::string XCodeBuildPhase::classNameForPhase(Type type)
 	case Frameworks: return "PBXFrameworksBuildPhase";
 	case Sources: return "PBXSourcesBuildPhase";
 	case Resources: return "PBXResourcesBuildPhase";
+	case CopyFiles: return "PBXCopyFilesBuildPhase";
 	case ShellScript: return "PBXShellScriptBuildPhase";
 	}
 	throw std::runtime_error("invalid build phase.");

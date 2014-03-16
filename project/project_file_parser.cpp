@@ -82,6 +82,7 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const std::st
 	m_CommandHandlers.insert(std::make_pair("public_headers", &ProjectFileParser::parsePublicHeaders));
 	m_CommandHandlers.insert(std::make_pair("defines", &ProjectFileParser::parseDefines));
 	m_CommandHandlers.insert(std::make_pair("import", &ProjectFileParser::parseImport));
+	m_CommandHandlers.insert(std::make_pair("resources", &ProjectFileParser::parseResources));
 	m_CommandHandlers.insert(std::make_pair("ios", &ProjectFileParser::parseIOSorOSX));
 	m_CommandHandlers.insert(std::make_pair("osx", &ProjectFileParser::parseIOSorOSX));
 }
@@ -303,6 +304,44 @@ void ProjectFileParser::parseImport()
 	} catch (const std::exception & e) {
 		reportWarning(fmt() << "unable to parse project file in git repository at '" << url << "': " << e.what());
 	}
+}
+
+void ProjectFileParser::parseResources()
+{
+	Platform::Type platforms = Platform::All;
+	if (getToken() == Token::Colon)
+	{
+		getToken();
+		platforms = parsePlatformMask();
+	}
+
+	if (m_Token != Token::LCurly)
+		{ reportError("expected '{'."); return; }
+
+	getToken();
+	while (m_Token != Token::RCurly && m_Token != Token::Eof)
+	{
+		if (m_Token != Token::Literal)
+			{ reportError("expected file name."); return; }
+
+		std::string name = m_TokenText;
+		std::string path = pathMakeAbsolute(name, m_ProjectPath);
+
+		try
+		{
+			SourceFilePtr sourceFile = m_Project->addResourceFile(name, path);
+			sourceFile->setPlatforms(platforms);
+		}
+		catch (const std::exception & e)
+		{
+			reportWarning(e.what());
+		}
+
+		getToken();
+	}
+
+	if (m_Token != Token::RCurly)
+		reportError("expected '}'.");
 }
 
 void ProjectFileParser::parseIOSorOSX()

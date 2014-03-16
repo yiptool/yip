@@ -48,6 +48,14 @@ SourceFilePtr Project::addSourceFile(const std::string & name, const std::string
 	return file;
 }
 
+SourceFilePtr Project::addResourceFile(const std::string & name, const std::string & path)
+{
+	SourceFilePtr file = std::make_shared<SourceFile>(name, path);
+	if (!m_ResourceFiles.insert(std::make_pair(name, file)).second)
+		throw std::runtime_error(fmt() << "duplicate resource file '" << path << "'.");
+	return file;
+}
+
 DefinePtr Project::addDefine(const std::string & name, Platform::Type platforms, BuildType::Value buildTypes)
 {
 	DefinePtr define = std::make_shared<Define>(name);

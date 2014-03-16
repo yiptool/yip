@@ -37,7 +37,22 @@ public:
 		Frameworks,
 		Sources,
 		Resources,
+		CopyFiles,
 		ShellScript
+	};
+
+	enum Subfolder
+	{
+		Subfolder_AbsolutePath = 0,
+		Subfolder_Wrapper = 1,
+		Subfolder_Executables = 6,
+		Subfolder_Resources = 7,
+		Subfolder_Frameworks = 10,
+		Subfolder_SharedFrameworks = 11,
+		Subfolder_SharedSupport = 12,
+		Subfolder_Plugins = 13,
+		Subfolder_JavaResources = 15,
+		Subfolder_ProductsDirectory = 16
 	};
 
 	inline std::string objectName() const { return phaseName(m_Type); }
@@ -48,6 +63,12 @@ public:
 
 	inline bool runOnlyForDeploymentPostProcessing() const { return m_RunOnlyForDeploymentPostProcessing; }
 	inline void setRunOnlyForDeploymentPostProcessing(bool flag) { m_RunOnlyForDeploymentPostProcessing = flag; }
+
+	inline Subfolder dstSubfolderSpec() const { return m_DstSubfolderSpec; }
+	inline void setDstSubfolderSpec(Subfolder folder) { m_DstSubfolderSpec = folder; }
+
+	inline const std::string & dstPath() const { return m_DstPath; }
+	inline void setDstPath(const std::string & dstPath) { m_DstPath = dstPath; }
 
 	inline const std::string & shellPath() const { return m_ShellPath; }
 	inline void setShellPath(const std::string & path) { m_ShellPath = path; }
@@ -68,6 +89,8 @@ private:
 	long m_BuildActionMask;
 	bool m_RunOnlyForDeploymentPostProcessing;
 	std::vector<XCodeBuildFile *> m_Files;
+	Subfolder m_DstSubfolderSpec;
+	std::string m_DstPath;
 	std::string m_ShellPath;
 	std::string m_ShellScript;
 	bool m_ShowEnvVarsInLog;

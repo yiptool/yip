@@ -56,6 +56,7 @@ namespace
 		XCodeGroup * productsGroup = nullptr;
 		XCodeGroup * resourcesGroup = nullptr;
 		std::map<std::pair<XCodeGroup *, std::string>, XCodeGroup *> dirGroups;
+		std::map<std::string, XCodeBuildPhase *> copyFilesBuildPhases;
 		XCodeTargetBuildConfiguration * cfgTargetDebug = nullptr;
 		XCodeTargetBuildConfiguration * cfgTargetRelease = nullptr;
 		XCodeLegacyBuildConfiguration * cfgPreBuildDebug = nullptr;
@@ -71,6 +72,7 @@ namespace
 
 		// Build phases
 		void createBuildPhases();
+		XCodeBuildPhase * copyFilesPhaseForResourceDir(const std::string & path);
 
 		// Groups
 		void createGroups();
@@ -79,6 +81,10 @@ namespace
 		// Source files
 		void addSourceFile(XCodeGroup * group, XCodeBuildPhase * phase, const SourceFilePtr & file);
 		void addSourceFiles();
+
+		// Resource files
+		void addResourceFile(const SourceFilePtr & file);
+		void addResourceFiles();
 
 		// Configurations
 		void initDebugConfiguration();
@@ -189,6 +195,23 @@ void Gen::createBuildPhases()
 	resourcesBuildPhase = xcodeProject->addResourcesBuildPhase();
 }
 
+XCodeBuildPhase * Gen::copyFilesPhaseForResourceDir(const std::string & path)
+{
+	if (path.length() == 0)
+		return resourcesBuildPhase;
+
+	auto it = copyFilesBuildPhases.find(path);
+	if (it != copyFilesBuildPhases.end())
+		return it->second;
+
+	XCodeBuildPhase * phase = xcodeProject->addCopyFilesBuildPhase();
+	phase->setDstPath(path);
+	phase->setDstSubfolderSpec(XCodeBuildPhase::Subfolder_Resources);
+	copyFilesBuildPhases.insert(std::make_pair(path, phase));
+
+	return phase;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Groups
 
@@ -292,6 +315,52 @@ void Gen::addSourceFiles()
 	ref->setName(g_Config->projectFileName);
 	ref->setExplicitFileType(XCODE_FILETYPE_TEXT);
 	mainGroup->addChild(ref);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Resource files
+
+void Gen::addResourceFile(const SourceFilePtr & file)
+{
+	XCodeFileReference * ref = xcodeProject->addFileReference();
+	ref->setPath(file->path());
+	ref->setSourceTree("<absolute>");
+
+	// Set file name
+	std::string filename = pathGetFileName(file->name());
+	if (filename != file->path())
+		ref->setName(filename);
+
+	// Set file type
+	std::string explicitType = fileTypeForXCode(file->type());
+	std::string lastKnownType = fileTypeForXCode(determineFileType(file->path()));
+	if (lastKnownType == explicitType)
+		ref->setLastKnownFileType(lastKnownType);
+	else
+		ref->setExplicitFileType(explicitType);
+
+	// Add file into the group
+	XCodeGroup * group = resourcesGroup;
+	std::string path = pathGetDirectory(file->name());
+	if (path.length() > 0)
+		group = groupForPath(resourcesGroup, path);
+	group->addChild(ref);
+
+	// Add file to the build phase
+	XCodeBuildPhase * buildPhase = copyFilesPhaseForResourceDir(path);
+	XCodeBuildFile * buildFile = buildPhase->addFile();
+	buildFile->setFileRef(ref);
+}
+
+void Gen::addResourceFiles()
+{
+	for (auto it : project->resourceFiles())
+	{
+		const SourceFilePtr & file = it.second;
+		if (!(file->platforms() & (iOS ? Platform::iOS : Platform::OSX)))
+			continue;
+		addResourceFile(file);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -450,6 +519,8 @@ void Gen::createNativeTarget()
 	target->addBuildPhase(sourcesBuildPhase);
 	target->addBuildPhase(frameworksBuildPhase);
 	target->addBuildPhase(resourcesBuildPhase);
+	for (auto it : copyFilesBuildPhases)
+		target->addBuildPhase(it.second);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -833,6 +904,7 @@ void Gen::generate()
 	createBuildPhases();
 	createGroups();
 	addSourceFiles();
+	addResourceFiles();
 	initDebugConfiguration();
 	initReleaseConfiguration();
 	addDefines();
