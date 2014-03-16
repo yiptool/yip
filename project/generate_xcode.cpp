@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 //
 #include "generate_xcode.h"
+#include "../config.h"
 #include "../xcode/xcode_project.h"
 #include "../util/path.h"
 #include "../util/file_type.h"
@@ -284,6 +285,13 @@ void Gen::addSourceFiles()
 			continue;
 		addSourceFile(sourcesGroup, sourcesBuildPhase, file);
 	}
+
+	XCodeFileReference * ref = xcodeProject->addFileReference();
+	ref->setPath(pathConcat(project->projectPath(), g_Config->projectFileName));
+	ref->setSourceTree("<absolute>");
+	ref->setName(g_Config->projectFileName);
+	ref->setExplicitFileType(XCODE_FILETYPE_TEXT);
+	mainGroup->addChild(ref);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
