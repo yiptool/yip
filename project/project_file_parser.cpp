@@ -114,9 +114,9 @@ void ProjectFileParser::parseFromGit(const ProjectPtr & project, const std::stri
 		pathPrefix = repo->path();
 		if (pathPrefix.length() > 0 && pathIsSeparator(pathPrefix[pathPrefix.length() - 1]))
 			pathPrefix.resize(pathPrefix.length() - 1);
-		pathConcat(".yip-imports", pathGetFileName(pathPrefix));
+		pathPrefix = pathGetFileName(pathPrefix);
 	}
-	pathPrefix = pathConcat(".yip-imports", name);
+	pathPrefix = pathConcat(".yip-imports", pathPrefix);
 
 	ProjectFileParser parser(file, pathPrefix);
 	parser.doParse(project, true);
