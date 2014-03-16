@@ -568,8 +568,6 @@ void Gen::writeInfoPList()
 		ss << "\t<string>${MACOSX_DEPLOYMENT_TARGET}</string>\n";	// FIXME: make configurable
 		ss << "\t<key>NSHumanReadableCopyright</key>\n";
 		ss << "\t<string>Copyright © 2014. All rights reserved.</string>\n";	// FIXME: make configurable
-		ss << "\t<key>NSPrincipalClass</key>\n";
-		ss << "\t<string>NSApplication</string>\n";
 	}
 	else
 	{
