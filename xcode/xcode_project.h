@@ -29,12 +29,14 @@
 #include "xcode_file_reference.h"
 #include "xcode_project_build_configuration.h"
 #include "xcode_target_build_configuration.h"
+#include "xcode_legacy_build_configuration.h"
 #include "xcode_configuration_list.h"
 #include "xcode_container_item_proxy.h"
 #include "xcode_target_dependency.h"
 #include "xcode_build_file.h"
 #include "xcode_build_phase.h"
 #include "xcode_native_target.h"
+#include "xcode_legacy_target.h"
 #include <set>
 #include <string>
 #include <vector>
@@ -76,6 +78,7 @@ public:
 
 	XCodeProjectBuildConfiguration * addProjectBuildConfiguration();
 	XCodeTargetBuildConfiguration * addTargetBuildConfiguration();
+	XCodeLegacyBuildConfiguration * addLegacyBuildConfiguration();
 	XCodeConfigurationList * addConfigurationList();
 
 	inline XCodeConfigurationList * buildConfigurationList() const { return m_BuildConfigurationList; }
@@ -87,6 +90,7 @@ public:
 	XCodeBuildPhase * addShellScriptBuildPhase();
 
 	XCodeNativeTarget * addNativeTarget();
+	XCodeLegacyTarget * addLegacyTarget();
 
 	XCodeContainerItemProxy * addContainerItemProxy();
 	XCodeTargetDependency * addTargetDependency();
@@ -106,6 +110,7 @@ private:
 	std::vector<XCodeVariantGroup *> m_VarGroups;
 	std::vector<XCodeFileReference *> m_FileRefs;
 	std::vector<XCodeNativeTarget *> m_NativeTargets;
+	std::vector<XCodeLegacyTarget *> m_LegacyTargets;
 	std::vector<XCodeBuildConfiguration *> m_Cfgs;
 	std::vector<XCodeConfigurationList *> m_CfgLists;
 	std::vector<XCodeBuildFile *> m_BuildFiles;

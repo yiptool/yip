@@ -14,6 +14,10 @@ ADD_LIBRARY(xcode STATIC
 	xcode_file_reference.h
 	xcode_group.cpp
 	xcode_group.h
+	xcode_legacy_build_configuration.cpp
+	xcode_legacy_build_configuration.h
+	xcode_legacy_target.cpp
+	xcode_legacy_target.h
 	xcode_native_target.cpp
 	xcode_native_target.h
 	xcode_object.cpp

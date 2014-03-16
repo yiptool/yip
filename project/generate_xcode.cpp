@@ -24,6 +24,7 @@
 #include "../xcode/xcode_project.h"
 #include "../util/path.h"
 #include "../util/file_type.h"
+#include "../util/fmt.h"
 #include <map>
 #include <sstream>
 #include <cassert>
@@ -55,10 +56,14 @@ namespace
 		std::map<std::pair<XCodeGroup *, std::string>, XCodeGroup *> dirGroups;
 		XCodeTargetBuildConfiguration * cfgTargetDebug = nullptr;
 		XCodeTargetBuildConfiguration * cfgTargetRelease = nullptr;
+		XCodeLegacyBuildConfiguration * cfgPreBuildDebug = nullptr;
+		XCodeLegacyBuildConfiguration * cfgPreBuildRelease = nullptr;
 		XCodeProjectBuildConfiguration * cfgProjectDebug = nullptr;
 		XCodeProjectBuildConfiguration * cfgProjectRelease = nullptr;
 		XCodeConfigurationList * targetCfgList = nullptr;
+		XCodeConfigurationList * preBuildCfgList = nullptr;
 		XCodeConfigurationList * projectCfgList = nullptr;
+		XCodeLegacyTarget * preBuildTarget = nullptr;
 
 		/* Methods */
 
@@ -81,7 +86,8 @@ namespace
 		// Preprocessor definitions
 		void addDefines();
 
-		// Native target
+		// Targets
+		void createPreBuildTarget();
 		void createNativeTarget();
 
 		// Frameworks
@@ -294,6 +300,9 @@ void Gen::initDebugConfiguration()
 		cfgTargetDebug->setAssetCatalogLaunchImageName("LaunchImage");
 	cfgTargetDebug->addHeaderSearchPath(pathConcat(project->yipDirectory()->path(), ".yip-import-proxies"));
 
+	cfgPreBuildDebug = xcodeProject->addLegacyBuildConfiguration();
+	cfgPreBuildDebug->setName("Debug");
+
 	cfgProjectDebug = xcodeProject->addProjectBuildConfiguration();
 	cfgProjectDebug->setName("Debug");
 	if (!iOS)
@@ -321,6 +330,9 @@ void Gen::initReleaseConfiguration()
 		cfgTargetRelease->setAssetCatalogLaunchImageName("LaunchImage");
 	cfgTargetRelease->addHeaderSearchPath(pathConcat(project->yipDirectory()->path(), ".yip-import-proxies"));
 
+	cfgPreBuildRelease = xcodeProject->addLegacyBuildConfiguration();
+	cfgPreBuildRelease->setName("Release");
+
 	cfgProjectRelease = xcodeProject->addProjectBuildConfiguration();
 	cfgProjectRelease->setName("Release");
 	if (!iOS)
@@ -346,6 +358,10 @@ void Gen::createConfigurationLists()
 	targetCfgList->setDefaultConfigurationName("Release");
 	targetCfgList->addConfiguration(cfgTargetDebug);
 	targetCfgList->addConfiguration(cfgTargetRelease);
+
+	preBuildCfgList = xcodeProject->addConfigurationList();
+	preBuildCfgList->addConfiguration(cfgPreBuildDebug);
+	preBuildCfgList->addConfiguration(cfgPreBuildRelease);
 
 	projectCfgList = xcodeProject->addConfigurationList();
 	projectCfgList->setDefaultConfigurationName("Release");
@@ -385,6 +401,18 @@ void Gen::addDefines()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Native target
 
+void Gen::createPreBuildTarget()
+{
+	preBuildTarget = xcodeProject->addLegacyTarget();
+	preBuildTarget->setName("yip-prebuild");
+	preBuildTarget->setProductName("yip-prebuild");
+	preBuildTarget->setBuildConfigurationList(preBuildCfgList);
+	preBuildTarget->setBuildToolPath(pathGetThisExecutableFile());
+	preBuildTarget->setBuildArgumentsString(fmt() << "xcode-prebuild " << (iOS ? "ios" : "osx") << " $(ACTION)");
+	preBuildTarget->setBuildWorkingDirectory(project->projectPath());
+	preBuildTarget->setPassBuildSettingsInEnvironment(true);
+}
+
 void Gen::createNativeTarget()
 {
 	XCodeFileReference * productRef = xcodeProject->addFileReference();
@@ -394,11 +422,22 @@ void Gen::createNativeTarget()
 	productRef->setSourceTree("BUILT_PRODUCTS_DIR");
 	productsGroup->addChild(productRef);
 
+	XCodeContainerItemProxy * preBuildProxy = xcodeProject->addContainerItemProxy();
+	preBuildProxy->setContainerPortal(xcodeProject.get());
+	preBuildProxy->setProxyType("1");
+	preBuildProxy->setRemoteGlobalIDString(preBuildTarget->uniqueID().toString());
+	preBuildProxy->setRemoteInfo(preBuildTarget->name());
+
+	XCodeTargetDependency * preBuildDep = xcodeProject->addTargetDependency();
+	preBuildDep->setTarget(preBuildTarget);
+	preBuildDep->setTargetProxy(preBuildProxy);
+
 	XCodeNativeTarget * target = xcodeProject->addNativeTarget();
 	target->setName(projectName);
 	target->setBuildConfigurationList(targetCfgList);
 	target->setProductName(projectName);
 	target->setProductReference(productRef);
+	target->addDependency(preBuildDep);
 	target->addBuildPhase(sourcesBuildPhase);
 	target->addBuildPhase(frameworksBuildPhase);
 	target->addBuildPhase(resourcesBuildPhase);
@@ -778,6 +817,7 @@ void Gen::generate()
 	initReleaseConfiguration();
 	addDefines();
 	createConfigurationLists();
+	createPreBuildTarget();
 	createNativeTarget();
 	addFrameworks();
 

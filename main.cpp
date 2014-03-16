@@ -372,6 +372,35 @@ static int update(int, char **)
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// XCode pre-build helper
+
+static int xcodePrebuild(int argc, char ** argv)
+{
+	if (argc < 1 || argc > 2)
+		throw std::runtime_error("invalid command-line arguments.");
+
+	bool iOS;
+	if (!strcmp(argv[0], "osx"))
+		iOS = false;
+	else if (!strcmp(argv[0], "ios"))
+		iOS = true;
+	else
+		throw std::runtime_error("invalid command-line arguments.");
+
+	bool clean;
+	if (argc < 2)
+		clean = false;
+	else if (!strcmp(argv[1], "clean"))
+		clean = true;
+	else
+		throw std::runtime_error("invalid command-line arguments.");
+
+	// FIXME
+
+	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Help
 
 static int help(int, char **)
@@ -407,6 +436,7 @@ int main(int argc, char ** argv)
 			commands.insert(std::make_pair("help", &help));
 			commands.insert(std::make_pair("up", &update));
 			commands.insert(std::make_pair("update", &update));
+			commands.insert(std::make_pair("xcode-prebuild", &xcodePrebuild));
 
 			auto it = commands.find(argv[1]);
 			if (it == commands.end())

@@ -63,4 +63,6 @@ bool pathIsFile(const std::string & path);
 
 time_t pathGetModificationTime(const std::string & path);
 
+std::string pathGetThisExecutableFile();
+
 #endif

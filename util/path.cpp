@@ -33,6 +33,12 @@
 #ifndef _WIN32
  #include <unistd.h>
  #include <pwd.h>
+ #ifdef __APPLE__
+  #include <mach-o/dyld.h>
+ #endif
+ #ifdef __FreeBSD__
+  #include <sys/sysctl.h>
+ #endif
 #else
  #ifndef WIN32_LEAN_AND_MEAN
   #define WIN32_LEAN_AND_MEAN
@@ -512,4 +518,62 @@ time_t pathGetModificationTime(const std::string & path)
 		throw std::runtime_error(fmt() << "unable to stat file '" << path << "': " << strerror(err));
 	}
 	return st.st_mtime;
+}
+
+std::string pathGetThisExecutableFile()
+{
+  #ifdef _WIN32
+	char buf[MAX_PATH];
+	if (!GetModuleFileNameA(NULL, buf, sizeof(buf)))
+	{
+		DWORD err = GetLastError();
+		throw std::runtime_error(fmt()
+			<< "unable to determine file name of yip executable file (code " << err << ").");
+	}
+  #elif defined(__APPLE__)
+	uint32_t size = 0;
+	char tempChar = 0;
+	if (_NSGetExecutablePath(&tempChar, &size) >= 0 || size == 0)
+	{
+		throw std::runtime_error(
+			"unable to determine file name of yip executable file (_NSGetExecutablePath has weird behavior).");
+	}
+	std::vector<char> buf(size + 1);
+	if (_NSGetExecutablePath(buf.data(), &size) < 0)
+	{
+		throw std::runtime_error
+			("unable to determine file name of yip executable file (_NSGetExecutablePath has failed).");
+	}
+	return buf.data();
+  #elif defined(__linux__) || defined(__ANDROID__)
+	std::vector<char> buf(PATH_MAX + 1);
+	if (readlink("/proc/self/exe", buf.data(), PATH_MAX) < 0)
+	{
+		int err = errno;
+		throw std::runtime_error(fmt() << "unable to read link '/proc/self/exe': " << strerror(err));
+	}
+	return buf.data();
+  #elif defined(__FreeBSD__)
+	int mib[4] = {
+		CTL_KERN,
+		KERN_PROC,
+		KERN_PROC_PATHNAME,
+		-1
+	};
+	std::vector<char> buf(PATH_MAX + 1);
+	if (sysctl(mib, 4, buf, PATH_MAX, NULL, 0) < 0)
+	{
+		int err = errno;
+		throw std::runtime_error(fmt()
+			<< "unable to determine file name of yip executable file: " << strerror(err));
+	}
+	return buf.data();
+  #elif defined(sun) || defined(__sun) || defined(SUNOS)
+	const char * path = getexecname();
+	if (!path || !*path)
+		throw std::runtime_error("unable to determine file name of yip executable file.");
+	return path;
+  #else
+	throw std::runtime_error("unable to determine file name of yip executable file (not implemented).");
+  #endif
 }

@@ -72,7 +72,7 @@ private:
 	std::string m_ShellScript;
 	bool m_ShowEnvVarsInLog;
 
-	XCodeBuildPhase(XCodeProject * project, Type projectType);
+	XCodeBuildPhase(XCodeProject * project, Type buildPhaseType);
 	~XCodeBuildPhase();
 
 	static std::string phaseName(Type type);

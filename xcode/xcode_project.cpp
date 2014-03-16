@@ -74,6 +74,10 @@ XCodeProject::~XCodeProject()
 			it = m_NativeTargets.begin(); it != m_NativeTargets.end(); ++it)
 		delete *it;
 
+	for (std::vector<XCodeLegacyTarget *>::const_iterator
+			it = m_LegacyTargets.begin(); it != m_LegacyTargets.end(); ++it)
+		delete *it;
+
 	for (std::vector<XCodeContainerItemProxy *>::const_iterator
 			it = m_Proxies.begin(); it != m_Proxies.end(); ++it)
 		delete *it;
@@ -118,6 +122,13 @@ XCodeTargetBuildConfiguration * XCodeProject::addTargetBuildConfiguration()
 	return config;
 }
 
+XCodeLegacyBuildConfiguration * XCodeProject::addLegacyBuildConfiguration()
+{
+	XCodeLegacyBuildConfiguration * config = new XCodeLegacyBuildConfiguration;
+	m_Cfgs.push_back(config);
+	return config;
+}
+
 XCodeConfigurationList * XCodeProject::addConfigurationList()
 {
 	XCodeConfigurationList * list = new XCodeConfigurationList;
@@ -157,6 +168,13 @@ XCodeNativeTarget * XCodeProject::addNativeTarget()
 {
 	XCodeNativeTarget * target = new XCodeNativeTarget;
 	m_NativeTargets.push_back(target);
+	return target;
+}
+
+XCodeLegacyTarget * XCodeProject::addLegacyTarget()
+{
+	XCodeLegacyTarget * target = new XCodeLegacyTarget;
+	m_LegacyTargets.push_back(target);
 	return target;
 }
 
@@ -218,6 +236,13 @@ std::string XCodeProject::toString() const
 	ss << "/* End PBXGroup section */\n";
 	ss << '\n';
 
+	ss << "/* Begin PBXLegacyTarget section */\n";
+	for (std::vector<XCodeLegacyTarget *>::const_iterator
+			it = m_LegacyTargets.begin(); it != m_LegacyTargets.end(); ++it)
+		ss << (*it)->toString();
+	ss << "/* End PBXLegacyTarget section */\n";
+	ss << '\n';
+
 	ss << "/* Begin PBXNativeTarget section */\n";
 	for (std::vector<XCodeNativeTarget *>::const_iterator
 			it = m_NativeTargets.begin(); it != m_NativeTargets.end(); ++it)
@@ -250,6 +275,9 @@ std::string XCodeProject::toString() const
 	ss << "\t\t\ttargets = (\n";
 	for (std::vector<XCodeNativeTarget *>::const_iterator
 			it = m_NativeTargets.begin(); it != m_NativeTargets.end(); ++it)
+		ss << "\t\t\t\t" << objectID(*it) << ",\n";
+	for (std::vector<XCodeLegacyTarget *>::const_iterator
+			it = m_LegacyTargets.begin(); it != m_LegacyTargets.end(); ++it)
 		ss << "\t\t\t\t" << objectID(*it) << ",\n";
 	ss << "\t\t\t);\n";
 	ss << "\t\t};\n";
