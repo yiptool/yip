@@ -54,6 +54,7 @@ Config::Config()
 	repos.insert(std::make_pair("tinyxml", "https://github.com/oss-forks/tinyxml.git"));
 	repos.insert(std::make_pair("zlib", "https://github.com/oss-forks/zlib.git"));
 
+	repos.insert(std::make_pair("box2d-debug-renderer", "https://github.com/zapolnov/yip-box2d-debug-renderer.git"));
 	repos.insert(std::make_pair("cxx-util", "https://github.com/zapolnov/yip-cxx-util.git"));
 	repos.insert(std::make_pair("game-main", "https://github.com/zapolnov/yip-game-main.git"));
 	repos.insert(std::make_pair("gl_wrappers", "https://github.com/zapolnov/yip-gl-wrappers.git"));
