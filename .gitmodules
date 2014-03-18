@@ -16,3 +16,6 @@
 [submodule "3rdparty/sqlite3"]
 	path = 3rdparty/sqlite3
 	url = https://github.com/oss-forks/sqlite3.git
+[submodule "3rdparty/lua"]
+	path = 3rdparty/lua
+	url = https://github.com/oss-forks/lua.git

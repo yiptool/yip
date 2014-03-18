@@ -49,6 +49,7 @@ Config::Config()
 	: projectFileName(PROJECT_FILE_NAME)
 {
 	repos.insert(std::make_pair("box2d", "https://github.com/oss-forks/box2d.git"));
+	repos.insert(std::make_pair("lua", "https://github.com/oss-forks/lua.git"));
 	repos.insert(std::make_pair("sqlite3", "https://github.com/oss-forks/sqlite3.git"));
 	repos.insert(std::make_pair("stb_image", "https://github.com/oss-forks/stb_image.git"));
 	repos.insert(std::make_pair("tinyxml", "https://github.com/oss-forks/tinyxml.git"));

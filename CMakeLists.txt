@@ -21,6 +21,7 @@ ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/libssh2")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/libgit2")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/inih")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/sqlite3")
+ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/lua")
 
 ##################################################################################################################
 ## Compiler flags
@@ -65,6 +66,6 @@ ADD_EXECUTABLE(yip
 	main.cpp
 )
 
-TARGET_LINK_LIBRARIES(yip project xcode util inih libgit2 sqlite3)
+TARGET_LINK_LIBRARIES(yip project xcode util inih libgit2 sqlite3 lua)
 
 INSTALL(TARGETS yip RUNTIME DESTINATION "bin")
