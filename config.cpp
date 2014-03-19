@@ -58,6 +58,7 @@ Config::Config()
 	repos.insert(std::make_pair("box2d-debug-renderer", "https://github.com/zapolnov/yip-box2d-debug-renderer.git"));
 	repos.insert(std::make_pair("cxx-util", "https://github.com/zapolnov/yip-cxx-util.git"));
 	repos.insert(std::make_pair("game-main", "https://github.com/zapolnov/yip-game-main.git"));
+	repos.insert(std::make_pair("gl", "https://github.com/zapolnov/yip-gl.git"));
 	repos.insert(std::make_pair("gl_wrappers", "https://github.com/zapolnov/yip-gl-wrappers.git"));
 	repos.insert(std::make_pair("math", "https://github.com/zapolnov/yip-math.git"));
 	repos.insert(std::make_pair("stb_image_cxx", "https://github.com/zapolnov/yip-stb-image-cxx.git"));
