@@ -242,6 +242,8 @@ static int build(int argc, char ** argv)
 	if (!project->isValid())
 		return 1;
 
+	project->generateLicenseData();
+
 	if (platform & Platform::OSX)
 	{
 		std::string projectPath = generateXCode(project, false);
@@ -317,6 +319,8 @@ static int generate(int argc, char ** argv)
 	ProjectPtr project = loadProject();
 	if (!project->isValid())
 		return 1;
+
+	project->generateLicenseData();
 
 	size_t numPlatforms = 0;
 	for (size_t i = 1; i <= 0x8000; i <<= 1)
@@ -398,6 +402,8 @@ static int xcodePrebuild(int argc, char ** argv)
 	ProjectPtr project = loadProject();
 	if (!project->isValid())
 		return 1;
+
+	project->generateLicenseData();
 
 	bool changed = false;
 	generateXCode(project, iOS, &changed);

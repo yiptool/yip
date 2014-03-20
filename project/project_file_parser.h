@@ -73,6 +73,7 @@ private:
 	void parseImport();
 	void parseResources();
 	void parseIOSorOSX();
+	void parseLicense();
 
 	Platform::Type parsePlatformMask();
 	Platform::Type parsePlatformName();

@@ -85,6 +85,7 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const std::st
 	m_CommandHandlers.insert(std::make_pair("resources", &ProjectFileParser::parseResources));
 	m_CommandHandlers.insert(std::make_pair("ios", &ProjectFileParser::parseIOSorOSX));
 	m_CommandHandlers.insert(std::make_pair("osx", &ProjectFileParser::parseIOSorOSX));
+	m_CommandHandlers.insert(std::make_pair("license", &ProjectFileParser::parseLicense));
 }
 
 ProjectFileParser::~ProjectFileParser()
@@ -399,6 +400,13 @@ void ProjectFileParser::parseIOSorOSX()
 	}
 
 	reportError(fmt() << "invalid variable '" << prefix << ":" << m_TokenText << "'.");
+}
+
+void ProjectFileParser::parseLicense()
+{
+	if (getToken() != Token::Literal)
+		reportError("expected license text after 'license'.");
+	m_Project->addLicense(m_TokenText);
 }
 
 Platform::Type ProjectFileParser::parsePlatformMask()

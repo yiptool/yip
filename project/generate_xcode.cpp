@@ -306,7 +306,7 @@ void Gen::addSourceFiles()
 		const SourceFilePtr & file = it.second;
 		if (!(file->platforms() & (iOS ? Platform::iOS : Platform::OSX)))
 			continue;
-		addSourceFile(sourcesGroup, sourcesBuildPhase, file);
+		addSourceFile(file->isGenerated() ? generatedGroup : sourcesGroup, sourcesBuildPhase, file);
 	}
 
 	XCodeFileReference * ref = xcodeProject->addFileReference();

@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 //
 #include "project.h"
+#include "../util/sha1.h"
 #include "../util/fmt.h"
 
 Project::Project(const std::string & prjPath)
@@ -106,4 +107,75 @@ void Project::addFramework(std::map<std::string, std::string> & map, const std::
 		throw std::runtime_error(fmt() << "conflicting declaration for " << what << " framework '" << name
 			<< "' (was '" << it.first->second << "', now '" << path << "').");
 	}
+}
+
+static void cxxEscape(std::stringstream & ss, const std::string & str)
+{
+	for (char ch : str)
+	{
+		switch (ch)
+		{
+		case '\r':
+		case '\n':
+		case '\\':
+		case '"':
+		case '\'':
+		case '?':
+			ss << '\\' << ch;
+			break;
+		case '\t':
+			ss << '\t' << ch;
+			break;
+		case '\f':
+			ss << '\f' << ch;
+			break;
+		case '\v':
+			ss << '\v' << ch;
+			break;
+		case '\a':
+			ss << '\a' << ch;
+			break;
+		case '\b':
+			ss << '\b' << ch;
+			break;
+		case '\0':
+			ss << '\0' << ch;
+			break;
+		default:
+			ss << ch;
+		}
+	}
+}
+
+void Project::generateLicenseData()
+{
+	std::stringstream ss;
+	ss << "#include \".yip-import-proxies/yip/licenses.h\"\n";
+	ss << "namespace YIP {\n";
+	ss << "const char * const licenses[" << m_Licenses.size() << "] = {\n";
+	for (const std::string & license : m_Licenses)
+	{
+		ss << "\t\"";
+		cxxEscape(ss, license);
+		ss << "\",\n";
+	}
+	ss << "};\n";
+	ss << "}\n";
+	std::string path = yipDirectory()->writeFile("licenses.cpp", ss.str());
+	SourceFilePtr sourceFile = addSourceFile("yip/licenses.cpp", path);
+	sourceFile->setIsGenerated(true);
+
+	std::stringstream ss2;
+	std::string guard = sha1(ss.str());
+	ss2 << "#ifndef __" << guard << "__\n";
+	ss2 << "#define __" << guard << "__\n";
+	ss2 << "#include <cstddef>\n";
+	ss2 << "namespace YIP {\n";
+	ss2 << "extern const char * const licenses[" << m_Licenses.size() << "];\n";
+	ss2 << "const size_t numLicenses = " << m_Licenses.size() << ";\n";
+	ss2 << "}\n";
+	ss2 << "#endif\n";
+	path = yipDirectory()->writeFile(".yip-import-proxies/yip/licenses.h", ss2.str());
+	sourceFile = addSourceFile("yip/licenses.h", path);
+	sourceFile->setIsGenerated(true);
 }

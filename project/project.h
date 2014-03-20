@@ -67,6 +67,14 @@ public:
 	void iosAddFramework(const std::string & name, const std::string & path);
 	inline const std::map<std::string, std::string> & iosFrameworks() const { return m_IOSFrameworks; }
 
+	// Licenses
+
+	inline void addLicense(const std::string & license) { m_Licenses.push_back(license); }
+
+	// Code generation
+
+	void generateLicenseData();
+
 private:
 	std::string m_ProjectPath;
 	std::map<std::string, SourceFilePtr> m_SourceFiles;
@@ -75,6 +83,7 @@ private:
 	std::map<std::string, std::string> m_Imports;
 	std::map<std::string, std::string> m_OSXFrameworks;
 	std::map<std::string, std::string> m_IOSFrameworks;
+	std::vector<std::string> m_Licenses;
 	mutable YipDirectoryPtr m_YipDirectory;
 	bool m_Valid;
 
