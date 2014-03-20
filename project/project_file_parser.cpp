@@ -79,6 +79,7 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const std::st
 		throw std::runtime_error(fmt() << "unable to open file '" << filename << "'.");
 
 	m_CommandHandlers.insert(std::make_pair("sources", &ProjectFileParser::parseSources));
+	m_CommandHandlers.insert(std::make_pair("app_sources", &ProjectFileParser::parseAppSources));
 	m_CommandHandlers.insert(std::make_pair("public_headers", &ProjectFileParser::parsePublicHeaders));
 	m_CommandHandlers.insert(std::make_pair("defines", &ProjectFileParser::parseDefines));
 	m_CommandHandlers.insert(std::make_pair("import", &ProjectFileParser::parseImport));
@@ -205,6 +206,49 @@ void ProjectFileParser::parseSources()
 		catch (const std::exception & e)
 		{
 			reportWarning(e.what());
+		}
+
+		getToken();
+	}
+
+	if (m_Token != Token::RCurly)
+		reportError("expected '}'.");
+}
+
+void ProjectFileParser::parseAppSources()
+{
+	Platform::Type platforms = Platform::All;
+	if (getToken() == Token::Colon)
+	{
+		getToken();
+		platforms = parsePlatformMask();
+	}
+
+	if (m_Token != Token::LCurly)
+		reportError("expected '{'.");
+
+	getToken();
+	while (m_Token != Token::RCurly && m_Token != Token::Eof)
+	{
+		if (m_Token != Token::Literal)
+			reportError("expected file name.");
+
+		if (m_PathPrefix.length() == 0)
+		{
+			std::string name = m_TokenText;
+			std::string path = pathMakeAbsolute(m_TokenText, m_ProjectPath);
+			if (m_PathPrefix.length() > 0)
+				name = pathConcat(m_PathPrefix, name);
+
+			try
+			{
+				SourceFilePtr sourceFile = m_Project->addSourceFile(name, path);
+				sourceFile->setPlatforms(platforms);
+			}
+			catch (const std::exception & e)
+			{
+				reportWarning(e.what());
+			}
 		}
 
 		getToken();

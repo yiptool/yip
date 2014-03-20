@@ -136,6 +136,21 @@ is the same as for `sources`, even the platform specification suffix is allowed:
         ios_logo.png
       }
 
+### Application source files
+
+Source files specified in the `source` directive are compiled both when project
+is built and when project is imported.
+
+Directive `app_sources` allows to specify source files that will be compiled
+only when project is built and will not be compiled when project is imported.
+
+Syntax for `app_sources` directive is the same as for the `sources` directive.
+
+      app_sources
+      {
+         main.cpp
+      }
+
 ### Frameworks on Apple platforms
 
 Frameworks on OSX and iOS could be linked using the `ios:framework` and
@@ -156,6 +171,26 @@ The dollar sign at the beginning of the path means *SDKROOT*.
 Third variant links with the user-provided framework at the specified path.
 Path could be either absolute or relative to the directory where `Yipfile`
 is located.
+
+### License handling
+
+License for the project could be specified in the `Yipfile` using the
+`license` directive:
+
+      license "Copyright (c) ACME, Inc.
+      All rights reserved."
+
+All licenses are collected and are written into the array. This array is
+accessible from the application:
+
+      #include <yip/licenses.h>
+      
+      int main()
+      {
+          for (size_t i = 0; i < YIP::numLicenses; i++)
+              printf("%s\n", YIP::licenses[i]);
+          return 0;
+      }
 
 Working directory
 -----------------
