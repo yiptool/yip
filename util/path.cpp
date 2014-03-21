@@ -577,3 +577,29 @@ std::string pathGetThisExecutableFile()
 	throw std::runtime_error("unable to determine file name of yip executable file (not implemented).");
   #endif
 }
+
+void pathCreateSymLink(const std::string & from, const std::string & to)
+{
+  #ifdef _WIN32
+	if (!CreateSymbolicLinkA(to.c_str(), from.c_str(), 0))
+	{
+		DWORD err = GetLastError();
+		throw std::runtime_error(fmt()
+			<< "unable to create symlink from '" << from << "' to '" << to << " (code " << err << ").");
+	}
+  #else
+	int r = symlink(from.c_str(), to.c_str());
+	if (r < 0)
+	{
+		int err = errno;
+		if (err == EEXIST)
+		{
+			std::vector<char> buf(PATH_MAX + 1);
+			if (readlink(to.c_str(), buf.data(), PATH_MAX) >= 0 && from == buf.data())
+				return;
+		}
+		throw std::runtime_error(fmt() << "unable to create symlink from '" << from << "' to '" << to
+			<< "': " << strerror(err));
+	}
+  #endif
+}

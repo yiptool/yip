@@ -22,6 +22,7 @@
 //
 #include "project/project_file_parser.h"
 #include "project/generate_xcode.h"
+#include "project/generate_tizen.h"
 #include "3rdparty/libgit2/include/git2/threads.h"
 #include "xcode/xcode_unique_id.h"
 #include "util/fmt.h"
@@ -70,7 +71,7 @@ static void usage()
 	  #endif
 //	    "       -p, --pnacl    Build for PNaCl.\n"                                    /*|*/
 //	    "       -q, --qt       Build for Qt.\n"                                       /*|*/
-//	    "       -t, --tizen    Build for Tizen.\n"                                    /*|*/
+	    "       -t, --tizen    Build for Tizen.\n"                                    /*|*/
 //	  #if defined(_WIN64) || defined(_WIN32)
 //	    "       -w, --winrt    Build for Windows.\n"                                  /*|*/
 //	  #endif
@@ -93,7 +94,7 @@ static void usage()
 	    "       -i, --ios      Generate XCode project for iOS.\n"                     /*|*/
 	    "       -o, --osx      Generate XCode project for OSX" << apple_default << ".\n"
 //	    "       -p, --pnacl    Generate project files for PNaCl.\n"                   /*|*/
-//	    "       -t, --tizen    Generate project files for Tizen.\n"                   /*|*/
+	    "       -t, --tizen    Generate project files for Tizen.\n"                   /*|*/
 //	    "       -v, --vs2012   Generate project files for Visual Studio 2012.\n"      /*|*/
 	    "\n"                                                                          /*|*/
 	    "     Yip will open the generated project file in the IDE after generating\n" /*|*/
@@ -218,6 +219,8 @@ static int build(int argc, char ** argv)
 			platform |= Platform::iOS;
 			buildIOSSimulator = true;
 		}
+		else if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "--tizen"))
+			platform |= Platform::Tizen;
 	}
 
 	if (buildType == BuildType::Unspecified)
@@ -268,6 +271,14 @@ static int build(int argc, char ** argv)
 	  #endif
 	}
 
+	if (platform & Platform::Tizen)
+	{
+		std::string projectPath = generateTizen(project);
+		// FIXME: build the project
+		(void)projectPath;
+		platform &= ~Platform::Tizen;
+	}
+
 	if (platform != 0)
 	{
 		std::cerr << "Not all platforms/targets were built (0x" << std::hex << std::setw(4) << std::setfill('0')
@@ -296,6 +307,8 @@ static int generate(int argc, char ** argv)
 			platform |= Platform::OSX;
 		else if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--ios"))
 			platform |= Platform::iOS;
+		else if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "--tizen"))
+			platform |= Platform::Tizen;
 		else if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "--no-open"))
 			noOpen = true;
 	}
@@ -354,6 +367,14 @@ static int generate(int argc, char ** argv)
 		(void)generatedFile;
 	  #endif
 		platform &= ~Platform::iOS;
+	}
+
+	if (platform & Platform::Tizen)
+	{
+		std::string generatedFile = generateTizen(project);
+		// FIXME: open project
+		(void)generatedFile;
+		platform &= ~Platform::Tizen;
 	}
 
 	if (platform != 0)
