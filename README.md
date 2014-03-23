@@ -37,7 +37,7 @@ Project files
 By default yip expects to find a file named `Yipfile` in the directory where
 it is run (Project file name could be overriden in the configuration file).
 
-### Simplest project file
+### Source files
 
 The format of the `Yipfile` is pretty simple. Here is an example:
 
@@ -86,7 +86,7 @@ curly braces:
 Supported options are:
 
 * Option `type` allows to override type of the file. This allows, for example,
-  to compile file with the `.c` extension as a `.cpp` file.
+  to compile file with the `.c` extension as an Objective-C source.
 
 ### Preprocessor definitions
 
