@@ -82,6 +82,7 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const std::st
 	m_CommandHandlers.insert(std::make_pair("app_sources", &ProjectFileParser::parseAppSources));
 	m_CommandHandlers.insert(std::make_pair("public_headers", &ProjectFileParser::parsePublicHeaders));
 	m_CommandHandlers.insert(std::make_pair("defines", &ProjectFileParser::parseDefines));
+	m_CommandHandlers.insert(std::make_pair("app_defines", &ProjectFileParser::parseAppDefines));
 	m_CommandHandlers.insert(std::make_pair("import", &ProjectFileParser::parseImport));
 	m_CommandHandlers.insert(std::make_pair("resources", &ProjectFileParser::parseResources));
 	m_CommandHandlers.insert(std::make_pair("ios", &ProjectFileParser::parseIOSorOSX));
@@ -323,6 +324,36 @@ void ProjectFileParser::parseDefines()
 		if (m_Token != Token::Literal)
 			reportError("expected preprocessor definition.");
 		m_Project->addDefine(m_TokenText, platforms, buildTypes);
+		getToken();
+	}
+
+	if (m_Token != Token::RCurly)
+		reportError("expected '}'.");
+}
+
+void ProjectFileParser::parseAppDefines()
+{
+	BuildType::Value buildTypes = BuildType::All;
+	Platform::Type platforms = Platform::All;
+
+	if (getToken() == Token::Colon)
+	{
+		getToken();
+		parsePlatformOrBuildTypeMask(platforms, buildTypes);
+	}
+
+	if (m_Token != Token::LCurly)
+		reportError("expected '{'.");
+
+	getToken();
+	while (m_Token != Token::RCurly && m_Token != Token::Eof)
+	{
+		if (m_Token != Token::Literal)
+			reportError("expected preprocessor definition.");
+
+		if (m_PathPrefix.length() > 0)
+			m_Project->addDefine(m_TokenText, platforms, buildTypes);
+
 		getToken();
 	}
 

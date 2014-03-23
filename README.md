@@ -164,6 +164,14 @@ Syntax for `app_sources` directive is the same as for the `sources` directive.
          main.cpp
       }
 
+It is also possible to specify preprocessor definitions to be defined only when
+project is build. There is an 'app_defines' directive:
+
+      app_defines
+      {
+         BUILDING_APP
+      }
+
 ### Frameworks on Apple platforms
 
 Frameworks on OSX and iOS could be linked using the `ios:framework` and

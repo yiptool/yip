@@ -71,6 +71,7 @@ private:
 	void parseAppSources();
 	void parsePublicHeaders();
 	void parseDefines();
+	void parseAppDefines();
 	void parseImport();
 	void parseResources();
 	void parseIOSorOSX();
