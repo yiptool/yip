@@ -352,7 +352,7 @@ void ProjectFileParser::parseAppDefines()
 		if (m_Token != Token::Literal)
 			reportError("expected preprocessor definition.");
 
-		if (m_PathPrefix.length() > 0)
+		if (m_PathPrefix.length() == 0)
 			m_Project->addDefine(m_TokenText, platforms, buildTypes);
 
 		getToken();
