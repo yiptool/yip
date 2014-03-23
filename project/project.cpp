@@ -75,6 +75,11 @@ DefinePtr Project::addDefine(const std::string & name, Platform::Type platforms,
 	return define;
 }
 
+void Project::winrtAddLibrary(const std::string & name)
+{
+	m_WinRTLibraries.insert(name);
+}
+
 void Project::osxAddFramework(const std::string & name, const std::string & path)
 {
 	addFramework(m_OSXFrameworks, name, path, "OSX");

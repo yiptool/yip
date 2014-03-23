@@ -29,6 +29,7 @@
 #include "../util/git.h"
 #include <vector>
 #include <map>
+#include <set>
 #include <memory>
 
 class Project : public std::enable_shared_from_this<Project>
@@ -57,6 +58,11 @@ public:
 		{ return m_Imports.insert(std::make_pair(name, url)).second; }
 	inline const std::map<std::string, std::string> & imports() const { return m_Imports; }
 
+	// WinRT
+
+	void winrtAddLibrary(const std::string & name);
+	inline const std::set<std::string> & winrtLibraries() const { return m_WinRTLibraries; }
+
 	// OSX
 
 	void osxAddFramework(const std::string & name, const std::string & path);
@@ -83,6 +89,7 @@ private:
 	std::map<std::string, std::string> m_Imports;
 	std::map<std::string, std::string> m_OSXFrameworks;
 	std::map<std::string, std::string> m_IOSFrameworks;
+	std::set<std::string> m_WinRTLibraries;
 	std::vector<std::string> m_Licenses;
 	mutable YipDirectoryPtr m_YipDirectory;
 	bool m_Valid;

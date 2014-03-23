@@ -85,6 +85,7 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const std::st
 	m_CommandHandlers.insert(std::make_pair("app_defines", &ProjectFileParser::parseAppDefines));
 	m_CommandHandlers.insert(std::make_pair("import", &ProjectFileParser::parseImport));
 	m_CommandHandlers.insert(std::make_pair("resources", &ProjectFileParser::parseResources));
+	m_CommandHandlers.insert(std::make_pair("winrt", &ProjectFileParser::parseWinRT));
 	m_CommandHandlers.insert(std::make_pair("ios", &ProjectFileParser::parseIOSorOSX));
 	m_CommandHandlers.insert(std::make_pair("osx", &ProjectFileParser::parseIOSorOSX));
 	m_CommandHandlers.insert(std::make_pair("license", &ProjectFileParser::parseLicense));
@@ -426,6 +427,27 @@ void ProjectFileParser::parseResources()
 
 	if (m_Token != Token::RCurly)
 		reportError("expected '}'.");
+}
+
+void ProjectFileParser::parseWinRT()
+{
+	const std::string & prefix = m_TokenText;
+
+	if (getToken() != Token::Colon)
+		{ reportError(fmt() << "expected ':' after '" << prefix << "'."); return; }
+
+	if (getToken() != Token::Literal)
+		{ reportError(fmt() << "expected variable name after '" << prefix << ":'."); return; }
+
+	if (m_TokenText == "library")
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected library name after '" << prefix << ":library'."); return; }
+		m_Project->winrtAddLibrary(m_TokenText);
+		return;
+	}
+
+	reportError(fmt() << "invalid variable '" << prefix << ":" << m_TokenText << "'.");
 }
 
 void ProjectFileParser::parseIOSorOSX()

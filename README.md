@@ -172,6 +172,17 @@ project is build. There is an 'app_defines' directive:
          BUILDING_APP
       }
 
+### Libraries on Microsoft Windows
+
+Libraries on Microsoft Windows could be linked using the `winrt:library`
+directive:
+
+      winrt:library
+      {
+         shell32
+         opengl32
+      }
+
 ### Frameworks on Apple platforms
 
 Frameworks on OSX and iOS could be linked using the `ios:framework` and

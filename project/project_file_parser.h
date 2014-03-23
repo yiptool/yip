@@ -74,6 +74,7 @@ private:
 	void parseAppDefines();
 	void parseImport();
 	void parseResources();
+	void parseWinRT();
 	void parseIOSorOSX();
 	void parseLicense();
 
