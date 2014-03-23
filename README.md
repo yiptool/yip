@@ -75,6 +75,19 @@ File `not_osx.cpp` will be compiled on all platforms, except Apple Mac OSX.
 File `not_nacl_and_tizen.cpp` will be compiled on all platforms, expect Google
 PNaCl and Samsung Tizen.
 
+It is possible to specify additional options per source file. Options are
+specified after the file name in the form of `name = value` pairs enclosed into
+curly braces:
+
+      sources {
+         file.c { type = source/objective-c }
+      }
+
+Supported options are:
+
+* Option `type` allows to override type of the file. This allows, for example,
+  to compile file with the `.c` extension as a `.cpp` file.
+
 ### Preprocessor definitions
 
 Preprocessor definitions for C family of languages could be specified using

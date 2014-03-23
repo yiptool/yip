@@ -198,9 +198,10 @@ void ProjectFileParser::parseSources()
 		if (m_PathPrefix.length() > 0)
 			name = pathConcat(m_PathPrefix, name);
 
+		SourceFilePtr sourceFile;
 		try
 		{
-			SourceFilePtr sourceFile = m_Project->addSourceFile(name, path);
+			sourceFile = m_Project->addSourceFile(name, path);
 			sourceFile->setPlatforms(platforms);
 		}
 		catch (const std::exception & e)
@@ -209,6 +210,7 @@ void ProjectFileParser::parseSources()
 		}
 
 		getToken();
+		parseFileFlags(sourceFile);
 	}
 
 	if (m_Token != Token::RCurly)
@@ -233,6 +235,7 @@ void ProjectFileParser::parseAppSources()
 		if (m_Token != Token::Literal)
 			reportError("expected file name.");
 
+		SourceFilePtr sourceFile;
 		if (m_PathPrefix.length() == 0)
 		{
 			std::string name = m_TokenText;
@@ -242,7 +245,7 @@ void ProjectFileParser::parseAppSources()
 
 			try
 			{
-				SourceFilePtr sourceFile = m_Project->addSourceFile(name, path);
+				sourceFile = m_Project->addSourceFile(name, path);
 				sourceFile->setPlatforms(platforms);
 			}
 			catch (const std::exception & e)
@@ -252,6 +255,7 @@ void ProjectFileParser::parseAppSources()
 		}
 
 		getToken();
+		parseFileFlags(sourceFile);
 	}
 
 	if (m_Token != Token::RCurly)
@@ -271,24 +275,28 @@ void ProjectFileParser::parsePublicHeaders()
 
 		std::string name = m_TokenText;
 		std::string path = pathMakeAbsolute(m_TokenText, m_ProjectPath);
+
+		SourceFilePtr sourceFile;
 		try {
-			m_Project->addSourceFile(pathConcat(m_PathPrefix, name), path);
+			sourceFile = m_Project->addSourceFile(pathConcat(m_PathPrefix, name), path);
 		} catch (const std::exception & e) {
 			reportWarning(e.what());
 		}
 
+		SourceFilePtr sourceFile2;
 		if (m_PathPrefix.length() > 0)
 		{
 			std::string proxyName = pathConcat(".yip-import-proxies/yip-imports", name);
 			std::string proxyPath = m_Project->yipDirectory()->writeIncludeWrapper(proxyName, path);
 			try {
-				m_Project->addSourceFile(pathConcat(".yip-imports-proxies", name), proxyPath);
+				sourceFile2 = m_Project->addSourceFile(pathConcat(".yip-imports-proxies", name), proxyPath);
 			} catch (const std::exception & e) {
 				reportWarning(e.what());
 			}
 		}
 
 		getToken();
+		parseFileFlags(sourceFile, sourceFile2, true);
 	}
 
 	if (m_Token != Token::RCurly)
@@ -523,6 +531,62 @@ void ProjectFileParser::parsePlatformOrBuildTypeMask(Platform::Type & platforms,
 
 	platforms = (inverse ? ~platfMask : platfMask);
 	buildTypes = (inverse ? ~buildMask : buildMask);
+}
+
+void ProjectFileParser::parseFileFlags(const SourceFilePtr & sourceFile, const SourceFilePtr & sourceFile2,
+	bool isPublicHeader)
+{
+	(void)isPublicHeader;
+
+	if (m_Token != Token::LCurly)
+		return;
+
+	getToken();
+	while (m_Token != Token::RCurly && m_Token != Token::Eof)
+	{
+		if (m_Token != Token::Literal)
+		{
+			reportError("expected option name.");
+			return;
+		}
+		std::string name = m_TokenText;
+
+		if (getToken() != Token::Equal)
+		{
+			reportError("expected '='.");
+			return;
+		}
+
+		if (getToken() != Token::Literal)
+		{
+			reportError("expected option value.");
+			return;
+		}
+		std::string value = m_TokenText;
+
+		if (name == "type")
+		{
+			FileType type = fileTypeFromString(value);
+			if (type == FILE_UNKNOWN)
+				reportWarning(fmt() << "invalid file type: '" << value << "'.");
+			else
+			{
+				if (sourceFile)
+					sourceFile->setFileType(type);
+				if (sourceFile2)
+					sourceFile2->setFileType(type);
+			}
+		}
+		else
+			reportWarning(fmt() << "invalid file option '" << name << "'.");
+
+		if (getToken() == Token::Comma)
+			getToken();
+	}
+
+	if (m_Token != Token::RCurly)
+		reportError("expected '}'.");
+	getToken();
 }
 
 ProjectFileParser::Token ProjectFileParser::getToken()

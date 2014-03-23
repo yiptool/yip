@@ -76,5 +76,6 @@ enum FileType
 };
 
 FileType determineFileType(const std::string & path);
+FileType fileTypeFromString(const std::string & name);
 
 #endif

@@ -108,3 +108,65 @@ FileType determineFileType(const std::string & path)
 
 	return FILE_UNKNOWN;
 }
+
+static std::unordered_map<std::string, FileType> g_ConstMap;
+static bool g_Initialized2;
+
+FileType fileTypeFromString(const std::string & name)
+{
+	if (!g_Initialized2)
+	{
+		g_ConstMap.insert(std::make_pair("text/plain", FILE_TEXT_PLAIN));
+		g_ConstMap.insert(std::make_pair("text/html", FILE_TEXT_HTML));
+		g_ConstMap.insert(std::make_pair("text/css", FILE_TEXT_CSS));
+		g_ConstMap.insert(std::make_pair("text/markdown", FILE_TEXT_MARKDOWN));
+		g_ConstMap.insert(std::make_pair("text/xml", FILE_TEXT_XML));
+		g_ConstMap.insert(std::make_pair("archive/arj", FILE_ARCHIVE_ARJ));
+		g_ConstMap.insert(std::make_pair("archive/zip", FILE_ARCHIVE_ZIP));
+		g_ConstMap.insert(std::make_pair("archive/rar", FILE_ARCHIVE_RAR));
+		g_ConstMap.insert(std::make_pair("archive/tar", FILE_ARCHIVE_TAR));
+		g_ConstMap.insert(std::make_pair("archive/tar-gz", FILE_ARCHIVE_TAR_GZ));
+		g_ConstMap.insert(std::make_pair("archive/tar-bz2", FILE_ARCHIVE_TAR_BZ2));
+		g_ConstMap.insert(std::make_pair("archive/gzip", FILE_ARCHIVE_GZIP));
+		g_ConstMap.insert(std::make_pair("archive/bzip2", FILE_ARCHIVE_BZIP2));
+		g_ConstMap.insert(std::make_pair("build/makefile", FILE_BUILD_MAKEFILE));
+		g_ConstMap.insert(std::make_pair("build/cmake-script", FILE_BUILD_CMAKE_SCRIPT));
+		g_ConstMap.insert(std::make_pair("build/cmakelists", FILE_BUILD_CMAKELISTS));
+		g_ConstMap.insert(std::make_pair("binary/win32-exe", FILE_BINARY_WIN32_EXE));
+		g_ConstMap.insert(std::make_pair("binary/win32-dll", FILE_BINARY_WIN32_DLL));
+		g_ConstMap.insert(std::make_pair("binary/win32-res", FILE_BINARY_WIN32_RES));
+		g_ConstMap.insert(std::make_pair("binary/win32-lib", FILE_BINARY_WIN32_LIB));
+		g_ConstMap.insert(std::make_pair("binary/object", FILE_BINARY_OBJECT));
+		g_ConstMap.insert(std::make_pair("binary/shared-object", FILE_BINARY_SHARED_OBJECT));
+		g_ConstMap.insert(std::make_pair("binary/archive", FILE_BINARY_ARCHIVE));
+		g_ConstMap.insert(std::make_pair("binary/apple-framework", FILE_BINARY_APPLE_FRAMEWORK));
+		g_ConstMap.insert(std::make_pair("binary/apple-dylib", FILE_BINARY_APPLE_DYNAMIC_LIB));
+		g_ConstMap.insert(std::make_pair("source/c", FILE_SOURCE_C));
+		g_ConstMap.insert(std::make_pair("source/cxx", FILE_SOURCE_CXX));
+		g_ConstMap.insert(std::make_pair("source/c-header", FILE_SOURCE_C_HEADER));
+		g_ConstMap.insert(std::make_pair("source/cxx-header", FILE_SOURCE_CXX_HEADER));
+		g_ConstMap.insert(std::make_pair("source/objective-c", FILE_SOURCE_OBJC));
+		g_ConstMap.insert(std::make_pair("source/objective-cxx", FILE_SOURCE_OBJCXX));
+		g_ConstMap.insert(std::make_pair("source/java", FILE_SOURCE_JAVA));
+		g_ConstMap.insert(std::make_pair("source/javascript", FILE_SOURCE_JAVASCRIPT));
+		g_ConstMap.insert(std::make_pair("source/lua", FILE_SOURCE_LUA));
+		g_ConstMap.insert(std::make_pair("source/shell", FILE_SOURCE_SHELL));
+		g_ConstMap.insert(std::make_pair("source/php", FILE_SOURCE_PHP));
+		g_ConstMap.insert(std::make_pair("source/python", FILE_SOURCE_PYTHON));
+		g_ConstMap.insert(std::make_pair("source/win32-rc", FILE_SOURCE_WIN32_RC));
+		g_ConstMap.insert(std::make_pair("source/win32-def", FILE_SOURCE_WIN32_DEF));
+		g_ConstMap.insert(std::make_pair("source/plist", FILE_SOURCE_PLIST));
+		g_ConstMap.insert(std::make_pair("image/xcassets", FILE_IMAGE_XCASSETS));
+		g_ConstMap.insert(std::make_pair("image/png", FILE_IMAGE_PNG));
+		g_ConstMap.insert(std::make_pair("image/jpeg", FILE_IMAGE_JPEG));
+		g_ConstMap.insert(std::make_pair("image/gif", FILE_IMAGE_GIF));
+		g_ConstMap.insert(std::make_pair("image/bmp", FILE_IMAGE_BMP));
+		g_Initialized2 = true;
+	}
+
+	auto it = g_ConstMap.find(name);
+	if (it != g_ConstMap.end())
+		return it->second;
+
+	return FILE_UNKNOWN;
+}

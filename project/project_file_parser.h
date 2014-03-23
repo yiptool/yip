@@ -80,6 +80,8 @@ private:
 	Platform::Type parsePlatformName();
 
 	void parsePlatformOrBuildTypeMask(Platform::Type & platforms, BuildType::Value & buildTypes);
+	void parseFileFlags(const SourceFilePtr & sourceFile,
+		const SourceFilePtr & sourceFile2 = SourceFilePtr(), bool isPublicHeader = false);
 
 	Token getToken();
 
