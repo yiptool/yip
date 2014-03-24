@@ -127,6 +127,17 @@ void ProjectFileParser::parseFromGit(const ProjectPtr & project, const std::stri
 	parser.doParse(project, true);
 }
 
+void ProjectFileParser::parseFromGit(const ProjectPtr & project, const std::string & url)
+{
+	GitRepositoryPtr repo;
+	try {
+		repo = project->yipDirectory()->openGitRepository(url);
+	} catch (const std::exception & e) {
+		throw std::runtime_error(fmt() << "unable to open git repository at '" << url << "': " << e.what());
+	}
+	parseFromGit(project, url, repo);
+}
+
 void ProjectFileParser::reportWarning(const std::string & message)
 {
 	std::cerr << m_FileName << '(' << m_TokenLine << "): " << message << std::endl;

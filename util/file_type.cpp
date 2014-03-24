@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 //
 #include "file_type.h"
+#include "fmt.h"
 #include "path.h"
 #include <unordered_map>
 
@@ -28,7 +29,7 @@ static std::unordered_map<std::string, FileType> g_ExtMap;
 static std::unordered_map<std::string, FileType> g_NameMap;
 static bool g_Initialized;
 
-FileType determineFileType(const std::string & path)
+static void init()
 {
 	if (!g_Initialized)
 	{
@@ -90,6 +91,11 @@ FileType determineFileType(const std::string & path)
 		g_NameMap.insert(std::make_pair("CMakeLists.txt", FILE_BUILD_CMAKELISTS));
 		g_Initialized = true;
 	}
+}
+
+FileType determineFileType(const std::string & path)
+{
+	init();
 
 	std::string name = pathGetFileName(path);
 	auto it = g_NameMap.find(name);
@@ -107,6 +113,34 @@ FileType determineFileType(const std::string & path)
 		return jt->second;
 
 	return FILE_UNKNOWN;
+}
+
+std::string extensionForFileType(FileType type)
+{
+	switch (type)
+	{
+	case FILE_TEXT_HTML: return ".html";
+  #ifdef _WIN32
+	case FILE_BINARY_OBJECT: return ".obj";
+  #else
+	case FILE_BINARY_OBJECT: return ".o";
+  #endif
+	case FILE_SOURCE_CXX: return ".cpp";
+	case FILE_SOURCE_CXX_HEADER: return ".hpp";
+	case FILE_SOURCE_PHP: return ".php";
+	case FILE_IMAGE_JPEG: return ".jpg";
+	default: break;
+	}
+
+	init();
+
+	for (auto it : g_ExtMap)
+	{
+		if (it.second == type)
+			return it.first;
+	}
+
+	throw std::runtime_error(fmt() << "unable to determine extension for file type (" << type << ").");
 }
 
 static std::unordered_map<std::string, FileType> g_ConstMap;

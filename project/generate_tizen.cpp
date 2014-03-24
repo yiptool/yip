@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 //
 #include "generate_tizen.h"
+#include "../util/sha1.h"
 #include "../util/path.h"
 #include <sstream>
 
@@ -39,7 +40,7 @@ namespace
 
 		/* Methods */
 
-		void createSymLinks();
+		void generateSrcFiles();
 
 		void writeMakefileInit();
 		void writeManifest();
@@ -49,19 +50,6 @@ namespace
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-static std::string expandFileName(const std::string & file)
-{
-	std::stringstream ss;
-	ss << '_';
-	for (char ch : file)
-	{
-		if (pathIsSeparator(ch))
-			ch = '_';
-		ss << ch;
-	}
-	return ss.str();
-}
 
 static bool isCompilableFileType(FileType type)
 {
@@ -77,27 +65,39 @@ static bool isCompilableFileType(FileType type)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Gen::createSymLinks()
+void Gen::generateSrcFiles()
 {
+	std::string srcDir = pathConcat(projectName, "src");
 	for (auto it : project->sourceFiles())
 	{
 		const SourceFilePtr & file = it.second;
+
 		if (!(file->platforms() & Platform::Tizen))
 			continue;
+		if (!isCompilableFileType(file->type()))
+			continue;
 
-		std::string name = pathConcat(projectName, pathConcat("src", file->name()));
+		std::string name = pathConcat(srcDir, file->name());
 		std::string path = pathConcat(project->yipDirectory()->path(), name);
 
-		pathCreate(pathGetDirectory(path));
-		pathCreateSymLink(file->path(), path);
-
-//		pathCreate(file->path(),
-//			pathConcat(pathConcat(projectName, project->yipDirectory()->path()),
-//			pathConcat("src", file->name())));
-//		pathCreateSymLink(file->path(),
-//			pathConcat(pathConcat(projectName, project->yipDirectory()->path()),
-//			pathConcat("src", file->name())));
+		std::stringstream ss;
+		ss << "#include \"" << file->path() << "\"\n";
+		project->yipDirectory()
+			->writeFile(pathConcat(srcDir, sha1(name) + extensionForFileType(file->type())), ss.str());
 	}
+}
+
+static std::string escapeQuote(const std::string & str)
+{
+	std::stringstream ss;
+	for (char ch : str)
+	{
+		if (ch != '"')
+			ss << ch;
+		else
+			ss << "\\\"";
+	}
+	return ss.str();
 }
 
 void Gen::writeMakefileInit()
@@ -106,18 +106,22 @@ void Gen::writeMakefileInit()
 	std::string incPath2 = pathConcat(incPath1, ".yip-import-proxies");
 
 	std::stringstream ss;
-	ss << "CC := $(CC) -std=c++11 -I\"" << incPath1 << "\" -I\"" << incPath2 << "\"\n\n";
-	ss << "CXX_SRCS := ";
-	for (auto it : project->sourceFiles())
+	ss << "CC := $(CC) -std=c++11 -I\"" << incPath1 << "\" -I\"" << incPath2 << "\"";
+	for (const std::string & path : project->headerPaths())
+		ss << " -I\"" << escapeQuote(path) << '"';
+	ss << " -D__TIZEN__";
+	for (auto it : project->defines())
 	{
-		const SourceFilePtr & file = it.second;
-		if (!(file->platforms() & Platform::Tizen))
+		const DefinePtr & define = it.second;
+		if (!(define->platforms() & Platform::Tizen))
 			continue;
-		if (!isCompilableFileType(file->type()))
-			continue;
-		ss << "\\\n\t\"" << file->name() << "\"";
+
+//		if (define->buildTypes() & BuildType::Debug)		// FIXME
+//		if (define->buildTypes() & BuildType::Release)
+		ss << " \"-D" << escapeQuote(define->name()) << '"';
 	}
 	ss << '\n';
+	ss << "TC_LINKER_MISC += -lrt\n";
 	project->yipDirectory()->writeFile(pathConcat(projectName, "makefile.init"), ss.str());
 }
 
@@ -160,7 +164,7 @@ void Gen::generate()
 	projectName = "tizen";
 	projectPath = pathConcat(project->yipDirectory()->path(), projectName);
 
-	createSymLinks();
+	generateSrcFiles();
 	writeMakefileInit();
 	writeManifest();
 }

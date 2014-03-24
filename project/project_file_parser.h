@@ -37,6 +37,7 @@ public:
 	static void parse(const ProjectPtr & project, const std::string & filename, bool resolveImports);
 	static void parseFromCurrentDirectory(const ProjectPtr & project, bool resolveImports);
 	static void parseFromGit(const ProjectPtr & project, const std::string & name, const GitRepositoryPtr & repo);
+	static void parseFromGit(const ProjectPtr & project, const std::string & url);
 
 protected:
 	inline const std::string & fileName() const { return m_FileName; }

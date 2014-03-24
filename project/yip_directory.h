@@ -36,6 +36,9 @@ public:
 
 	inline const std::string & path() const { return m_Path; }
 
+	bool didBuildTizen() const;
+	void setDidBuildTizen();
+
 	std::string writeFile(const std::string & path, const std::string & data, bool * changed = nullptr);
 	std::string writeIncludeWrapper(const std::string & name, const std::string & originalIncludePath);
 

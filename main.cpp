@@ -115,13 +115,22 @@ static void usage()
 	    << std::endl;
 }
 
-static ProjectPtr loadProject()
+static ProjectPtr loadProject(bool tizen = false)
 {
 	std::string projectPath = pathGetDirectory(pathMakeAbsolute(g_Config->projectFileName));
 	XCodeUniqueID::setSeed(projectPath);
 
 	ProjectPtr project = std::make_shared<Project>(projectPath);
 	ProjectFileParser::parseFromCurrentDirectory(project, true);
+
+	if (tizen || project->yipDirectory()->didBuildTizen())
+	{
+		std::string url = "https://github.com/oss-forks/libcxx.git";
+		project->addImport(url, url);
+		ProjectFileParser::parseFromGit(project, url);
+		project->yipDirectory()->setDidBuildTizen();
+		project->addHeaderPath(pathConcat(project->yipDirectory()->getGitRepositoryPath(url), "include"));
+	}
 
 	return project;
 }
@@ -241,7 +250,7 @@ static int build(int argc, char ** argv)
 		updateProjectImports(project);
 	}
 
-	ProjectPtr project = loadProject();
+	ProjectPtr project = loadProject(platform & Platform::Tizen);
 	if (!project->isValid())
 		return 1;
 
@@ -329,7 +338,7 @@ static int generate(int argc, char ** argv)
 		updateProjectImports(project);
 	}
 
-	ProjectPtr project = loadProject();
+	ProjectPtr project = loadProject(platform & Platform::Tizen);
 	if (!project->isValid())
 		return 1;
 
