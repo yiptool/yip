@@ -58,6 +58,9 @@ public:
 		{ return m_Imports.insert(std::make_pair(name, url)).second; }
 	inline const std::map<std::string, std::string> & imports() const { return m_Imports; }
 
+	inline void addHeaderPath(const std::string & path) { m_HeaderPaths.push_back(path); }
+	inline const std::vector<std::string> & headerPaths() const { return m_HeaderPaths; }
+
 	// WinRT
 
 	void winrtAddLibrary(const std::string & name);
@@ -83,6 +86,7 @@ public:
 
 private:
 	std::string m_ProjectPath;
+	std::vector<std::string> m_HeaderPaths;
 	std::map<std::string, SourceFilePtr> m_SourceFiles;
 	std::map<std::string, SourceFilePtr> m_ResourceFiles;
 	std::map<std::string, DefinePtr> m_Defines;
