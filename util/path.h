@@ -25,6 +25,27 @@
 
 #include <string>
 #include <ctime>
+#include <vector>
+
+enum DirEntryType
+{
+	DirEntry_Unknown = 0,
+	DirEntry_RegularFile,
+	DirEntry_Directory,
+	DirEntry_FIFO,
+	DirEntry_Socket,
+	DirEntry_CharDevice,
+	DirEntry_BlockDevice,
+	DirEntry_Link
+};
+
+struct DirEntry
+{
+	DirEntryType type;
+	std::string name;
+};
+
+typedef std::vector<DirEntry> DirEntryList;
 
 std::string pathToNativeSeparators(const std::string & path);
 std::string pathToUnixSeparators(const std::string & path);
@@ -55,6 +76,7 @@ std::string pathGetFileName(const std::string & path);
 
 std::string pathGetShortFileExtension(const std::string & path);
 std::string pathGetFullFileExtension(const std::string & path);
+std::string pathReplaceFullFileExtension(const std::string & path, const std::string & ext);
 
 bool pathCreate(const std::string & path);
 
@@ -66,5 +88,7 @@ time_t pathGetModificationTime(const std::string & path);
 std::string pathGetThisExecutableFile();
 
 void pathCreateSymLink(const std::string & from, const std::string & to);
+
+DirEntryList pathEnumDirectoryContents(const std::string & path);
 
 #endif

@@ -4,14 +4,18 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 ##################################################################################################################
 ## 3rdparty libraries
 
-MACRO(ADD_SUBMODULE path)
-	IF(NOT EXISTS "${path}/CMakeLists.txt")
+MACRO(FETCH_SUBMODULE path check_file)
+	IF(NOT EXISTS "${path}/${check_file}")
 		EXECUTE_PROCESS(COMMAND
 				git submodule update --init --recursive "${path}"
 			WORKING_DIRECTORY
 				"${CMAKE_SOURCE_DIR}"
 		)
 	ENDIF()
+ENDMACRO()
+
+MACRO(ADD_SUBMODULE path)
+	FETCH_SUBMODULE("${path}" "CMakeLists.txt")
 	ADD_SUBDIRECTORY("${path}")
 ENDMACRO()
 
@@ -22,6 +26,8 @@ ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/libgit2")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/inih")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/sqlite3")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/lua")
+
+FETCH_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/dirent" "include/dirent")
 
 ##################################################################################################################
 ## Compiler flags

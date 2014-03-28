@@ -19,3 +19,6 @@
 [submodule "3rdparty/lua"]
 	path = 3rdparty/lua
 	url = https://github.com/oss-forks/lua.git
+[submodule "3rdparty/dirent"]
+	path = 3rdparty/dirent
+	url = https://github.com/oss-forks/dirent.git

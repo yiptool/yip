@@ -36,8 +36,10 @@ class ProjectFileParser
 public:
 	static void parse(const ProjectPtr & project, const std::string & filename, bool resolveImports);
 	static void parseFromCurrentDirectory(const ProjectPtr & project, bool resolveImports);
-	static void parseFromGit(const ProjectPtr & project, const std::string & name, const GitRepositoryPtr & repo);
-	static void parseFromGit(const ProjectPtr & project, const std::string & url);
+	static void parseFromGit(const ProjectPtr & project, const std::string & name, const GitRepositoryPtr & repo,
+		Platform::Type platform = Platform::All);
+	static void parseFromGit(const ProjectPtr & project, const std::string & url,
+		Platform::Type platform = Platform::All);
 
 protected:
 	inline const std::string & fileName() const { return m_FileName; }
@@ -57,13 +59,15 @@ private:
 	std::string m_ProjectPath;
 	std::stringstream m_Buffer;
 	std::string m_TokenText;
+	Platform::Type m_DefaultPlatformMask;
 	Token m_Token;
 	int m_CurLine;
 	int m_TokenLine;
 	int m_LastChar;
 	bool m_ResolveImports;
 
-	ProjectFileParser(const std::string & filename, const std::string & pathPrefix = std::string());
+	ProjectFileParser(const std::string & filename, const std::string & pathPrefix = std::string(),
+		Platform::Type platform = Platform::All);
 	~ProjectFileParser();
 
 	void doParse(const ProjectPtr & project, bool resolveImports);

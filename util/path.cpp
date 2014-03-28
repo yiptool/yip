@@ -33,6 +33,8 @@
 #ifndef _WIN32
  #include <unistd.h>
  #include <pwd.h>
+ #include <sys/types.h>
+ #include <dirent.h>
  #ifdef __APPLE__
   #include <mach-o/dyld.h>
  #endif
@@ -46,6 +48,7 @@
  #include <windows.h>
  #include <shlwapi.h>
  #include <userenv.h>
+ #include "../3rdparty/dirent/include/dirent.h"
 #endif
 
 std::string pathToNativeSeparators(const std::string & path)
@@ -405,6 +408,13 @@ std::string pathGetFullFileExtension(const std::string & path)
 	return (pos == std::string::npos ? std::string() : path.substr(pos));
 }
 
+std::string pathReplaceFullFileExtension(const std::string & path, const std::string & ext)
+{
+	size_t offset = pathIndexOfFileName(path);
+	size_t pos = path.find('.', offset);
+	return (pos == std::string::npos ? path + ext : path.substr(0, pos) + ext);
+}
+
 bool pathCreate(const std::string & path)
 {
 	std::string dir = pathMakeAbsolute(path);
@@ -602,4 +612,53 @@ void pathCreateSymLink(const std::string & from, const std::string & to)
 			<< "': " << strerror(err));
 	}
   #endif
+}
+
+DirEntryList pathEnumDirectoryContents(const std::string & path)
+{
+	DirEntryList list;
+	DIR * dir;
+
+	dir = opendir(path.c_str());
+	if (!dir)
+	{
+		int err = errno;
+		throw std::runtime_error(fmt() << "unable to enumerate contents of directory '" << path << "'.");
+	}
+
+	try
+	{
+		struct dirent * ent;
+		while ((ent = readdir(dir)) != NULL)
+		{
+			DirEntry entry;
+
+			entry.name = ent->d_name;
+			if (entry.name == "." || entry.name == "..")
+				continue;
+
+			switch (ent->d_type)
+			{
+			case DT_REG: entry.type = DirEntry_RegularFile; break;
+			case DT_DIR: entry.type = DirEntry_Directory; break;
+			case DT_FIFO: entry.type = DirEntry_FIFO; break;
+			case DT_SOCK: entry.type = DirEntry_Socket; break;
+			case DT_CHR: entry.type = DirEntry_CharDevice; break;
+			case DT_BLK: entry.type = DirEntry_BlockDevice; break;
+			case DT_LNK: entry.type = DirEntry_Link; break;
+			default: entry.type = DirEntry_Unknown; break;
+			}
+
+			list.push_back(entry);
+		}
+	}
+	catch (...)
+	{
+		closedir(dir);
+		throw;
+	}
+
+	closedir(dir);
+
+	return list;
 }

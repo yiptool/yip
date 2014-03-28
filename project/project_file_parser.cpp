@@ -64,10 +64,12 @@ static bool isValidPathPrefix(const std::string & prefix)
 
 /* ProjectFileParser */
 
-ProjectFileParser::ProjectFileParser(const std::string & filename, const std::string & pathPrefix)
+ProjectFileParser::ProjectFileParser(const std::string & filename, const std::string & pathPrefix,
+		Platform::Type platform)
 	: m_FileName(pathMakeAbsolute(filename)),
 	  m_PathPrefix(pathPrefix),
 	  m_ProjectPath(pathGetDirectory(m_FileName)),
+	  m_DefaultPlatformMask(platform),
 	  m_Token(Token::Eof),
 	  m_CurLine(1),
 	  m_TokenLine(1),
@@ -107,7 +109,7 @@ void ProjectFileParser::parseFromCurrentDirectory(const ProjectPtr & project, bo
 }
 
 void ProjectFileParser::parseFromGit(const ProjectPtr & project, const std::string & name,
-	const GitRepositoryPtr & repo)
+	const GitRepositoryPtr & repo, Platform::Type platform)
 {
 	std::string file = pathConcat(repo->path(), g_Config->projectFileName);
 
@@ -123,11 +125,11 @@ void ProjectFileParser::parseFromGit(const ProjectPtr & project, const std::stri
 	}
 	pathPrefix = pathConcat(".yip-imports", pathPrefix);
 
-	ProjectFileParser parser(file, pathPrefix);
+	ProjectFileParser parser(file, pathPrefix, platform);
 	parser.doParse(project, true);
 }
 
-void ProjectFileParser::parseFromGit(const ProjectPtr & project, const std::string & url)
+void ProjectFileParser::parseFromGit(const ProjectPtr & project, const std::string & url, Platform::Type platform)
 {
 	GitRepositoryPtr repo;
 	try {
@@ -135,7 +137,7 @@ void ProjectFileParser::parseFromGit(const ProjectPtr & project, const std::stri
 	} catch (const std::exception & e) {
 		throw std::runtime_error(fmt() << "unable to open git repository at '" << url << "': " << e.what());
 	}
-	parseFromGit(project, url, repo);
+	parseFromGit(project, url, repo, platform);
 }
 
 void ProjectFileParser::reportWarning(const std::string & message)
@@ -190,7 +192,7 @@ void ProjectFileParser::doParse(const ProjectPtr & project, bool resolveImports)
 
 void ProjectFileParser::parseSources()
 {
-	Platform::Type platforms = Platform::All;
+	Platform::Type platforms = m_DefaultPlatformMask;
 	if (getToken() == Token::Colon)
 	{
 		getToken();
@@ -232,7 +234,7 @@ void ProjectFileParser::parseSources()
 
 void ProjectFileParser::parseAppSources()
 {
-	Platform::Type platforms = Platform::All;
+	Platform::Type platforms = m_DefaultPlatformMask;
 	if (getToken() == Token::Colon)
 	{
 		getToken();
@@ -319,7 +321,7 @@ void ProjectFileParser::parsePublicHeaders()
 void ProjectFileParser::parseDefines()
 {
 	BuildType::Value buildTypes = BuildType::All;
-	Platform::Type platforms = Platform::All;
+	Platform::Type platforms = m_DefaultPlatformMask;
 
 	if (getToken() == Token::Colon)
 	{
@@ -346,7 +348,7 @@ void ProjectFileParser::parseDefines()
 void ProjectFileParser::parseAppDefines()
 {
 	BuildType::Value buildTypes = BuildType::All;
-	Platform::Type platforms = Platform::All;
+	Platform::Type platforms = m_DefaultPlatformMask;
 
 	if (getToken() == Token::Colon)
 	{
@@ -404,7 +406,7 @@ void ProjectFileParser::parseImport()
 
 void ProjectFileParser::parseResources()
 {
-	Platform::Type platforms = Platform::All;
+	Platform::Type platforms = m_DefaultPlatformMask;
 	if (getToken() == Token::Colon)
 	{
 		getToken();

@@ -127,7 +127,7 @@ static ProjectPtr loadProject(bool tizen = false)
 	{
 		std::string url = "https://github.com/oss-forks/libcxx.git";
 		project->addImport(url, url);
-		ProjectFileParser::parseFromGit(project, url);
+		ProjectFileParser::parseFromGit(project, url, Platform::Tizen);
 		project->yipDirectory()->setDidBuildTizen();
 		project->addHeaderPath(pathConcat(project->yipDirectory()->getGitRepositoryPath(url), "include"));
 	}

@@ -21,9 +21,11 @@
 // THE SOFTWARE.
 //
 #include "generate_tizen.h"
+#include "../util/fmt.h"
 #include "../util/sha1.h"
 #include "../util/path.h"
 #include <sstream>
+#include <unordered_set>
 
 namespace
 {
@@ -37,10 +39,12 @@ namespace
 
 		// Private
 		std::string projectName;
+		std::unordered_set<std::string> srcFiles;
 
 		/* Methods */
 
 		void generateSrcFiles();
+		void deleteOldSrcFiles(const std::string & path);
 
 		void writeMakefileInit();
 		void writeManifest();
@@ -78,12 +82,34 @@ void Gen::generateSrcFiles()
 			continue;
 
 		std::string name = pathConcat(srcDir, file->name());
-		std::string path = pathConcat(project->yipDirectory()->path(), name);
 
-		std::stringstream ss;
-		ss << "#include \"" << file->path() << "\"\n";
-		project->yipDirectory()
-			->writeFile(pathConcat(srcDir, sha1(name) + extensionForFileType(file->type())), ss.str());
+		std::string ext = extensionForFileType(file->type());
+		if (pathGetFullFileExtension(file->name()) != ext)
+			name = fmt() << file->name() << '.' << sha1(file->name()).substr(0, 4) << ext;
+
+		std::string path = pathSimplify(pathConcat(project->yipDirectory()->path(), name));
+
+		pathCreate(pathGetDirectory(path));
+		pathCreateSymLink(file->path(), path);
+
+		srcFiles.insert(pathToUnixSeparators(path));
+	}
+}
+
+void Gen::deleteOldSrcFiles(const std::string & path)
+{
+	DirEntryList list = pathEnumDirectoryContents(path);
+	for (auto it : list)
+	{
+		std::string file = pathConcat(path, it.name);
+		if (it.type == DirEntry_Directory)
+			deleteOldSrcFiles(file);
+
+		if (srcFiles.find(file) == srcFiles.end())
+		{
+			printf("<<%s>>\n", file.c_str());
+//			unlink(file.c_str());
+		}
 	}
 }
 
@@ -165,6 +191,8 @@ void Gen::generate()
 	projectPath = pathConcat(project->yipDirectory()->path(), projectName);
 
 	generateSrcFiles();
+	deleteOldSrcFiles(pathConcat(projectPath, "src"));
+
 	writeMakefileInit();
 	writeManifest();
 }
