@@ -26,6 +26,7 @@
 #include "../util/path.h"
 #include <sstream>
 #include <unordered_set>
+#include <iostream>
 
 namespace
 {
@@ -44,7 +45,7 @@ namespace
 		/* Methods */
 
 		void generateSrcFiles();
-		void deleteOldSrcFiles(const std::string & path);
+		void deleteOldSrcFiles(const std::string & path, const std::string & fullpath);
 
 		void writeMakefileInit();
 		void writeManifest();
@@ -96,19 +97,23 @@ void Gen::generateSrcFiles()
 	}
 }
 
-void Gen::deleteOldSrcFiles(const std::string & path)
+void Gen::deleteOldSrcFiles(const std::string & path, const std::string & fullpath)
 {
-	DirEntryList list = pathEnumDirectoryContents(path);
+	DirEntryList list = pathEnumDirectoryContents(fullpath);
 	for (auto it : list)
 	{
-		std::string file = pathConcat(path, it.name);
+		std::string file = pathConcat(fullpath, it.name);
+
 		if (it.type == DirEntry_Directory)
-			deleteOldSrcFiles(file);
+		{
+			deleteOldSrcFiles(pathConcat(path, it.name), file);
+			continue;
+		}
 
 		if (srcFiles.find(file) == srcFiles.end())
 		{
-			printf("<<%s>>\n", file.c_str());
-//			unlink(file.c_str());
+			std::cout << "killing " << pathConcat(path, it.name).c_str() << std::endl;
+			pathDeleteFile(file.c_str());
 		}
 	}
 }
@@ -195,7 +200,7 @@ void Gen::generate()
 	projectPath = pathConcat(project->yipDirectory()->path(), projectName);
 
 	generateSrcFiles();
-	deleteOldSrcFiles(pathConcat(projectPath, "src"));
+	deleteOldSrcFiles("src", pathConcat(projectPath, "src"));
 
 	writeMakefileInit();
 	writeManifest();

@@ -91,4 +91,6 @@ void pathCreateSymLink(const std::string & from, const std::string & to);
 
 DirEntryList pathEnumDirectoryContents(const std::string & path);
 
+void pathDeleteFile(const std::string & file);
+
 #endif

@@ -623,7 +623,8 @@ DirEntryList pathEnumDirectoryContents(const std::string & path)
 	if (!dir)
 	{
 		int err = errno;
-		throw std::runtime_error(fmt() << "unable to enumerate contents of directory '" << path << "'.");
+		throw std::runtime_error(fmt() << "unable to enumerate contents of directory '"
+			<< path << "': " << strerror(err));
 	}
 
 	try
@@ -661,4 +662,21 @@ DirEntryList pathEnumDirectoryContents(const std::string & path)
 	closedir(dir);
 
 	return list;
+}
+
+void pathDeleteFile(const std::string & path)
+{
+  #ifndef _WIN32
+	if (unlink(path.c_str()) < 0)
+	{
+		int err = errno;
+		throw std::runtime_error(fmt() << "unable to delete file '" << path << "': " << strerror(err));
+	}
+  #else
+	if (!DeleteFileA(path.c_str()))
+	{
+		DWORD err = GetLastError();
+		throw std::runtime_error(fmt() << "unable to delete file '" << path << "' (code " << err << ").");
+	}
+  #endif
 }
