@@ -6,6 +6,8 @@ ADD_LIBRARY(project STATIC
 	generate_tizen.h
 	generate_xcode.cpp
 	generate_xcode.h
+	header_path.cpp
+	header_path.h
 	platform.cpp
 	platform.h
 	project.cpp

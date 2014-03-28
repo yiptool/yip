@@ -133,8 +133,12 @@ void Gen::writeMakefileInit()
 
 	std::stringstream ss;
 	ss << "CC := $(CC) -std=c++11 -I\"" << incPath1 << "\" -I\"" << incPath2 << "\"";
-	for (const std::string & path : project->headerPaths())
-		ss << " -I\"" << escapeQuote(path) << '"';
+	for (auto it : project->headerPaths())
+	{
+		if ((!it.second->platforms() & Platform::Tizen))
+			continue;
+		ss << " -I\"" << escapeQuote(it.second->path()) << '"';
+	}
 	ss << " -D__TIZEN__";
 	for (auto it : project->defines())
 	{

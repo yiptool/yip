@@ -129,7 +129,8 @@ static ProjectPtr loadProject(bool tizen = false)
 		project->addImport(url, url);
 		ProjectFileParser::parseFromGit(project, url, Platform::Tizen);
 		project->yipDirectory()->setDidBuildTizen();
-		project->addHeaderPath(pathConcat(project->yipDirectory()->getGitRepositoryPath(url), "include"));
+		std::string headerPath = pathConcat(project->yipDirectory()->getGitRepositoryPath(url), "include");
+		project->addHeaderPath(headerPath, Platform::Tizen);
 	}
 
 	return project;

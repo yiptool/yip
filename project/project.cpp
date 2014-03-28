@@ -75,6 +75,18 @@ DefinePtr Project::addDefine(const std::string & name, Platform::Type platforms,
 	return define;
 }
 
+void Project::addHeaderPath(const std::string & path, Platform::Type platform)
+{
+	auto it = m_HeaderPaths.find(path);
+	if (it != m_HeaderPaths.end())
+		it->second->setPlatforms(it->second->platforms() | platform);
+	else
+	{
+		HeaderPathPtr headerPath = std::make_shared<HeaderPath>(path);
+		m_HeaderPaths.insert(std::make_pair(path, headerPath));
+	}
+}
+
 void Project::winrtAddLibrary(const std::string & name)
 {
 	m_WinRTLibraries.insert(name);

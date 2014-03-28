@@ -377,8 +377,14 @@ void Gen::initDebugConfiguration()
 	else
 		cfgTargetDebug->setAssetCatalogLaunchImageName("LaunchImage");
 	cfgTargetDebug->addHeaderSearchPath(pathConcat(project->yipDirectory()->path(), ".yip-import-proxies"));
-	for (const std::string & path : project->headerPaths())
-		cfgTargetDebug->addHeaderSearchPath(path);
+
+	for (auto it : project->headerPaths())
+	{
+		const HeaderPathPtr & headerPath = it.second;
+		if (!(headerPath->platforms() & (iOS ? Platform::iOS : Platform::OSX)))
+			continue;
+		cfgTargetDebug->addHeaderSearchPath(headerPath->path());
+	}
 
 	cfgPreBuildDebug = xcodeProject->addLegacyBuildConfiguration();
 	cfgPreBuildDebug->setName("Debug");
@@ -409,8 +415,14 @@ void Gen::initReleaseConfiguration()
 	else
 		cfgTargetRelease->setAssetCatalogLaunchImageName("LaunchImage");
 	cfgTargetRelease->addHeaderSearchPath(pathConcat(project->yipDirectory()->path(), ".yip-import-proxies"));
-	for (const std::string & path : project->headerPaths())
-		cfgTargetRelease->addHeaderSearchPath(path);
+
+	for (auto it : project->headerPaths())
+	{
+		const HeaderPathPtr & headerPath = it.second;
+		if (!(headerPath->platforms() & (iOS ? Platform::iOS : Platform::OSX)))
+			continue;
+		cfgTargetRelease->addHeaderSearchPath(headerPath->path());
+	}
 
 	cfgPreBuildRelease = xcodeProject->addLegacyBuildConfiguration();
 	cfgPreBuildRelease->setName("Release");
