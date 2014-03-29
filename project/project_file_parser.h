@@ -80,6 +80,7 @@ private:
 	void parseImport();
 	void parseResources();
 	void parseWinRT();
+	void parseTizen();
 	void parseIOSorOSX();
 	void parseLicense();
 

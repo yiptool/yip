@@ -102,6 +102,11 @@ void Project::iosAddFramework(const std::string & name, const std::string & path
 	addFramework(m_IOSFrameworks, name, path, "iOS");
 }
 
+void Project::tizenAddPrivilege(const std::string & url)
+{
+	m_TizenPrivileges.insert(url);
+}
+
 void Project::addFramework(std::map<std::string, std::string> & map, const std::string & name,
 	const std::string & path, const char * what)
 {

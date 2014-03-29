@@ -90,6 +90,7 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const std::st
 	m_CommandHandlers.insert(std::make_pair("winrt", &ProjectFileParser::parseWinRT));
 	m_CommandHandlers.insert(std::make_pair("ios", &ProjectFileParser::parseIOSorOSX));
 	m_CommandHandlers.insert(std::make_pair("osx", &ProjectFileParser::parseIOSorOSX));
+	m_CommandHandlers.insert(std::make_pair("tizen", &ProjectFileParser::parseTizen));
 	m_CommandHandlers.insert(std::make_pair("license", &ProjectFileParser::parseLicense));
 }
 
@@ -514,6 +515,27 @@ void ProjectFileParser::parseIOSorOSX()
 			reportWarning(e.what());
 		}
 
+		return;
+	}
+
+	reportError(fmt() << "invalid variable '" << prefix << ":" << m_TokenText << "'.");
+}
+
+void ProjectFileParser::parseTizen()
+{
+	const std::string & prefix = m_TokenText;
+
+	if (getToken() != Token::Colon)
+		{ reportError(fmt() << "expected ':' after '" << prefix << "'."); return; }
+
+	if (getToken() != Token::Literal)
+		{ reportError(fmt() << "expected variable name after '" << prefix << ":'."); return; }
+
+	if (m_TokenText == "privilege")
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected privilege name after '" << prefix << ":privilege'."); return; }
+		m_Project->tizenAddPrivilege(m_TokenText);
 		return;
 	}
 

@@ -141,7 +141,17 @@ void Gen::writeManifest()
 	ss << "\t</Requirements>\n";
 	ss << "\t<Apps>\n";
 	ss << "\t\t<ApiVersion>2.2</ApiVersion>\n";
-	ss << "\t\t<Privileges />\n";
+
+	if (project->tizenPrivileges().empty())
+		ss << "\t\t<Privileges />\n";
+	else
+	{
+		ss << "\t\t<Privileges>\n";
+		for (const std::string & privilege : project->tizenPrivileges())
+			ss << "\t\t\t<Privilege>" << xmlEscape(privilege) << "</Privilege>\n";
+		ss << "\t\t</Privileges>\n";
+	}
+
 	ss << "\t\t<UiApp Main=\"True\" MenuIconVisible=\"True\" Name=\"" << xmlEscape(projectName) << "\">\n";
 	ss << "\t\t\t<UiScalability CoordinateSystem=\"Physical\" />\n";
 	ss << "\t\t\t<UiTheme SystemTheme=\"Black\" />\n";

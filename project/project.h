@@ -77,6 +77,11 @@ public:
 	void iosAddFramework(const std::string & name, const std::string & path);
 	inline const std::map<std::string, std::string> & iosFrameworks() const { return m_IOSFrameworks; }
 
+	// Tizen
+
+	void tizenAddPrivilege(const std::string & url);
+	inline const std::set<std::string> & tizenPrivileges() const { return m_TizenPrivileges; }
+
 	// Licenses
 
 	inline void addLicense(const std::string & license) { m_Licenses.push_back(license); }
@@ -95,6 +100,7 @@ private:
 	std::map<std::string, std::string> m_OSXFrameworks;
 	std::map<std::string, std::string> m_IOSFrameworks;
 	std::set<std::string> m_WinRTLibraries;
+	std::set<std::string> m_TizenPrivileges;
 	std::vector<std::string> m_Licenses;
 	mutable YipDirectoryPtr m_YipDirectory;
 	bool m_Valid;

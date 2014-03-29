@@ -204,6 +204,13 @@ Third variant links with the user-provided framework at the specified path.
 Path could be either absolute or relative to the directory where `Yipfile`
 is located.
 
+### Privileges on the Samsung Tizen platform
+
+If your application requires certain privileges on the Tizen platform, they
+could be requested using the `tizen:privilege` command:
+
+      tizen:privilege "http://tizen.org/privilege/power"
+
 ### License handling
 
 License for the project could be specified in the `Yipfile` using the
@@ -236,15 +243,15 @@ Supported platforms
 
 Currently the following platforms are supported:
 
-* Apple Mac OSX (XCode)
 * Apple iOS (XCode)
+* Apple Mac OSX (XCode)
+* Samsung Tizen
 
 The following platforms are expected to be supported in the near future:
 
 * Microsoft Windows (WinRT, Visual Studio 2013)
 * Google Android
 * Google PNaCl
-* Samsung Tizen
 * Qt
 
 License
