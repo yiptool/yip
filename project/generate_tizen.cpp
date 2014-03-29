@@ -572,6 +572,10 @@ void Gen::writeCProjectFile()
 	ss << "\t\t\t\t\t\t\t\t\t<listOptionValue builtIn=\"false\" value=\""
 			<< xmlEscape(pathConcat(prjDir, "lib")) << "\"/>\n";
 	ss << "\t\t\t\t\t\t\t\t</option>\n";
+	ss << "\t\t\t\t\t\t\t\t<option id=\"gnu.cpp.link.option.libs.1976314268\" name=\"Libraries (-l)\" "
+			"superClass=\"gnu.cpp.link.option.libs\" valueType=\"libs\">\n";
+	ss << "\t\t\t\t\t\t\t\t\t<listOptionValue builtIn=\"false\" value=\"rt\"/>\n";
+	ss << "\t\t\t\t\t\t\t\t</option>\n";
 	ss << "\t\t\t\t\t\t\t\t<inputType id=\"cdt.managedbuild.tool.gnu.cpp.linker.input.827211201\" "
 			"superClass=\"cdt.managedbuild.tool.gnu.cpp.linker.input\">\n";
 	ss << "\t\t\t\t\t\t\t\t\t<additionalInput kind=\"additionalinputdependency\" paths=\"$(USER_OBJS)\"/>\n";
@@ -801,6 +805,10 @@ void Gen::writeCProjectFile()
 			"name=\"Library search path (-L)\" superClass=\"gnu.cpp.link.option.paths\" valueType=\"libPaths\">\n";
 	ss << "\t\t\t\t\t\t\t\t\t<listOptionValue builtIn=\"false\" value=\"" << xmlEscape(pathConcat(prjDir, "lib"))
 			<< "\"/>\n";
+	ss << "\t\t\t\t\t\t\t\t</option>\n";
+	ss << "\t\t\t\t\t\t\t\t<option id=\"gnu.cpp.link.option.libs.604111176\" "
+			"superClass=\"gnu.cpp.link.option.libs\" valueType=\"libs\">\n";
+	ss << "\t\t\t\t\t\t\t\t\t<listOptionValue builtIn=\"false\" value=\"rt\"/>\n";
 	ss << "\t\t\t\t\t\t\t\t</option>\n";
 	ss << "\t\t\t\t\t\t\t\t<inputType id=\"cdt.managedbuild.tool.gnu.cpp.linker.input.936282359\" "
 			"superClass=\"cdt.managedbuild.tool.gnu.cpp.linker.input\">\n";
@@ -1038,6 +1046,7 @@ void Gen::writeCProjectFile()
 	ss << "\t\t\t\t\t\t\t\t<option id=\"gnu.cpp.link.option.libs.2140324894\" "
 			"name=\"Libraries (-l)\" superClass=\"gnu.cpp.link.option.libs\" valueType=\"libs\">\n";
 	ss << "\t\t\t\t\t\t\t\t\t<listOptionValue builtIn=\"false\" value=\"daprobe\"/>\n";
+	ss << "\t\t\t\t\t\t\t\t\t<listOptionValue builtIn=\"false\" value=\"rt\"/>\n";
 	ss << "\t\t\t\t\t\t\t\t</option>\n";
 	ss << "\t\t\t\t\t\t\t\t<option id=\"gnu.cpp.link.option.paths.2016772773\" "
 			"name=\"Library search path (-L)\" superClass=\"gnu.cpp.link.option.paths\" valueType=\"libPaths\">\n";
