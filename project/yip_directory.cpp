@@ -54,6 +54,42 @@ void YipDirectory::setDidBuildTizen()
 	m_DB->exec(fmt() << "REPLACE INTO did_build_tizen (id, value) VALUES (1, 1)");
 }
 
+bool YipDirectory::shouldProcessFile(const std::string & path, const std::string & sourcePath)
+{
+	std::string targetFile = pathSimplify(pathConcat(m_Path, path));
+
+	// Always process input file if output file does not exist
+	if (!pathIsExistent(targetFile))
+		return true;
+
+	// There is no good way to handle non-existence of the input file. Leave it to the caller.
+	if (!pathIsExistent(sourcePath))
+		return true;
+
+	// Canonicalize output file path
+	targetFile = pathMakeCanonical(targetFile);
+
+	// Get information about file from the database
+	bool found = false;
+	time_t old_time = 0;
+	m_DB->select("SELECT time FROM files WHERE path = ? LIMIT 1", { targetFile },
+		[&found, &old_time](const SQLiteCursor & cursor) {
+			found = true;
+			old_time = cursor.toTimeT(0);
+		}
+	);
+
+	// This file was never built. Build it now.
+	if (!found)
+		return true;
+
+	// Check whether file has been modified since last build.
+	if (pathGetModificationTime(sourcePath) > old_time)
+		return true;
+
+	return false;
+}
+
 std::string YipDirectory::writeFile(const std::string & path, const std::string & data, bool * changed)
 {
 	std::string file = pathSimplify(pathConcat(m_Path, path));

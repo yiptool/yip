@@ -23,6 +23,7 @@
 #include "project/project_file_parser.h"
 #include "project/generate_xcode.h"
 #include "project/generate_tizen.h"
+#include "project/resource_compiler.h"
 #include "3rdparty/libgit2/include/git2/threads.h"
 #include "xcode/xcode_unique_id.h"
 #include "util/fmt.h"
@@ -256,6 +257,7 @@ static int build(int argc, char ** argv)
 		return 1;
 
 	project->generateLicenseData();
+	compileResources(project);
 
 	if (platform & Platform::OSX)
 	{
@@ -344,6 +346,7 @@ static int generate(int argc, char ** argv)
 		return 1;
 
 	project->generateLicenseData();
+	compileResources(project);
 
 	size_t numPlatforms = 0;
 	for (size_t i = 1; i <= 0x8000; i <<= 1)
@@ -435,6 +438,7 @@ static int xcodePrebuild(int argc, char ** argv)
 		return 1;
 
 	project->generateLicenseData();
+	compileResources(project);
 
 	bool changed = false;
 	generateXCode(project, iOS, &changed);

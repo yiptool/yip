@@ -1,5 +1,7 @@
 
 ADD_LIBRARY(util STATIC
+	cxx_escape.cpp
+	cxx_escape.h
 	file_type.cpp
 	file_type.h
 	fmt.h

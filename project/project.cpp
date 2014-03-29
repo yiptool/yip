@@ -23,6 +23,7 @@
 #include "project.h"
 #include "../util/sha1.h"
 #include "../util/fmt.h"
+#include "../util/cxx_escape.h"
 
 Project::Project(const std::string & prjPath)
 	: m_ProjectPath(prjPath),
@@ -128,44 +129,6 @@ void Project::addFramework(std::map<std::string, std::string> & map, const std::
 
 		throw std::runtime_error(fmt() << "conflicting declaration for " << what << " framework '" << name
 			<< "' (was '" << it.first->second << "', now '" << path << "').");
-	}
-}
-
-static void cxxEscape(std::stringstream & ss, const std::string & str)
-{
-	for (char ch : str)
-	{
-		switch (ch)
-		{
-		case '\r':
-		case '\n':
-		case '\\':
-		case '"':
-		case '\'':
-		case '?':
-			ss << '\\' << ch;
-			break;
-		case '\t':
-			ss << '\t' << ch;
-			break;
-		case '\f':
-			ss << '\f' << ch;
-			break;
-		case '\v':
-			ss << '\v' << ch;
-			break;
-		case '\a':
-			ss << '\a' << ch;
-			break;
-		case '\b':
-			ss << '\b' << ch;
-			break;
-		case '\0':
-			ss << '\0' << ch;
-			break;
-		default:
-			ss << ch;
-		}
 	}
 }
 

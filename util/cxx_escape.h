@@ -20,45 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __8d3668e7a9293f349502913684e4cb1c__
-#define __8d3668e7a9293f349502913684e4cb1c__
+#ifndef __850a111da598c4b6970540c4e0246a89__
+#define __850a111da598c4b6970540c4e0246a89__
 
-#include "../util/git.h"
-#include "../util/sqlite.h"
-#include <memory>
+#include <sstream>
 #include <string>
 
-class YipDirectory
-{
-public:
-	YipDirectory(const std::string & projectPath);
-	~YipDirectory();
-
-	inline const std::string & path() const { return m_Path; }
-
-	bool didBuildTizen() const;
-	void setDidBuildTizen();
-
-	bool shouldProcessFile(const std::string & path, const std::string & sourcePath);
-
-	std::string writeFile(const std::string & path, const std::string & data, bool * changed = nullptr);
-	std::string writeIncludeWrapper(const std::string & name, const std::string & originalIncludePath);
-
-	std::string getGitRepositoryPath(const std::string & url);
-	GitRepositoryPtr openGitRepository(const std::string & url, GitProgressPrinter * printer);
-	GitRepositoryPtr openGitRepository(const std::string & url, GitProgressPrinter && prn = GitProgressPrinter())
-		{ return openGitRepository(url, &prn); }
-
-private:
-	std::string m_Path;
-	SQLiteDatabasePtr m_DB;
-
-	void initDB();
-
-	YipDirectory(const YipDirectory &) = delete;
-	YipDirectory & operator=(const YipDirectory &) = delete;
-};
-
-typedef std::shared_ptr<YipDirectory> YipDirectoryPtr;
+void cxxEscape(std::stringstream & ss, const std::string & str);
 
 #endif

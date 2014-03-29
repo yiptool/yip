@@ -14,6 +14,8 @@ ADD_LIBRARY(project STATIC
 	project.h
 	project_file_parser.cpp
 	project_file_parser.h
+	resource_compiler.cpp
+	resource_compiler.h
 	source_file.cpp
 	source_file.h
 	yip_directory.cpp
