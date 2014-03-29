@@ -48,7 +48,6 @@ namespace
 		void generateSrcFiles();
 		void deleteOldSrcFiles(const std::string & path, const std::string & fullpath);
 
-		void writeMakefileInit();
 		void writeManifest();
 
 		void writeProjectFile();
@@ -129,54 +128,12 @@ void Gen::deleteOldSrcFiles(const std::string & path, const std::string & fullpa
 	}
 }
 
-static std::string escapeQuote(const std::string & str)
-{
-	std::stringstream ss;
-	for (char ch : str)
-	{
-		if (ch != '"')
-			ss << ch;
-		else
-			ss << "\\\"";
-	}
-	return ss.str();
-}
-
-void Gen::writeMakefileInit()
-{
-	std::string incPath1 = project->yipDirectory()->path();
-	std::string incPath2 = pathConcat(incPath1, ".yip-import-proxies");
-
-	std::stringstream ss;
-	ss << "CC := $(CC) -std=c++11 -I\"" << incPath1 << "\" -I\"" << incPath2 << "\"";
-	for (auto it : project->headerPaths())
-	{
-		if ((!it.second->platforms() & Platform::Tizen))
-			continue;
-		ss << " -I\"" << escapeQuote(it.second->path()) << '"';
-	}
-	ss << " -D__TIZEN__";
-	for (auto it : project->defines())
-	{
-		const DefinePtr & define = it.second;
-		if (!(define->platforms() & Platform::Tizen))
-			continue;
-
-//		if (define->buildTypes() & BuildType::Debug)		// FIXME
-//		if (define->buildTypes() & BuildType::Release)
-		ss << " \"-D" << escapeQuote(define->name()) << '"';
-	}
-	ss << '\n';
-	ss << "TC_LINKER_MISC += -lrt\n";
-	project->yipDirectory()->writeFile(pathConcat(projectName, "makefile.init"), ss.str());
-}
-
 void Gen::writeManifest()
 {
 	std::stringstream ss;
 	ss << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>";
 	ss << "<Manifest xmlns=\"http://schemas.tizen.org/2012/12/manifest\">\n";
-	ss << "\t<Id>$(manifestAppId)</Id>\n";
+	ss << "\t<Id>" << sha1(projectName).substr(0, 10) << "</Id>\n";
 	ss << "\t<Version>2.2.0</Version>\n";
 	ss << "\t<Type>C++App</Type>\n";
 	ss << "\t<Requirements>\n";
@@ -185,15 +142,17 @@ void Gen::writeManifest()
 	ss << "\t<Apps>\n";
 	ss << "\t\t<ApiVersion>2.2</ApiVersion>\n";
 	ss << "\t\t<Privileges />\n";
-	ss << "\t\t<UiApp Main=\"True\" MenuIconVisible=\"True\" Name=\"$(projectName)\">\n";
+	ss << "\t\t<UiApp Main=\"True\" MenuIconVisible=\"True\" Name=\"" << xmlEscape(projectName) << "\">\n";
 	ss << "\t\t\t<UiScalability CoordinateSystem=\"Physical\" />\n";
 	ss << "\t\t\t<UiTheme SystemTheme=\"Black\" />\n";
 	ss << "\t\t\t<DisplayNames>\n";
-	ss << "\t\t\t\t<DisplayName Locale=\"eng-GB\">$(projectName)</DisplayName>\n";
+	ss << "\t\t\t\t<DisplayName Locale=\"eng-GB\">" << xmlEscape(projectName) << "</DisplayName>\n";
 	ss << "\t\t\t</DisplayNames>\n";
+/*	FIXME
 	ss << "\t\t\t<Icons>\n";
 	ss << "\t\t\t\t<Icon Section=\"MainMenu\" Type=\"Xhigh\">mainmenu.png</Icon>\n";
 	ss << "\t\t\t</Icons>\n";
+*/
 	ss << "\t\t\t<LaunchConditions />\n";
 	ss << "\t\t\t<Notifications />\n";
 	ss << "\t\t</UiApp>\n";
@@ -204,6 +163,8 @@ void Gen::writeManifest()
 
 void Gen::writeProjectFile()
 {
+	std::string prjDir = pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), projectName));
+
 	std::stringstream ss;
 	ss << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 	ss << "<projectDescription>\n";
@@ -237,7 +198,7 @@ void Gen::writeProjectFile()
 	ss << "\t\t\t\t</dictionary>\n";
 	ss << "\t\t\t\t<dictionary>\n";
 	ss << "\t\t\t\t\t<key>org.eclipse.cdt.make.core.buildLocation</key>\n";
-	ss << "\t\t\t\t\t<value>${project_loc:/Debug}</value>\n";
+	ss << "\t\t\t\t\t<value>" << xmlEscape(pathConcat(prjDir, "Debug")) << "</value>\n";
 	ss << "\t\t\t\t</dictionary>\n";
 	ss << "\t\t\t\t<dictionary>\n";
 	ss << "\t\t\t\t\t<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>\n";
@@ -1120,8 +1081,7 @@ void Gen::generate()
 	generateSrcFiles();
 	deleteOldSrcFiles("src", pathConcat(projectPath, "src"));
 
-//	writeMakefileInit();
-//	writeManifest();
+	writeManifest();
 
 	writeProjectFile();
 	writeCProjectFile();
