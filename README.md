@@ -149,6 +149,10 @@ is the same as for `sources`, even the platform specification suffix is allowed:
         ios_logo.png
       }
 
+Please note that there is a
+[convenient cross-platform library](https://github.com/zapolnov/yip-resources)
+for resource loading.
+
 ### Application source files
 
 Source files specified in the `source` directive are compiled both when project
