@@ -13,6 +13,8 @@ ADD_LIBRARY(util STATIC
 	shell.h
 	sqlite.cpp
 	sqlite.h
+	xml.cpp
+	xml.h
 )
 
 IF(WIN32)
