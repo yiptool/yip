@@ -574,7 +574,7 @@ void ProjectFileParser::parsePlatformOrBuildTypeMask(Platform::Type & platforms,
 		getToken();
 	}
 
-	platforms = 0;
+	bool hasBuildTypes = false, hasPlatforms = false;
 	for (;;)
 	{
 		if (m_Token != Token::Literal)
@@ -585,9 +585,15 @@ void ProjectFileParser::parsePlatformOrBuildTypeMask(Platform::Type & platforms,
 
 		BuildType::Value buildType = buildTypeFromString(m_TokenText, std::nothrow);
 		if (buildType != BuildType::Unspecified)
+		{
 			buildMask |= buildType;
+			hasBuildTypes = true;
+		}
 		else
+		{
 			platfMask |= parsePlatformName();
+			hasPlatforms = true;
+		}
 
 		if (m_Token != Token::Comma)
 			break;
@@ -595,8 +601,10 @@ void ProjectFileParser::parsePlatformOrBuildTypeMask(Platform::Type & platforms,
 		getToken();
 	}
 
-	platforms = (inverse ? ~platfMask : platfMask);
-	buildTypes = (inverse ? ~buildMask : buildMask);
+	if (hasPlatforms)
+		platforms = (inverse ? ~platfMask : platfMask);
+	if (hasBuildTypes)
+		buildTypes = (inverse ? ~buildMask : buildMask);
 }
 
 void ProjectFileParser::parseFileFlags(const SourceFilePtr & sourceFile, const SourceFilePtr & sourceFile2,
