@@ -221,6 +221,17 @@ and `osx:icon` commands respectively:
 Note that this commands accepts only PNG images. Other image formats are
 not accepted.
 
+### Launch images on iOS
+
+Launch images for iOS applications could be specified using the
+`ios:launch_image` command:
+
+      ios:launch_image splashes/iphone_retina.png
+      ios:launch_image splashes/iphone5_retina.png
+
+Note that this command accepts only PNG images. Other image formats are
+not accepted.
+
 ### Privileges on the Samsung Tizen platform
 
 If your application requires certain privileges on the Tizen platform, they

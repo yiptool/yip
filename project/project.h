@@ -39,13 +39,20 @@ public:
 	enum ImageSize
 	{
 		IMAGESIZE_INVALID = 0,
-		IMAGESIZE_IPHONE_STANDARD,		// 57x57
-		IMAGESIZE_IPAD_STANDARD_IOS6,	// 72x72
-		IMAGESIZE_IPAD_STANDARD,		// 76x76
-		IMAGESIZE_IPHONE_RETINA_IOS6,	// 114x114
-		IMAGESIZE_IPHONE_RETINA,		// 120x120
-		IMAGESIZE_IPAD_RETINA_IOS6,		// 144x144
-		IMAGESIZE_IPAD_RETINA,			// 152x152
+		// iOS icons
+		IMAGESIZE_IPHONE_STANDARD,				// 57x57
+		IMAGESIZE_IPAD_STANDARD_IOS6,			// 72x72
+		IMAGESIZE_IPAD_STANDARD,				// 76x76
+		IMAGESIZE_IPHONE_RETINA_IOS6,			// 114x114
+		IMAGESIZE_IPHONE_RETINA,				// 120x120
+		IMAGESIZE_IPAD_RETINA_IOS6,				// 144x144
+		IMAGESIZE_IPAD_RETINA,					// 152x152
+		// iOS launch images
+		IMAGESIZE_LAUNCH_IPHONE_STANDARD,		// 320x480
+		IMAGESIZE_LAUNCH_IPHONE_RETINA,			// 640x960
+		IMAGESIZE_LAUNCH_IPHONE5_RETINA,		// 640x1136
+		IMAGESIZE_LAUNCH_IPAD_PORTRAIT,			// 768x1024
+		IMAGESIZE_LAUNCH_IPAD_PORTRAIT_RETINA,	// 1536x2048
 	};
 
 	Project(const std::string & prjPath);
@@ -95,6 +102,9 @@ public:
 	void iosAddIcon(ImageSize size, const std::string & path);
 	inline const std::map<ImageSize, std::string> & iosIcons() const { return m_IOSIcons; }
 
+	void iosAddLaunchImage(ImageSize size, const std::string & path);
+	inline const std::map<ImageSize, std::string> & iosLaunchImages() const { return m_IOSLaunchImages; }
+
 	// Tizen
 
 	void tizenAddPrivilege(const std::string & url);
@@ -119,6 +129,7 @@ private:
 	std::map<std::string, std::string> m_IOSFrameworks;
 	std::map<ImageSize, std::string> m_OSXIcons;
 	std::map<ImageSize, std::string> m_IOSIcons;
+	std::map<ImageSize, std::string> m_IOSLaunchImages;
 	std::set<std::string> m_WinRTLibraries;
 	std::set<std::string> m_TizenPrivileges;
 	std::vector<std::string> m_Licenses;

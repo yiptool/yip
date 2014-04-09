@@ -115,6 +115,12 @@ void Project::iosAddIcon(ImageSize size, const std::string & path)
 		throw std::runtime_error("duplicate icon of the same size.");
 }
 
+void Project::iosAddLaunchImage(ImageSize size, const std::string & path)
+{
+	if (!m_IOSLaunchImages.insert(std::make_pair(size, path)).second)
+		throw std::runtime_error("duplicate launch image of the same size.");
+}
+
 void Project::tizenAddPrivilege(const std::string & url)
 {
 	m_TizenPrivileges.insert(url);

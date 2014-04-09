@@ -587,6 +587,45 @@ void ProjectFileParser::parseIOSorOSX()
 
 		return;
 	}
+	else if (m_TokenText == "launch_image")
+	{
+		if (!iOS)
+			{ reportError("launch images are not supported on OSX."); return; }
+
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected launch image path after '" << prefix << ":launch_image'."); return; }
+
+		std::string path = pathMakeAbsolute(m_TokenText, m_ProjectPath);
+
+		unsigned width = 0, height = 0;
+		ImageFormat format;
+		imageGetInfo(path, &format, &width, &height);
+
+		if (format != FORMAT_PNG)
+			{ reportError(fmt() << "file '" << path << "' is not png."); return; }
+
+		Project::ImageSize imageSize = Project::IMAGESIZE_INVALID;
+		imageSize = validateImageSize(width, height, {
+			{ Project::IMAGESIZE_LAUNCH_IPHONE_STANDARD,		320,	480 },
+			{ Project::IMAGESIZE_LAUNCH_IPHONE_RETINA,			640,	960 },
+			{ Project::IMAGESIZE_LAUNCH_IPHONE5_RETINA,			640,	1136 },
+			{ Project::IMAGESIZE_LAUNCH_IPAD_PORTRAIT,			768,	1024 },
+			{ Project::IMAGESIZE_LAUNCH_IPAD_PORTRAIT_RETINA,	1536,	2048 },
+		});
+
+		if (imageSize == Project::IMAGESIZE_INVALID)
+			return;
+
+		try {
+			m_Project->iosAddLaunchImage(imageSize, path);
+		} catch (const Error &) {
+			throw;
+		} catch (const std::exception & e) {
+			reportWarning(e.what());
+		}
+
+		return;
+	}
 
 	reportError(fmt() << "invalid variable '" << prefix << ":" << m_TokenText << "'.");
 }

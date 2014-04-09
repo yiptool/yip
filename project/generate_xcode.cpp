@@ -831,9 +831,28 @@ void Gen::writeImageAssets()
 		->writeFile(projectName + "/Images.xcassets/AppIcon.appiconset/Contents.json", ss.str(), &changed);
 	somethingChanged = somethingChanged || changed;
 
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	assetsDir = pathConcat(
+		project->yipDirectory()->path(),
+		projectName + "/Images.xcassets/LaunchImage.launchimage"
+	);
+
 	if (iOS)
 	{
-		// FIXME
+		const std::map<Project::ImageSize, std::string> & launchImages = project->iosLaunchImages();
+		std::map<Project::ImageSize, std::string>::const_iterator it;
+
+		#define IOS_LAUNCHIMAGE(SIZE) \
+			if ((it = launchImages.find(SIZE)) != launchImages.end()) \
+			{ \
+				std::string name = fmt() << SIZE << ".png"; \
+				std::string path = pathConcat(assetsDir, name); \
+				pathCreate(pathGetDirectory(path)); \
+				pathCreateSymLink(it->second, path); \
+				ss2 << "      \"filename\" : \"" << jsonEscape(name) << "\",\n"; \
+			}
+
 		std::stringstream ss2;
 		ss2 << "{\n";
 		ss2 << "  \"images\" : [\n";
@@ -841,6 +860,7 @@ void Gen::writeImageAssets()
 		ss2 << "      \"orientation\" : \"portrait\",\n";
 		ss2 << "      \"idiom\" : \"iphone\",\n";
 		ss2 << "      \"extent\" : \"full-screen\",\n";
+		IOS_LAUNCHIMAGE(Project::IMAGESIZE_LAUNCH_IPHONE_STANDARD)
 		ss2 << "      \"scale\" : \"1x\"\n";
 		ss2 << "    },\n";
 		ss2 << "    {\n";
@@ -848,21 +868,21 @@ void Gen::writeImageAssets()
 		ss2 << "      \"idiom\" : \"iphone\",\n";
 		ss2 << "      \"extent\" : \"full-screen\",\n";
 		ss2 << "      \"minimum-system-version\" : \"7.0\",\n";
-//		ss2 << "      \"filename\" : \"$(iphone_2x)\",\n";
+		IOS_LAUNCHIMAGE(Project::IMAGESIZE_LAUNCH_IPHONE_RETINA)
 		ss2 << "      \"scale\" : \"2x\"\n";
 		ss2 << "    },\n";
 		ss2 << "    {\n";
 		ss2 << "      \"orientation\" : \"portrait\",\n";
 		ss2 << "      \"idiom\" : \"iphone\",\n";
 		ss2 << "      \"extent\" : \"full-screen\",\n";
-//		ss2 << "      \"filename\" : \"$(iphone_2x)\",\n";
+		IOS_LAUNCHIMAGE(Project::IMAGESIZE_LAUNCH_IPHONE_RETINA)
 		ss2 << "      \"scale\" : \"2x\"\n";
 		ss2 << "    },\n";
 		ss2 << "    {\n";
 		ss2 << "      \"extent\" : \"full-screen\",\n";
 		ss2 << "      \"idiom\" : \"iphone\",\n";
 		ss2 << "      \"subtype\" : \"retina4\",\n";
-//		ss2 << "      \"filename\" : \"$(iphone_r4)\",\n";
+		IOS_LAUNCHIMAGE(Project::IMAGESIZE_LAUNCH_IPHONE5_RETINA)
 		ss2 << "      \"minimum-system-version\" : \"7.0\",\n";
 		ss2 << "      \"orientation\" : \"portrait\",\n";
 		ss2 << "      \"scale\" : \"2x\"\n";
@@ -871,7 +891,7 @@ void Gen::writeImageAssets()
 		ss2 << "      \"orientation\" : \"portrait\",\n";
 		ss2 << "      \"idiom\" : \"iphone\",\n";
 		ss2 << "      \"extent\" : \"full-screen\",\n";
-//		ss2 << "      \"filename\" : \"$(iphone_r4)\",\n";
+		IOS_LAUNCHIMAGE(Project::IMAGESIZE_LAUNCH_IPHONE5_RETINA)
 		ss2 << "      \"subtype\" : \"retina4\",\n";
 		ss2 << "      \"scale\" : \"2x\"\n";
 		ss2 << "    },\n";
@@ -880,14 +900,14 @@ void Gen::writeImageAssets()
 		ss2 << "      \"idiom\" : \"ipad\",\n";
 		ss2 << "      \"extent\" : \"full-screen\",\n";
 		ss2 << "      \"minimum-system-version\" : \"7.0\",\n";
-//		ss2 << "      \"filename\" : \"$(ipad_portrait)\",\n";
+		IOS_LAUNCHIMAGE(Project::IMAGESIZE_LAUNCH_IPAD_PORTRAIT)
 		ss2 << "      \"scale\" : \"1x\"\n";
 		ss2 << "    },\n";
 		ss2 << "    {\n";
 		ss2 << "      \"orientation\" : \"portrait\",\n";
 		ss2 << "      \"idiom\" : \"ipad\",\n";
 		ss2 << "      \"extent\" : \"full-screen\",\n";
-//		ss2 << "      \"filename\" : \"$(ipad_portrait)\",\n";
+		IOS_LAUNCHIMAGE(Project::IMAGESIZE_LAUNCH_IPAD_PORTRAIT)
 		ss2 << "      \"scale\" : \"1x\"\n";
 		ss2 << "    },\n";
 		ss2 << "    {\n";
@@ -895,14 +915,14 @@ void Gen::writeImageAssets()
 		ss2 << "      \"idiom\" : \"ipad\",\n";
 		ss2 << "      \"extent\" : \"full-screen\",\n";
 		ss2 << "      \"minimum-system-version\" : \"7.0\",\n";
-//		ss2 << "      \"filename\" : \"$(ipad_portrait_2x)\",\n";
+		IOS_LAUNCHIMAGE(Project::IMAGESIZE_LAUNCH_IPAD_PORTRAIT_RETINA)
 		ss2 << "      \"scale\" : \"2x\"\n";
 		ss2 << "    },\n";
 		ss2 << "    {\n";
 		ss2 << "      \"orientation\" : \"portrait\",\n";
 		ss2 << "      \"idiom\" : \"ipad\",\n";
 		ss2 << "      \"extent\" : \"full-screen\",\n";
-//		ss2 << "      \"filename\" : \"$(ipad_portrait_2x)\",\n";
+		IOS_LAUNCHIMAGE(Project::IMAGESIZE_LAUNCH_IPAD_PORTRAIT_RETINA)
 		ss2 << "      \"scale\" : \"2x\"\n";
 		ss2 << "    }\n";
 		ss2 << "  ],\n";
