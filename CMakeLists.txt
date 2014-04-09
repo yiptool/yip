@@ -23,6 +23,7 @@ ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/zlib")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/openssl")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/libssh2")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/libgit2")
+ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/libpng")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/inih")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/sqlite3")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/lua")
@@ -72,6 +73,6 @@ ADD_EXECUTABLE(yip
 	main.cpp
 )
 
-TARGET_LINK_LIBRARIES(yip project xcode util inih libgit2 sqlite3 lua)
+TARGET_LINK_LIBRARIES(yip project xcode util inih libgit2 libpng sqlite3 lua)
 
 INSTALL(TARGETS yip RUNTIME DESTINATION "bin")
