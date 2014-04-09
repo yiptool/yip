@@ -219,7 +219,7 @@ ConfigPtr loadConfigFile(bool create)
 	{
 		int err = errno;
 		std::cerr << "warning: unable to open file '"
-			<< pathToNativeSeparators(configFile) << "': " << strerror(err);
+			<< pathToNativeSeparators(configFile) << "': " << strerror(err) << std::endl;
 	}
 
 	return config;
