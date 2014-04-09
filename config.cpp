@@ -66,6 +66,7 @@ Config::Config()
 	repos.insert(std::make_pair("math", "https://github.com/zapolnov/yip-math.git"));
 	repos.insert(std::make_pair("resources", "https://github.com/zapolnov/yip-resources.git"));
 	repos.insert(std::make_pair("stb_image_cxx", "https://github.com/zapolnov/yip-stb-image-cxx.git"));
+	repos.insert(std::make_pair("ui-helpers", "https://github.com/zapolnov/yip-ui-helpers.git"));
 
 	repos.insert(std::make_pair("audio", "https://github.com/friedcroc/yip-audio.git"));
 }
