@@ -28,7 +28,6 @@ void cxxEscape(std::stringstream & ss, const std::string & str)
 	{
 		switch (ch)
 		{
-		case '\r':
 		case '\n':
 		case '\\':
 		case '"':
@@ -36,23 +35,26 @@ void cxxEscape(std::stringstream & ss, const std::string & str)
 		case '?':
 			ss << '\\' << ch;
 			break;
+		case '\r':
+			ss << "\\r";
+			break;
 		case '\t':
-			ss << '\t' << ch;
+			ss << "\\t";
 			break;
 		case '\f':
-			ss << '\f' << ch;
+			ss << "\\f";
 			break;
 		case '\v':
-			ss << '\v' << ch;
+			ss << "\\v";
 			break;
 		case '\a':
-			ss << '\a' << ch;
+			ss << "\\a";
 			break;
 		case '\b':
-			ss << '\b' << ch;
+			ss << "\\b";
 			break;
 		case '\0':
-			ss << '\0' << ch;
+			ss << "\\0";
 			break;
 		default:
 			ss << ch;
