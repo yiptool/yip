@@ -50,6 +50,7 @@ Config::Config()
 {
 	repos.insert(std::make_pair("box2d", "https://github.com/oss-forks/box2d.git"));
 	repos.insert(std::make_pair("kissfft", "https://github.com/oss-forks/kissfft.git"));
+	repos.insert(std::make_pair("libpng", "https://github.com/oss-forks/libpng.git"));
 	repos.insert(std::make_pair("lua", "https://github.com/oss-forks/lua.git"));
 	repos.insert(std::make_pair("novocaine", "https://github.com/oss-forks/novocaine.git"));
 	repos.insert(std::make_pair("sqlite3", "https://github.com/oss-forks/sqlite3.git"));

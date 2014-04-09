@@ -51,6 +51,9 @@ protected:
 private:
 	enum class Token : int;
 
+	struct ImageSize;
+	struct Error;
+
 	std::ifstream m_Stream;
 	Project * m_Project;
 	std::unordered_map<std::string, void (ProjectFileParser::*)()> m_CommandHandlers;
@@ -95,6 +98,8 @@ private:
 
 	int getChar();
 	void ungetChar();
+
+	Project::ImageSize validateImageSize(unsigned width, unsigned height, std::initializer_list<ImageSize> sizes);
 
 	ProjectFileParser(const ProjectFileParser &) = delete;
 	ProjectFileParser & operator=(const ProjectFileParser &) = delete;

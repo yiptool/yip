@@ -36,6 +36,18 @@
 class Project : public std::enable_shared_from_this<Project>
 {
 public:
+	enum ImageSize
+	{
+		IMAGESIZE_INVALID = 0,
+		IMAGESIZE_IPHONE_STANDARD,		// 57x57
+		IMAGESIZE_IPAD_STANDARD_IOS6,	// 72x72
+		IMAGESIZE_IPAD_STANDARD,		// 76x76
+		IMAGESIZE_IPHONE_RETINA_IOS6,	// 114x114
+		IMAGESIZE_IPHONE_RETINA,		// 120x120
+		IMAGESIZE_IPAD_RETINA_IOS6,		// 144x144
+		IMAGESIZE_IPAD_RETINA,			// 152x152
+	};
+
 	Project(const std::string & prjPath);
 	~Project();
 
@@ -72,10 +84,16 @@ public:
 	void osxAddFramework(const std::string & name, const std::string & path);
 	inline const std::map<std::string, std::string> & osxFrameworks() const { return m_OSXFrameworks; }
 
+	void osxAddIcon(ImageSize size, const std::string & path);
+	inline const std::map<ImageSize, std::string> & osxIcons() const { return m_OSXIcons; }
+
 	// iOS
 
 	void iosAddFramework(const std::string & name, const std::string & path);
 	inline const std::map<std::string, std::string> & iosFrameworks() const { return m_IOSFrameworks; }
+
+	void iosAddIcon(ImageSize size, const std::string & path);
+	inline const std::map<ImageSize, std::string> & iosIcons() const { return m_IOSIcons; }
 
 	// Tizen
 
@@ -99,6 +117,8 @@ private:
 	std::map<std::string, std::string> m_Imports;
 	std::map<std::string, std::string> m_OSXFrameworks;
 	std::map<std::string, std::string> m_IOSFrameworks;
+	std::map<ImageSize, std::string> m_OSXIcons;
+	std::map<ImageSize, std::string> m_IOSIcons;
 	std::set<std::string> m_WinRTLibraries;
 	std::set<std::string> m_TizenPrivileges;
 	std::vector<std::string> m_Licenses;

@@ -208,6 +208,19 @@ Third variant links with the user-provided framework at the specified path.
 Path could be either absolute or relative to the directory where `Yipfile`
 is located.
 
+### Application icons on Apple platforms
+
+Icons for applications on OSX and iOS could be specified using the `ios:icon`
+and `osx:icon` commands respectively:
+
+      ios:icon icons/144.png
+      ios:icon icons/120.png
+      
+      osx:icon icons/128.png
+
+Note that this commands accepts only PNG images. Other image formats are
+not accepted.
+
 ### Privileges on the Samsung Tizen platform
 
 If your application requires certain privileges on the Tizen platform, they

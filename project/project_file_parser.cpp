@@ -22,10 +22,12 @@
 //
 #include "project_file_parser.h"
 #include "../config.h"
+#include "../util/image.h"
 #include "../util/fmt.h"
 #include "../util/path.h"
 #include <cassert>
 #include <stdexcept>
+#include <sstream>
 #include <iostream>
 
 enum class ProjectFileParser::Token
@@ -41,6 +43,19 @@ enum class ProjectFileParser::Token
 	Literal,
 	Equal,
 	Arrow
+};
+
+struct ProjectFileParser::ImageSize
+{
+	Project::ImageSize size;
+	unsigned width;
+	unsigned height;
+};
+
+struct ProjectFileParser::Error : public std::runtime_error
+{
+	inline Error(const std::string & message) : std::runtime_error(message) {}
+	inline ~Error() noexcept {}
 };
 
 static bool isValidPathPrefix(const std::string & prefix)
@@ -149,7 +164,7 @@ void ProjectFileParser::reportWarning(const std::string & message)
 
 void ProjectFileParser::reportError(const std::string & message)
 {
-	throw std::runtime_error(fmt() << m_FileName << '(' << m_TokenLine << "): " << message);
+	throw Error(fmt() << m_FileName << '(' << m_TokenLine << "): " << message);
 }
 
 void ProjectFileParser::doParse(const ProjectPtr & project, bool resolveImports)
@@ -168,12 +183,11 @@ void ProjectFileParser::doParse(const ProjectPtr & project, bool resolveImports)
 			auto it = m_CommandHandlers.find(m_TokenText);
 			if (it != m_CommandHandlers.end())
 			{
-				try
-				{
+				try {
 					(this->*(it->second))();
-				}
-				catch (const std::exception & e)
-				{
+				} catch (const Error &) {
+					throw;
+				} catch (const std::exception & e) {
 					reportError(e.what());
 					return;
 				}
@@ -215,13 +229,12 @@ void ProjectFileParser::parseSources()
 			name = pathConcat(m_PathPrefix, name);
 
 		SourceFilePtr sourceFile;
-		try
-		{
+		try {
 			sourceFile = m_Project->addSourceFile(name, path);
 			sourceFile->setPlatforms(platforms);
-		}
-		catch (const std::exception & e)
-		{
+		} catch (const Error &) {
+			throw;
+		} catch (const std::exception & e) {
 			reportWarning(e.what());
 		}
 
@@ -259,13 +272,12 @@ void ProjectFileParser::parseAppSources()
 			if (m_PathPrefix.length() > 0)
 				name = pathConcat(m_PathPrefix, name);
 
-			try
-			{
+			try {
 				sourceFile = m_Project->addSourceFile(name, path);
 				sourceFile->setPlatforms(platforms);
-			}
-			catch (const std::exception & e)
-			{
+			} catch (const Error &) {
+				throw;
+			} catch (const std::exception & e) {
 				reportWarning(e.what());
 			}
 		}
@@ -295,6 +307,8 @@ void ProjectFileParser::parsePublicHeaders()
 		SourceFilePtr sourceFile;
 		try {
 			sourceFile = m_Project->addSourceFile(pathConcat(m_PathPrefix, name), path);
+		} catch (const Error &) {
+			throw;
 		} catch (const std::exception & e) {
 			reportWarning(e.what());
 		}
@@ -306,6 +320,8 @@ void ProjectFileParser::parsePublicHeaders()
 			std::string proxyPath = m_Project->yipDirectory()->writeIncludeWrapper(proxyName, path);
 			try {
 				sourceFile2 = m_Project->addSourceFile(pathConcat(".yip-imports-proxies", name), proxyPath);
+			} catch (const Error &) {
+				throw;
 			} catch (const std::exception & e) {
 				reportWarning(e.what());
 			}
@@ -426,13 +442,12 @@ void ProjectFileParser::parseResources()
 		std::string name = m_TokenText;
 		std::string path = pathMakeAbsolute(name, m_ProjectPath);
 
-		try
-		{
+		try {
 			SourceFilePtr sourceFile = m_Project->addResourceFile(name, path);
 			sourceFile->setPlatforms(platforms);
-		}
-		catch (const std::exception & e)
-		{
+		} catch (const Error &) {
+			throw;
+		} catch (const std::exception & e) {
 			reportWarning(e.what());
 		}
 
@@ -509,6 +524,61 @@ void ProjectFileParser::parseIOSorOSX()
 				m_Project->iosAddFramework(name, path);
 			else
 				m_Project->osxAddFramework(name, path);
+		}
+		catch (const Error &)
+		{
+			throw;
+		}
+		catch (const std::exception & e)
+		{
+			reportWarning(e.what());
+		}
+
+		return;
+	}
+	else if (m_TokenText == "icon")
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected icon path after '" << prefix << ":icon'."); return; }
+
+		std::string path = pathMakeAbsolute(m_TokenText, m_ProjectPath);
+
+		unsigned width = 0, height = 0;
+		ImageFormat format;
+		imageGetInfo(path, &format, &width, &height);
+
+		if (format != FORMAT_PNG)
+			{ reportError(fmt() << "file '" << path << "' is not png."); return; }
+
+		Project::ImageSize imageSize = Project::IMAGESIZE_INVALID;
+		if (!iOS)
+			{ reportError(fmt() << "osx:icon is not supported yet."); return; }		// FIXME
+		else
+		{
+			imageSize = validateImageSize(width, height, {
+				{ Project::IMAGESIZE_IPHONE_STANDARD,		57,		57 },
+				{ Project::IMAGESIZE_IPAD_STANDARD_IOS6,	72,		72 },
+				{ Project::IMAGESIZE_IPAD_STANDARD,			76,		76 },
+				{ Project::IMAGESIZE_IPHONE_RETINA_IOS6,	114,	114 },
+				{ Project::IMAGESIZE_IPHONE_RETINA,			120,	120 },
+				{ Project::IMAGESIZE_IPAD_RETINA_IOS6,		144,	144 },
+				{ Project::IMAGESIZE_IPAD_RETINA,			152,	152 },
+			});
+		}
+
+		if (imageSize == Project::IMAGESIZE_INVALID)
+			return;
+
+		try
+		{
+			if (iOS)
+				m_Project->iosAddIcon(imageSize, path);
+			else
+				m_Project->osxAddIcon(imageSize, path);
+		}
+		catch (const Error &)
+		{
+			throw;
 		}
 		catch (const std::exception & e)
 		{
@@ -831,4 +901,22 @@ void ProjectFileParser::ungetChar()
 	if (m_LastChar == '\n')
 		--m_CurLine;
 	m_LastChar = 0;
+}
+
+Project::ImageSize ProjectFileParser::validateImageSize(unsigned width, unsigned height,
+	std::initializer_list<ImageSize> sizes)
+{
+	for (const ImageSize & size : sizes)
+	{
+		if (size.width == width && size.height == height)
+			return size.size;
+	}
+
+	std::stringstream ss;
+	ss << "invalid image size, valid sizes are:\n";
+	for (const ImageSize & size : sizes)
+		ss << "\t" << size.width << 'x' << size.height << '\n';
+	reportError(ss.str());
+
+	return Project::IMAGESIZE_INVALID;
 }

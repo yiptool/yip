@@ -7,6 +7,10 @@ ADD_LIBRARY(util STATIC
 	fmt.h
 	git.cpp
 	git.h
+	image.cpp
+	image.h
+	json_escape.cpp
+	json_escape.h
 	path.cpp
 	path.h
 	sha1.cpp

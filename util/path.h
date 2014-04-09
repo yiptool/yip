@@ -87,7 +87,7 @@ time_t pathGetModificationTime(const std::string & path);
 
 std::string pathGetThisExecutableFile();
 
-void pathCreateSymLink(const std::string & from, const std::string & to);
+std::string pathCreateSymLink(const std::string & from, const std::string & to);
 
 DirEntryList pathEnumDirectoryContents(const std::string & path);
 

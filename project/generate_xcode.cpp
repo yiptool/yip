@@ -23,6 +23,7 @@
 #include "generate_xcode.h"
 #include "../config.h"
 #include "../xcode/xcode_project.h"
+#include "../util/json_escape.h"
 #include "../util/path.h"
 #include "../util/file_type.h"
 #include "../util/fmt.h"
@@ -698,57 +699,75 @@ void Gen::writeImageAssets()
 	XCodeBuildFile * buildFile = resourcesBuildPhase->addFile();
 	buildFile->setFileRef(assetsFileRef);
 
-	// FIXME
+	std::string assetsDir = pathConcat(
+		project->yipDirectory()->path(),
+		projectName + "/Images.xcassets/AppIcon.appiconset"
+	);
+
 	std::stringstream ss;
 	ss << "{\n";
 	ss << "  \"images\" : [\n";
 	if (iOS)
 	{
+		const std::map<Project::ImageSize, std::string> & icons = project->iosIcons();
+		std::map<Project::ImageSize, std::string>::const_iterator it;
+
+		#define IOS_ICON(SIZE) \
+			if ((it = icons.find(SIZE)) != icons.end()) \
+			{ \
+				std::string name = fmt() << SIZE << ".png"; \
+				std::string path = pathConcat(assetsDir, name); \
+				pathCreate(pathGetDirectory(path)); \
+				pathCreateSymLink(it->second, path); \
+				ss << "      \"filename\" : \"" << jsonEscape(name) << "\",\n"; \
+			}
+
 		ss << "    {\n";
 		ss << "      \"idiom\" : \"iphone\",\n";
 		ss << "      \"size\" : \"57x57\",\n";
-//		ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 57))\",\n";
+		IOS_ICON(Project::IMAGESIZE_IPHONE_STANDARD)
 		ss << "      \"scale\" : \"1x\"\n";
 		ss << "    },\n";
 		ss << "    {\n";
 		ss << "      \"size\" : \"57x57\",\n";
 		ss << "      \"idiom\" : \"iphone\",\n";
-//		ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 114))\",\n";
+		IOS_ICON(Project::IMAGESIZE_IPHONE_RETINA_IOS6)
 		ss << "      \"scale\" : \"2x\"\n";
 		ss << "    },\n";
 		ss << "    {\n";
 		ss << "      \"size\" : \"60x60\",\n";
 		ss << "      \"idiom\" : \"iphone\",\n";
-//		ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 120))\",\n";
+		IOS_ICON(Project::IMAGESIZE_IPHONE_RETINA)
 		ss << "      \"scale\" : \"2x\"\n";
 		ss << "    },\n";
 		ss << "    {\n";
 		ss << "      \"idiom\" : \"ipad\",\n";
 		ss << "      \"size\" : \"72x72\",\n";
-//		ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 72))\",\n";
+		IOS_ICON(Project::IMAGESIZE_IPAD_STANDARD_IOS6)
 		ss << "      \"scale\" : \"1x\"\n";
 		ss << "    },\n";
 		ss << "    {\n";
 		ss << "      \"size\" : \"72x72\",\n";
 		ss << "      \"idiom\" : \"ipad\",\n";
-//		ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 144))\",\n";
+		IOS_ICON(Project::IMAGESIZE_IPAD_RETINA_IOS6)
 		ss << "      \"scale\" : \"2x\"\n";
 		ss << "    },\n";
 		ss << "    {\n";
 		ss << "      \"size\" : \"76x76\",\n";
 		ss << "      \"idiom\" : \"ipad\",\n";
-//		ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 76))\",\n";
+		IOS_ICON(Project::IMAGESIZE_IPAD_STANDARD)
 		ss << "      \"scale\" : \"1x\"\n";
 		ss << "    },\n";
 		ss << "    {\n";
 		ss << "      \"size\" : \"76x76\",\n";
 		ss << "      \"idiom\" : \"ipad\",\n";
-//		ss << "      \"filename\" : \"$(ios_appicon_file(LIBDIR, iphone_icons, 152))\",\n";
+		IOS_ICON(Project::IMAGESIZE_IPAD_RETINA)
 		ss << "      \"scale\" : \"2x\"\n";
 		ss << "    }\n";
 	}
 	else
 	{
+		// FIXME
 		ss << "    {\n";
 		ss << "      \"idiom\" : \"mac\",\n";
 		ss << "      \"size\" : \"16x16\",\n";
@@ -814,6 +833,7 @@ void Gen::writeImageAssets()
 
 	if (iOS)
 	{
+		// FIXME
 		std::stringstream ss2;
 		ss2 << "{\n";
 		ss2 << "  \"images\" : [\n";

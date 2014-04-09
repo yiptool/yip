@@ -588,7 +588,7 @@ std::string pathGetThisExecutableFile()
   #endif
 }
 
-void pathCreateSymLink(const std::string & from, const std::string & to)
+std::string pathCreateSymLink(const std::string & from, const std::string & to)
 {
   #ifdef _WIN32
 	if (!CreateSymbolicLinkA(to.c_str(), from.c_str(), 0))
@@ -606,12 +606,14 @@ void pathCreateSymLink(const std::string & from, const std::string & to)
 		{
 			std::vector<char> buf(PATH_MAX + 1);
 			if (readlink(to.c_str(), buf.data(), PATH_MAX) >= 0 && from == buf.data())
-				return;
+				return to;
 		}
 		throw std::runtime_error(fmt() << "unable to create symlink from '" << from << "' to '" << to
 			<< "': " << strerror(err));
 	}
   #endif
+
+	return to;
 }
 
 DirEntryList pathEnumDirectoryContents(const std::string & path)

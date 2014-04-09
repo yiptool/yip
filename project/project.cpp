@@ -98,9 +98,21 @@ void Project::osxAddFramework(const std::string & name, const std::string & path
 	addFramework(m_OSXFrameworks, name, path, "OSX");
 }
 
+void Project::osxAddIcon(ImageSize size, const std::string & path)
+{
+	if (!m_OSXIcons.insert(std::make_pair(size, path)).second)
+		throw std::runtime_error("duplicate icon of the same size.");
+}
+
 void Project::iosAddFramework(const std::string & name, const std::string & path)
 {
 	addFramework(m_IOSFrameworks, name, path, "iOS");
+}
+
+void Project::iosAddIcon(ImageSize size, const std::string & path)
+{
+	if (!m_IOSIcons.insert(std::make_pair(size, path)).second)
+		throw std::runtime_error("duplicate icon of the same size.");
 }
 
 void Project::tizenAddPrivilege(const std::string & url)
