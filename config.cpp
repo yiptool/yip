@@ -49,6 +49,7 @@ Config::Config()
 	: projectFileName(PROJECT_FILE_NAME)
 {
 	repos.insert(std::make_pair("box2d", "https://github.com/oss-forks/box2d.git"));
+	repos.insert(std::make_pair("dirent", "https://github.com/oss-forks/dirent.git"));
 	repos.insert(std::make_pair("glm", "https://github.com/oss-forks/glm.git"));
 	repos.insert(std::make_pair("inih", "https://github.com/oss-forks/inih.git"));
 	repos.insert(std::make_pair("kissfft", "https://github.com/oss-forks/kissfft.git"));
