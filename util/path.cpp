@@ -29,12 +29,12 @@
 #include <vector>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "../3rdparty/dirent/dirent.h"
 
 #ifndef _WIN32
  #include <unistd.h>
  #include <pwd.h>
  #include <sys/types.h>
- #include <dirent.h>
  #ifdef __APPLE__
   #include <mach-o/dyld.h>
  #endif
@@ -48,7 +48,6 @@
  #include <windows.h>
  #include <shlwapi.h>
  #include <userenv.h>
- #include "../3rdparty/dirent/include/dirent.h"
 #endif
 
 std::string pathToNativeSeparators(const std::string & path)
