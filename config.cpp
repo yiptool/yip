@@ -61,15 +61,15 @@ Config::Config()
 	repos.insert(std::make_pair("tinyxml", "https://github.com/oss-forks/tinyxml.git"));
 	repos.insert(std::make_pair("zlib", "https://github.com/oss-forks/zlib.git"));
 
-	repos.insert(std::make_pair("box2d-debug-renderer", "https://github.com/zapolnov/yip-box2d-debug-renderer.git"));
-	repos.insert(std::make_pair("cxx-util", "https://github.com/zapolnov/yip-cxx-util.git"));
-	repos.insert(std::make_pair("game-main", "https://github.com/zapolnov/yip-game-main.git"));
-	repos.insert(std::make_pair("gles2", "https://github.com/zapolnov/yip-gles2.git"));
-	repos.insert(std::make_pair("gles2_wrappers", "https://github.com/zapolnov/yip-gles2-wrappers.git"));
-	repos.insert(std::make_pair("math", "https://github.com/zapolnov/yip-math.git"));
-	repos.insert(std::make_pair("resources", "https://github.com/zapolnov/yip-resources.git"));
-	repos.insert(std::make_pair("stb_image_cxx", "https://github.com/zapolnov/yip-stb-image-cxx.git"));
-	repos.insert(std::make_pair("ui-helpers", "https://github.com/zapolnov/yip-ui-helpers.git"));
+	repos.insert(std::make_pair("box2d-debug-renderer", "https://github.com/yiptool/box2d-debug-renderer.git"));
+	repos.insert(std::make_pair("cxx-util", "https://github.com/yiptool/cxx-util.git"));
+	repos.insert(std::make_pair("game-main", "https://github.com/yiptool/game-main.git"));
+	repos.insert(std::make_pair("gles2", "https://github.com/yiptool/gles2.git"));
+	repos.insert(std::make_pair("gles2-util", "https://github.com/yiptool/gles2-util.git"));
+	repos.insert(std::make_pair("math", "https://github.com/yiptool/math.git"));
+	repos.insert(std::make_pair("resources", "https://github.com/yiptool/resources.git"));
+	repos.insert(std::make_pair("stb_image_cxx", "https://github.com/yiptool/stb_image_cxx.git"));
+	repos.insert(std::make_pair("ui-helpers", "https://github.com/yiptool/ui-helpers.git"));
 
 	repos.insert(std::make_pair("audio", "https://github.com/friedcroc/yip-audio.git"));
 }
