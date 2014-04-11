@@ -54,6 +54,7 @@ Config::Config()
 	repos.insert(std::make_pair("kissfft", "https://github.com/oss-forks/kissfft.git"));
 	repos.insert(std::make_pair("libpng", "https://github.com/oss-forks/libpng.git"));
 	repos.insert(std::make_pair("lua", "https://github.com/oss-forks/lua.git"));
+	repos.insert(std::make_pair("dhpoware-modelobj", "https://github.com/oss-forks/dhpoware-modelobj.git"));
 	repos.insert(std::make_pair("mongoose", "https://github.com/oss-forks/mongoose.git"));
 	repos.insert(std::make_pair("novocaine", "https://github.com/oss-forks/novocaine.git"));
 	repos.insert(std::make_pair("openssl", "https://github.com/oss-forks/openssl.git"));
