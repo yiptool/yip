@@ -1,4 +1,8 @@
 
+ADD_DEFINITIONS("-DINCLUDE_DIRENT_H=\"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/dirent/dirent.h\"")
+
+ADD_SUBDIRECTORY(path-util)
+
 ADD_LIBRARY(util STATIC
 	cxx_escape.cpp
 	cxx_escape.h
@@ -11,7 +15,6 @@ ADD_LIBRARY(util STATIC
 	image.h
 	json_escape.cpp
 	json_escape.h
-	path.cpp
 	path.h
 	sha1.cpp
 	sha1.h
@@ -23,6 +26,4 @@ ADD_LIBRARY(util STATIC
 	xml.h
 )
 
-IF(WIN32)
-	TARGET_LINK_LIBRARIES(util shlwapi userenv)
-ENDIF()
+TARGET_LINK_LIBRARIES(util path-util)

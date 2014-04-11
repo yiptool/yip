@@ -25,3 +25,6 @@
 [submodule "3rdparty/libpng"]
 	path = 3rdparty/libpng
 	url = https://github.com/oss-forks/libpng.git
+[submodule "util/path-util"]
+	path = util/path-util
+	url = https://github.com/yiptool/path-util.git
