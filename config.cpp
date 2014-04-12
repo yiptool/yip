@@ -62,7 +62,7 @@ Config::Config()
 	repos.insert(std::make_pair("openssl", "https://github.com/oss-forks/openssl.git"));
 	repos.insert(std::make_pair("sqlite3", "https://github.com/oss-forks/sqlite3.git"));
 	repos.insert(std::make_pair("stb_image", "https://github.com/oss-forks/stb_image.git"));
-	repos.insert(std::make_pair("strtod", "https://github.com/zapolnov/strtod.git"));
+	repos.insert(std::make_pair("strtod", "https://github.com/oss-forks/strtod.git"));
 	repos.insert(std::make_pair("tinyxml", "https://github.com/oss-forks/tinyxml.git"));
 	repos.insert(std::make_pair("zlib", "https://github.com/oss-forks/zlib.git"));
 
