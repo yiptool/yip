@@ -29,6 +29,7 @@ Project::Project(const std::string & prjPath)
 	: m_ProjectPath(prjPath),
 	  m_Valid(true)
 {
+	addDefine("__YIP__");
 }
 
 Project::~Project()
