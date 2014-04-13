@@ -105,6 +105,9 @@ public:
 	void iosAddLaunchImage(ImageSize size, const std::string & path);
 	inline const std::map<ImageSize, std::string> & iosLaunchImages() const { return m_IOSLaunchImages; }
 
+	void iosAddFont(const std::string & font) { m_IOSFonts.insert(font); }
+	inline const std::set<std::string> & iosFonts() const { return m_IOSFonts; }
+
 	// Tizen
 
 	void tizenAddPrivilege(const std::string & url);
@@ -130,6 +133,7 @@ private:
 	std::map<ImageSize, std::string> m_OSXIcons;
 	std::map<ImageSize, std::string> m_IOSIcons;
 	std::map<ImageSize, std::string> m_IOSLaunchImages;
+	std::set<std::string> m_IOSFonts;
 	std::set<std::string> m_WinRTLibraries;
 	std::set<std::string> m_TizenPrivileges;
 	std::vector<std::string> m_Licenses;

@@ -626,6 +626,18 @@ void ProjectFileParser::parseIOSorOSX()
 
 		return;
 	}
+	else if (m_TokenText == "font")
+	{
+		if (!iOS)
+			{ reportError("embedded fonts are not supported for OSX projects."); return; }
+
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected font path after '" << prefix << ":font'."); return; }
+
+		m_Project->iosAddFont(m_TokenText);
+
+		return;
+	}
 
 	reportError(fmt() << "invalid variable '" << prefix << ":" << m_TokenText << "'.");
 }

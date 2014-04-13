@@ -51,6 +51,8 @@ Config::Config()
 	repos.insert(std::make_pair("box2d", "https://github.com/oss-forks/box2d.git"));
 	repos.insert(std::make_pair("dirent", "https://github.com/oss-forks/dirent.git"));
 	repos.insert(std::make_pair("glm", "https://github.com/oss-forks/glm.git"));
+	repos.insert(std::make_pair("font-opensans-regular", "https://github.com/oss-forks/font-opensans-regular.git"));
+	repos.insert(std::make_pair("font-opensans-semibold", "https://github.com/oss-forks/font-opensans-semibold.git"));
 	repos.insert(std::make_pair("inih", "https://github.com/oss-forks/inih.git"));
 	repos.insert(std::make_pair("kissfft", "https://github.com/oss-forks/kissfft.git"));
 	repos.insert(std::make_pair("libpng", "https://github.com/oss-forks/libpng.git"));

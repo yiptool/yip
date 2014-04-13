@@ -26,6 +26,7 @@
 #include "../util/json_escape.h"
 #include "../util/path.h"
 #include "../util/file_type.h"
+#include "../util/xml.h"
 #include "../util/fmt.h"
 #include <map>
 #include <sstream>
@@ -661,9 +662,17 @@ void Gen::writeInfoPList()
 	{
 		ss << "\t<key>LSRequiresIPhoneOS</key>\n";
 		ss << "\t<true/>\n";
+		if (!project->iosFonts().empty())
+		{
+			ss << "<key>UIAppFonts</key>\n";
+			ss << "<array>\n";
+			for (const std::string & font : project->iosFonts())
+				ss << "\t<string>" << xmlEscape(font) << "</string>\n";
+			ss << "</array>\n";
+		}
 		ss << "\t<key>UIRequiredDeviceCapabilities</key>\n";
 		ss << "\t<array>\n";
-		ss << "\t	<string>armv7</string>\n";							// FIXME: make configurable
+		ss << "\t\t<string>armv7</string>\n";							// FIXME: make configurable
 		ss << "\t</array>\n";
 		ss << "\t<key>UISupportedInterfaceOrientations</key>\n";		// FIXME: make configurable
 		ss << "\t<array>\n";
