@@ -587,11 +587,8 @@ void ProjectFileParser::parseIOSorOSX()
 
 		return;
 	}
-	else if (m_TokenText == "launch_image")
+	else if (m_TokenText == "launch_image" && iOS)
 	{
-		if (!iOS)
-			{ reportError("launch images are not supported on OSX."); return; }
-
 		if (getToken() != Token::Literal)
 			{ reportError(fmt() << "expected launch image path after '" << prefix << ":launch_image'."); return; }
 
@@ -626,15 +623,47 @@ void ProjectFileParser::parseIOSorOSX()
 
 		return;
 	}
-	else if (m_TokenText == "font")
+	else if (m_TokenText == "font" && iOS)
 	{
-		if (!iOS)
-			{ reportError("embedded fonts are not supported for OSX projects."); return; }
-
 		if (getToken() != Token::Literal)
 			{ reportError(fmt() << "expected font path after '" << prefix << ":font'."); return; }
 
 		m_Project->iosAddFont(m_TokenText);
+
+		return;
+	}
+	else if (m_TokenText == "supported_devices" && iOS)
+	{
+		m_Project->iosSetAllowIPad(false);
+		m_Project->iosSetAllowIPhone(false);
+
+		if (getToken() != Token::LParen)
+			{ reportError("expected '('."); return; }
+
+		for (;;)
+		{
+			if (getToken() != Token::Literal)
+				{ reportError("expected device family name."); return; }
+
+			if (m_TokenText == "iphone")
+				m_Project->iosSetAllowIPhone(true);
+			else if (m_TokenText == "ipad")
+				m_Project->iosSetAllowIPad(true);
+			else
+				{ reportError(fmt() << "invalid device family name '" << m_TokenText << "'."); }
+
+			switch (getToken())
+			{
+			case Token::RParen:
+				break;
+			case Token::Comma:
+				continue;
+			default:
+				reportError("expected ')'.");
+				return;
+			}
+			break;
+		}
 
 		return;
 	}

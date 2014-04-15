@@ -27,6 +27,8 @@
 
 Project::Project(const std::string & prjPath)
 	: m_ProjectPath(prjPath),
+	  m_IOSAllowIPad(false),
+	  m_IOSAllowIPhone(false),
 	  m_Valid(true)
 {
 	addDefine("__YIP__");

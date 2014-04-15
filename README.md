@@ -232,6 +232,24 @@ Launch images for iOS applications could be specified using the
 Note that this command accepts only PNG images. Other image formats are
 not accepted.
 
+### Supported devices on iOS
+
+List of supported device families for iOS projects could be set using the
+`ios:supported_devices` command:
+
+      ios:supported_devices (iphone)
+
+or
+
+      ios:supported_devices (ipad)
+
+or
+
+      ios:supported_devices (iphone, ipad)
+
+Note that each `ios:supported_devices` command overrides values set by the
+previous command.
+
 ### Privileges on the Samsung Tizen platform
 
 If your application requires certain privileges on the Tizen platform, they

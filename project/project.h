@@ -105,8 +105,13 @@ public:
 	void iosAddLaunchImage(ImageSize size, const std::string & path);
 	inline const std::map<ImageSize, std::string> & iosLaunchImages() const { return m_IOSLaunchImages; }
 
-	void iosAddFont(const std::string & font) { m_IOSFonts.insert(font); }
+	inline void iosAddFont(const std::string & font) { m_IOSFonts.insert(font); }
 	inline const std::set<std::string> & iosFonts() const { return m_IOSFonts; }
+
+	inline void iosSetAllowIPad(bool flag) { m_IOSAllowIPad = flag; }
+	inline void iosSetAllowIPhone(bool flag) { m_IOSAllowIPhone = flag; }
+	inline bool iosAllowIPad() const { return m_IOSAllowIPad; }
+	inline bool iosAllowIPhone() const { return m_IOSAllowIPhone; }
 
 	// Tizen
 
@@ -138,6 +143,8 @@ private:
 	std::set<std::string> m_TizenPrivileges;
 	std::vector<std::string> m_Licenses;
 	mutable YipDirectoryPtr m_YipDirectory;
+	bool m_IOSAllowIPad;
+	bool m_IOSAllowIPhone;
 	bool m_Valid;
 
 	void addFramework(std::map<std::string, std::string> & map, const std::string & name,

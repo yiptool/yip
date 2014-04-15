@@ -401,7 +401,15 @@ void Gen::initDebugConfiguration()
 	else
 		cfgProjectDebug->setMacOSXDeploymentTarget("10.8");					// FIXME: make configurable
 	cfgProjectDebug->setSDKRoot(iOS ? "iphoneos" : "macosx");
-	cfgProjectDebug->setTargetedDeviceFamily("");							// FIXME: make configurable
+
+	std::stringstream family;
+	const char * prefix = "";
+	if (project->iosAllowIPhone())
+		family << prefix << "1", prefix = ",";
+	if (project->iosAllowIPad())
+		family << prefix << "2", prefix = ",";
+	cfgProjectDebug->setTargetedDeviceFamily(family.str());
+
 	cfgProjectDebug->addPreprocessorDefinition("DEBUG=1");
 	cfgProjectDebug->setCodeSignIdentity("iphoneos*", "iPhone Developer");	// FIXME: make configurable
 }
@@ -441,7 +449,15 @@ void Gen::initReleaseConfiguration()
 		cfgProjectRelease->setMacOSXDeploymentTarget("10.8");					// FIXME: make configurable
 	cfgProjectRelease->setOnlyActiveArch(false);
 	cfgProjectRelease->setSDKRoot(iOS ? "iphoneos" : "macosx");
-	cfgProjectRelease->setTargetedDeviceFamily("");							// FIXME: make configurable
+
+	std::stringstream family;
+	const char * prefix = "";
+	if (project->iosAllowIPhone())
+		family << prefix << "1", prefix = ",";
+	if (project->iosAllowIPad())
+		family << prefix << "2", prefix = ",";
+	cfgProjectRelease->setTargetedDeviceFamily(family.str());
+
 	cfgProjectRelease->setValidateProduct(true);
 	cfgProjectRelease->addPreprocessorDefinition("NDEBUG=1");
 	cfgProjectRelease->addPreprocessorDefinition("DISABLE_ASSERTIONS=1");
