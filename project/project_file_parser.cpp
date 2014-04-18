@@ -632,6 +632,39 @@ void ProjectFileParser::parseIOSorOSX()
 
 		return;
 	}
+	else if (m_TokenText == "bundle_id")
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected bundle identifier after '" << prefix << ":bundle_id'."); return; }
+
+		if (iOS)
+			m_Project->iosSetBundleIdentifier(m_TokenText);
+		else
+			m_Project->osxSetBundleIdentifier(m_TokenText);
+
+		return;
+	}
+	else if (m_TokenText == "bundle_ver")
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected bundle identifier after '" << prefix << ":bundle_ver'."); return; }
+
+		if (iOS)
+			m_Project->iosSetBundleVersion(m_TokenText);
+		else
+			m_Project->osxSetBundleVersion(m_TokenText);
+
+		return;
+	}
+	else if (m_TokenText == "display_name" && iOS)
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected bundle identifier after '" << prefix << ":display_name'."); return; }
+
+		m_Project->iosSetBundleDisplayName(m_TokenText);
+
+		return;
+	}
 	else if (m_TokenText == "supported_devices" && iOS)
 	{
 		m_Project->iosSetAllowIPad(false);

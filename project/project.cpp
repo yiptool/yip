@@ -27,6 +27,11 @@
 
 Project::Project(const std::string & prjPath)
 	: m_ProjectPath(prjPath),
+	  m_OSXBundleIdentifier("com.zapolnov.${PRODUCT_NAME:rfc1034identifier}"),
+	  m_OSXBundleVersion("1.0"),
+	  m_IOSBundleIdentifier("com.zapolnov.${PRODUCT_NAME:rfc1034identifier}"),
+	  m_IOSBundleVersion("1.0"),
+	  m_IOSBundleDisplayName("${PRODUCT_NAME}"),
 	  m_IOSAllowIPad(false),
 	  m_IOSAllowIPhone(false),
 	  m_Valid(true)

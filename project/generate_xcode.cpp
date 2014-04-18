@@ -642,7 +642,7 @@ void Gen::writeInfoPList()
 	if (iOS)
 	{
 		ss << "\t<key>CFBundleDisplayName</key>\n";
-		ss << "\t<string>${PRODUCT_NAME}</string>\n";				// FIXME: make configurable
+		ss << "\t<string>" << xmlEscape(project->iosBundleDisplayName()) << "</string>\n";
 	}
 	ss << "\t<key>CFBundleExecutable</key>\n";
 	ss << "\t<string>${EXECUTABLE_NAME}</string>\n";				// FIXME: make configurable
@@ -652,19 +652,28 @@ void Gen::writeInfoPList()
 		ss << "\t<string></string>\n";
 	}
 	ss << "\t<key>CFBundleIdentifier</key>\n";
-	ss << "\t<string>com.zapolnov.${PRODUCT_NAME:rfc1034identifier}</string>\n";	// FIXME: make configurable
+	if (iOS)
+		ss << "\t<string>" << xmlEscape(project->iosBundleIdentifier()) << "</string>\n";
+	else
+		ss << "\t<string>" << xmlEscape(project->osxBundleIdentifier()) << "</string>\n";
 	ss << "\t<key>CFBundleInfoDictionaryVersion</key>\n";
-	ss << "\t<string>6.0</string>\n";								// FIXME: make configurable
+	ss << "\t<string>6.0</string>\n";
 	ss << "\t<key>CFBundleName</key>\n";
 	ss << "\t<string>${PRODUCT_NAME}</string>\n";					// FIXME: make configurable
 	ss << "\t<key>CFBundlePackageType</key>\n";
 	ss << "\t<string>APPL</string>\n";
 	ss << "\t<key>CFBundleShortVersionString</key>\n";
-	ss << "\t<string>1.0</string>\n";								// FIXME: make configurable
+	if (iOS)
+		ss << "\t<string>" << xmlEscape(project->iosBundleVersion()) << "</string>\n";
+	else
+		ss << "\t<string>" << xmlEscape(project->osxBundleVersion()) << "</string>\n";
 	ss << "\t<key>CFBundleSignature</key>\n";
 	ss << "\t<string>\?\?\?\?</string>\n";
 	ss << "\t<key>CFBundleVersion</key>\n";
-	ss << "\t<string>1.0</string>\n";								// FIXME: make configurable
+	if (iOS)
+		ss << "\t<string>" << xmlEscape(project->iosBundleVersion()) << "</string>\n";
+	else
+		ss << "\t<string>" << xmlEscape(project->osxBundleVersion()) << "</string>\n";
 	if (!iOS)
 	{
 		ss << "\t<key>LSApplicationCategoryType</key>\n";

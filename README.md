@@ -208,6 +208,18 @@ Third variant links with the user-provided framework at the specified path.
 Path could be either absolute or relative to the directory where `Yipfile`
 is located.
 
+### Bundle information on Apple platforms
+
+You can specify various bundle information on OSX and iOS. The commands should
+be self-explanatory. The following commands are available:
+
+      ios:display_name "Super App"
+      ios:bundle_id "com.example.app"
+      ios:bundle_ver "2.1"
+      
+      osx:bundle_id "com.example.osx_app"
+      osx:bundle_ver "3.9"
+
 ### Application icons on Apple platforms
 
 Icons for applications on OSX and iOS could be specified using the `ios:icon`

@@ -88,6 +88,12 @@ public:
 
 	// OSX
 
+	void osxSetBundleIdentifier(const std::string & val) { m_OSXBundleIdentifier = val; }
+	inline const std::string & osxBundleIdentifier() const { return m_OSXBundleIdentifier; }
+
+	void osxSetBundleVersion(const std::string & val) { m_OSXBundleVersion = val; }
+	inline const std::string & osxBundleVersion() const { return m_OSXBundleVersion; }
+
 	void osxAddFramework(const std::string & name, const std::string & path);
 	inline const std::map<std::string, std::string> & osxFrameworks() const { return m_OSXFrameworks; }
 
@@ -95,6 +101,15 @@ public:
 	inline const std::map<ImageSize, std::string> & osxIcons() const { return m_OSXIcons; }
 
 	// iOS
+
+	void iosSetBundleIdentifier(const std::string & val) { m_IOSBundleIdentifier = val; }
+	inline const std::string & iosBundleIdentifier() const { return m_IOSBundleIdentifier; }
+
+	void iosSetBundleVersion(const std::string & val) { m_IOSBundleVersion = val; }
+	inline const std::string & iosBundleVersion() const { return m_IOSBundleVersion; }
+
+	void iosSetBundleDisplayName(const std::string & val) { m_IOSBundleDisplayName = val; }
+	inline const std::string & iosBundleDisplayName() const { return m_IOSBundleDisplayName; }
 
 	void iosAddFramework(const std::string & name, const std::string & path);
 	inline const std::map<std::string, std::string> & iosFrameworks() const { return m_IOSFrameworks; }
@@ -142,6 +157,11 @@ private:
 	std::set<std::string> m_WinRTLibraries;
 	std::set<std::string> m_TizenPrivileges;
 	std::vector<std::string> m_Licenses;
+	std::string m_OSXBundleIdentifier;
+	std::string m_OSXBundleVersion;
+	std::string m_IOSBundleIdentifier;
+	std::string m_IOSBundleVersion;
+	std::string m_IOSBundleDisplayName;
 	mutable YipDirectoryPtr m_YipDirectory;
 	bool m_IOSAllowIPad;
 	bool m_IOSAllowIPhone;
