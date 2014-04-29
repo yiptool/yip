@@ -57,6 +57,7 @@ public:
 	inline void setWrapperExtension(const std::string & ext) { m_WrapperExtension = ext; }
 
 	inline void addHeaderSearchPath(const std::string & path) { m_HeaderSearchPaths.push_back(path); }
+	inline void addFrameworkSearchPath(const std::string & path) { m_FrameworkSearchPaths.push_back(path); }
 
 	inline void addPreprocessorDefinition(const std::string & def) { m_Defines.push_back(def); }
 
@@ -73,6 +74,7 @@ private:
 	std::string m_ProductName;
 	std::string m_WrapperExtension;
 	std::vector<std::string> m_HeaderSearchPaths;
+	std::vector<std::string> m_FrameworkSearchPaths;
 	std::vector<std::string> m_Defines;
 
 	XCodeTargetBuildConfiguration();

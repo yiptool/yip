@@ -42,6 +42,16 @@ void XCodeTargetBuildConfiguration::writeBuildSettings(std::stringstream & ss) c
 		ss << "\t\t\t\tASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = " << stringLiteral(m_AssetCatalogLaunchImageName) << ";\n";
 	if (m_CombineHiDpiImages)
 		ss << "\t\t\t\tCOMBINE_HIDPI_IMAGES = YES;\n";
+
+	if (m_FrameworkSearchPaths.size() > 0)
+	{
+		ss << "\t\t\t\tFRAMEWORK_SEARCH_PATHS = (\n";
+		for (const std::string & path : m_FrameworkSearchPaths)
+			ss << "\t\t\t\t\t" << stringLiteral(path) << ",\n";
+		ss << "\t\t\t\t\t\"$(inherited)\",\n";
+		ss << "\t\t\t\t);\n";
+	}
+
 	ss << "\t\t\t\tGCC_PRECOMPILE_PREFIX_HEADER = " << (m_PrecompilePrefixHeader ? "YES" : "NO") << ";\n";
 	if (m_PrefixHeader.length() > 0)
 		ss << "\t\t\t\tGCC_PREFIX_HEADER = " << stringLiteral(m_PrefixHeader) << ";\n";

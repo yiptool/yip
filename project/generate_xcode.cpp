@@ -586,7 +586,14 @@ void Gen::addFrameworks()
 		XCodeBuildFile * buildFile = frameworksBuildPhase->addFile();
 		buildFile->setFileRef(fileRef);
 
-		if (pathGetShortFileExtension(name) == ".dylib")
+		std::string ext = pathGetShortFileExtension(name);
+		if (ext == ".framework" && !sdkRoot)
+		{
+			std::string searchPath = pathSimplify(pathGetDirectory(path));
+			cfgTargetDebug->addFrameworkSearchPath(searchPath);
+			cfgTargetRelease->addFrameworkSearchPath(searchPath);
+		}
+		else if (ext == ".dylib")
 		{
 			std::string dir = pathSimplify(pathGetDirectory(path));
 			if (!dir.empty())
