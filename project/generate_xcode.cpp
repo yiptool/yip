@@ -676,6 +676,22 @@ void Gen::writeInfoPList()
 		ss << "\t<string>" << xmlEscape(project->osxBundleVersion()) << "</string>\n";
 	ss << "\t<key>CFBundleSignature</key>\n";
 	ss << "\t<string>\?\?\?\?</string>\n";
+	if (iOS && !project->iosFacebookAppID().empty())
+	{
+		ss << "\t<key>CFBundleURLTypes</key>\n";
+		ss << "\t<array>\n";
+		ss << "\t\t<dict>\n";
+		ss << "\t\t\t<key>CFBundleTypeRole</key>\n";
+		ss << "\t\t\t<string>Editor</string>\n";
+		ss << "\t\t\t<key>CFBundleURLIconFile</key>\n";
+		ss << "\t\t\t<string>Default</string>\n";
+		ss << "\t\t\t<key>CFBundleURLSchemes</key>\n";
+		ss << "\t\t\t<array>\n";
+		ss << "\t\t\t\t<string>fb" << xmlEscape(project->iosFacebookAppID()) << "</string>\n";
+		ss << "\t\t\t</array>\n";
+		ss << "\t\t</dict>\n";
+		ss << "\t</array>\n";
+	}
 	ss << "\t<key>CFBundleVersion</key>\n";
 	if (iOS)
 		ss << "\t<string>" << xmlEscape(project->iosBundleVersion()) << "</string>\n";
@@ -692,6 +708,16 @@ void Gen::writeInfoPList()
 	}
 	else
 	{
+		if (!project->iosFacebookAppID().empty())
+		{
+			ss << "\t<key>FacebookAppID</key>\n";
+			ss << "\t<string>" << xmlEscape(project->iosFacebookAppID()) << "</string>\n";
+		}
+		if (!project->iosFacebookDisplayName().empty())
+		{
+			ss << "\t<key>FacebookDisplayName</key>\n";
+			ss << "\t<string>" << xmlEscape(project->iosFacebookDisplayName()) << "</string>\n";
+		}
 		ss << "\t<key>LSRequiresIPhoneOS</key>\n";
 		ss << "\t<true/>\n";
 		if (!project->iosFonts().empty())

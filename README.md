@@ -262,6 +262,18 @@ or
 Note that each `ios:supported_devices` command overrides values set by the
 previous command.
 
+### Facebook SDK on iOS
+
+To use the Facebook SDK on the iOS platform add the following lines into your `Yipfile`:
+
+      import facebook-sdk
+      
+      ios:facebook_app_id "<app_id>"
+      ios:facebook_display_name "<display_name>"
+
+Replace `<app_id>` with your Facebook application ID and `<display_name>` with the Display Name you
+configured in the App Dashboard.
+
 ### Privileges on the Samsung Tizen platform
 
 If your application requires certain privileges on the Tizen platform, they

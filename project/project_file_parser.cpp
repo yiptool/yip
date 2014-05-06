@@ -700,6 +700,24 @@ void ProjectFileParser::parseIOSorOSX()
 
 		return;
 	}
+	else if (m_TokenText == "facebook_app_id" && iOS)
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected literal after '" << prefix << ":facebook_app_id'."); return; }
+
+		m_Project->iosSetFacebookAppID(m_TokenText);
+
+		return;
+	}
+	else if (m_TokenText == "facebook_display_name" && iOS)
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected literal after '" << prefix << ":facebook_display_name'."); return; }
+
+		m_Project->iosSetFacebookDisplayName(m_TokenText);
+
+		return;
+	}
 
 	reportError(fmt() << "invalid variable '" << prefix << ":" << m_TokenText << "'.");
 }

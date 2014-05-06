@@ -111,6 +111,12 @@ public:
 	void iosSetBundleDisplayName(const std::string & val) { m_IOSBundleDisplayName = val; }
 	inline const std::string & iosBundleDisplayName() const { return m_IOSBundleDisplayName; }
 
+	void iosSetFacebookAppID(const std::string & val) { m_IOSFacebookAppID = val; }
+	inline const std::string & iosFacebookAppID() const { return m_IOSFacebookAppID; }
+
+	void iosSetFacebookDisplayName(const std::string & val) { m_IOSFacebookDisplayName = val; }
+	inline const std::string & iosFacebookDisplayName() const { return m_IOSFacebookDisplayName; }
+
 	void iosAddFramework(const std::string & name, const std::string & path);
 	inline const std::map<std::string, std::string> & iosFrameworks() const { return m_IOSFrameworks; }
 
@@ -162,6 +168,8 @@ private:
 	std::string m_IOSBundleIdentifier;
 	std::string m_IOSBundleVersion;
 	std::string m_IOSBundleDisplayName;
+	std::string m_IOSFacebookAppID;
+	std::string m_IOSFacebookDisplayName;
 	mutable YipDirectoryPtr m_YipDirectory;
 	bool m_IOSAllowIPad;
 	bool m_IOSAllowIPhone;

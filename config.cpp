@@ -70,6 +70,7 @@ Config::Config()
 
 	repos.insert(std::make_pair("box2d-debug-renderer", "https://github.com/yiptool/box2d-debug-renderer.git"));
 	repos.insert(std::make_pair("cxx-util", "https://github.com/yiptool/cxx-util.git"));
+	repos.insert(std::make_pair("facebook-sdk", "https://github.com/yiptool/facebook-sdk.git"));
 	repos.insert(std::make_pair("game-main", "https://github.com/yiptool/game-main.git"));
 	repos.insert(std::make_pair("gles2", "https://github.com/yiptool/gles2.git"));
 	repos.insert(std::make_pair("gles2-util", "https://github.com/yiptool/gles2-util.git"));
