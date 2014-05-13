@@ -481,7 +481,7 @@ void ProjectFileParser::parseWinRT()
 
 void ProjectFileParser::parseIOSorOSX()
 {
-	const std::string & prefix = m_TokenText;
+	std::string prefix = m_TokenText;
 	bool iOS = (prefix == "ios");
 
 	if (getToken() != Token::Colon)
