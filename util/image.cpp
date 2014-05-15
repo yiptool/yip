@@ -35,20 +35,20 @@ bool pngGetInfo(FILE * file, unsigned * outWidth, unsigned * outHeight)
 	if (png_sig_cmp(sig, 0, 8) != 0)
 		return false;
 
-	png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
 	if (!png)
 		throw std::bad_alloc();
 
 	png_infop info = png_create_info_struct(png);
 	if (!info)
 	{
-		png_destroy_read_struct(&png, NULL, NULL);
+		png_destroy_read_struct(&png, nullptr, nullptr);
 		throw std::bad_alloc();
 	}
 
 	if (setjmp(png_jmpbuf(png)))
 	{
-		png_destroy_read_struct(&png, &info, NULL);
+		png_destroy_read_struct(&png, &info, nullptr);
 		throw std::runtime_error("png file is corrupt.");
 	}
 
@@ -59,14 +59,14 @@ bool pngGetInfo(FILE * file, unsigned * outWidth, unsigned * outHeight)
 
 	png_uint_32 width = 0, height = 0;
 	int bit_depth = 0, color_type = 0;
-	png_get_IHDR(png, info, &width, &height, &bit_depth, &color_type, NULL, NULL, NULL);
+	png_get_IHDR(png, info, &width, &height, &bit_depth, &color_type, nullptr, nullptr, nullptr);
 
 	if (outWidth)
 		*outWidth = static_cast<unsigned>(width);
 	if (outHeight)
 		*outHeight = static_cast<unsigned>(height);
 
-	png_destroy_read_struct(&png, &info, NULL);
+	png_destroy_read_struct(&png, &info, nullptr);
 
 	return true;
 }
