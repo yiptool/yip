@@ -21,6 +21,8 @@
 // THE SOFTWARE.
 //
 #include "generate_android.h"
+#include "../util/xml.h"
+#include "../util/path.h"
 #include <map>
 #include <sstream>
 #include <cassert>
@@ -31,6 +33,7 @@ namespace
 	struct Gen
 	{
 		ProjectPtr project;
+		std::string projectName;
 		std::string projectPath;
 
 		void writeIpr();
@@ -145,7 +148,7 @@ void Gen::writeIml()
 void Gen::writeStringsXml()
 {
 	std::stringstream ss;
-	ss << "<resources>\n"
+	ss << "<resources>\n";
 	ss << "\t<string name=\"app_title\">" << xmlEscape(project->androidDisplayName()) << "</string>\n";
 	ss << "</resources>\n";
 	project->yipDirectory()->writeFile(projectName + "/res/values/strings.xml", ss.str());

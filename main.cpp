@@ -62,7 +62,7 @@ static void usage()
 	    "\n"                                                                          /*|*/
 	    "     By default, yip builds for the current platform. This can be overriden by\n"
 	    "     specifying one or more of the following options:\n"                     /*|*/
-//	    "       -a, --android  Build for Android.\n"                                  /*|*/
+	    "       -a, --android  Build for Android.\n"                                  /*|*/
 	  #ifdef __APPLE__
 	    "       -i, --ios      Build for iOS.\n"                                      /*|*/
 	    "       -j, --ios-sym  Build for iOS simulator.\n"                            /*|*/
@@ -91,7 +91,7 @@ static void usage()
 	    "\n"                                                                          /*|*/
 	    "     By default, yip generates project file for the current platform only.\n"/*|*/
 	    "     This can be overriden by specifying one or more of the following options:\n"
-//	    "       -a, --android  Generate project for Android.\n"                       /*|*/
+	    "       -a, --android  Generate project for Android.\n"                       /*|*/
 //	    "       -c, --cmake    Generate project files for CMake.\n"                   /*|*/
 	    "       -i, --ios      Generate XCode project for iOS.\n"                     /*|*/
 	    "       -o, --osx      Generate XCode project for OSX" << apple_default << ".\n"
@@ -233,6 +233,8 @@ static int build(int argc, char ** argv)
 		}
 		else if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "--tizen"))
 			platform |= Platform::Tizen;
+		else if (!strcmp(argv[i], "-a") || !strcmp(argv[i], "--android"))
+			platform |= Platform::Android;
 	}
 
 	if (buildType == BuildType::Unspecified)
@@ -330,6 +332,8 @@ static int generate(int argc, char ** argv)
 			platform |= Platform::iOS;
 		else if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "--tizen"))
 			platform |= Platform::Tizen;
+		else if (!strcmp(argv[i], "-a") || !strcmp(argv[i], "--android"))
+			platform |= Platform::Android;
 		else if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "--no-open"))
 			noOpen = true;
 	}
