@@ -2,6 +2,8 @@
 ADD_LIBRARY(project STATIC
 	define.cpp
 	define.h
+	generate_android.cpp
+	generate_android.h
 	generate_tizen.cpp
 	generate_tizen.h
 	generate_xcode.cpp

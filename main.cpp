@@ -22,6 +22,7 @@
 //
 #include "project/project_file_parser.h"
 #include "project/generate_xcode.h"
+#include "project/generate_android.h"
 #include "project/generate_tizen.h"
 #include "project/resource_compiler.h"
 #include "3rdparty/libgit2/include/git2/threads.h"
@@ -291,6 +292,14 @@ static int build(int argc, char ** argv)
 		platform &= ~Platform::Tizen;
 	}
 
+	if (platform & Platform::Android)
+	{
+		std::string projectPath = generateAndroid(project);
+		// FIXME: build the project
+		(void)projectPath;
+		platform &= ~Platform::Android;
+	}
+
 	if (platform != 0)
 	{
 		std::cerr << "Not all platforms/targets were built (0x" << std::hex << std::setw(4) << std::setfill('0')
@@ -388,6 +397,14 @@ static int generate(int argc, char ** argv)
 		// FIXME: open project
 		(void)generatedFile;
 		platform &= ~Platform::Tizen;
+	}
+
+	if (platform & Platform::Android)
+	{
+		std::string generatedFile = generateAndroid(project);
+		// FIXME: open project
+		(void)generatedFile;
+		platform &= ~Platform::Android;
 	}
 
 	if (platform != 0)

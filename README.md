@@ -274,6 +274,69 @@ To use the Facebook SDK on the iOS platform add the following lines into your `Y
 Replace `<app_id>` with your Facebook application ID and `<display_name>` with the Display Name you
 configured in the App Dashboard.
 
+### Android target SDK
+
+To specify target SDK for Android, use the `android:target` command:
+
+      android:target "android-10"
+
+### Android package name
+
+To specify package name for Android, use the `android:package` command:
+
+      android:package "com.android.test"
+
+### Android display name
+
+To specify a name to be displayed under the application icon on Android,
+use the `android:display_name` command:
+
+      android:display_name "Super App"
+
+### Minimum and recommended Android versions
+
+To specify minimum supported Android version use the `android:min_sdk_version` command:
+
+      android:min_sdk_version 10
+
+This command corresponds to the `minSdkVersion` attribute of the `uses-sdk` element in the
+Android.
+
+To specify a recommended Android version (the one the application was designed to run on),
+use the `android:target_sdk_version` command:
+
+      android:target_sdk_version 19
+
+This command corresponds to the `targetSdkVersion` attribute of the `uses-sdk` element in the
+Android.
+
+### Android OpenGL version requirement
+
+To add the `uses-feature` element for OpenGL ES into the Android manifest file, use
+the `android:gles_version` command:
+
+      android:gles_version "0x00020000"
+
+### Android activities
+
+To add an activity to the Android manifest file, use the `android:activity` command:
+
+      android:activity '
+        <activity
+            android:name="MainActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:launchMode="singleTask"
+            android:configChanges="orientation|keyboardHidden">
+          <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+          </intent-filter>
+        </activity>
+      '
+
+You can have as many `android:activity` commands as you like. All of them will be
+added to the manifest file.
+
 ### Privileges on the Samsung Tizen platform
 
 If your application requires certain privileges on the Tizen platform, they

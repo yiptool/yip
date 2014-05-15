@@ -105,6 +105,7 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const std::st
 	m_CommandHandlers.insert(std::make_pair("winrt", &ProjectFileParser::parseWinRT));
 	m_CommandHandlers.insert(std::make_pair("ios", &ProjectFileParser::parseIOSorOSX));
 	m_CommandHandlers.insert(std::make_pair("osx", &ProjectFileParser::parseIOSorOSX));
+	m_CommandHandlers.insert(std::make_pair("android", &ProjectFileParser::parseAndroid));
 	m_CommandHandlers.insert(std::make_pair("tizen", &ProjectFileParser::parseTizen));
 	m_CommandHandlers.insert(std::make_pair("license", &ProjectFileParser::parseLicense));
 }
@@ -460,7 +461,7 @@ void ProjectFileParser::parseResources()
 
 void ProjectFileParser::parseWinRT()
 {
-	const std::string & prefix = m_TokenText;
+	std::string prefix = m_TokenText;
 
 	if (getToken() != Token::Colon)
 		{ reportError(fmt() << "expected ':' after '" << prefix << "'."); return; }
@@ -647,7 +648,7 @@ void ProjectFileParser::parseIOSorOSX()
 	else if (m_TokenText == "bundle_ver")
 	{
 		if (getToken() != Token::Literal)
-			{ reportError(fmt() << "expected bundle identifier after '" << prefix << ":bundle_ver'."); return; }
+			{ reportError(fmt() << "expected bundle version after '" << prefix << ":bundle_ver'."); return; }
 
 		if (iOS)
 			m_Project->iosSetBundleVersion(m_TokenText);
@@ -659,10 +660,8 @@ void ProjectFileParser::parseIOSorOSX()
 	else if (m_TokenText == "display_name" && iOS)
 	{
 		if (getToken() != Token::Literal)
-			{ reportError(fmt() << "expected bundle identifier after '" << prefix << ":display_name'."); return; }
-
+			{ reportError(fmt() << "expected display name after '" << prefix << ":display_name'."); return; }
 		m_Project->iosSetBundleDisplayName(m_TokenText);
-
 		return;
 	}
 	else if (m_TokenText == "supported_devices" && iOS)
@@ -722,9 +721,80 @@ void ProjectFileParser::parseIOSorOSX()
 	reportError(fmt() << "invalid variable '" << prefix << ":" << m_TokenText << "'.");
 }
 
+void ProjectFileParser::parseAndroid()
+{
+	std::string prefix = m_TokenText;
+
+	if (getToken() != Token::Colon)
+		{ reportError(fmt() << "expected ':' after '" << prefix << "'."); return; }
+
+	if (getToken() != Token::Literal)
+		{ reportError(fmt() << "expected variable name after '" << prefix << ":'."); return; }
+
+	if (m_TokenText == "target")
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected target name after '" << prefix << ":target'."); return; }
+		m_Project->androidSetTarget(m_TokenText);
+		return;
+	}
+	else if (m_TokenText == "package")
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected package name after '" << prefix << ":package'."); return; }
+		m_Project->androidSetPackage(m_TokenText);
+		return;
+	}
+	else if (m_TokenText == "display_name")
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected display name after '" << prefix << ":display_name'."); return; }
+		m_Project->androidSetDisplayName(m_TokenText);
+		return;
+	}
+	else if (m_TokenText == "gles_version")
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected opengl version after '" << prefix << ":gles_version'."); return; }
+		m_Project->androidSetGlEsVersion(m_TokenText);
+		return;
+	}
+	else if (m_TokenText == "min_sdk_version")
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected minimum SDK version after '" << prefix << ":min_sdk_version'."); return; }
+		const char * p = m_TokenText.c_str(), * end = nullptr;
+		long value = strtol(p, (char **)&end, 10);
+		if (end != p + m_TokenText.length() || value <= 0 || value > 1000)
+			{ reportError(fmt() << "invalid value for '" << prefix << ":min_sdk_version'."); return; }
+		m_Project->androidSetMinSdkVersion(int(value));
+		return;
+	}
+	else if (m_TokenText == "target_sdk_version")
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected target SDK version after '" << prefix << ":target_sdk_version'."); return; }
+		const char * p = m_TokenText.c_str(), * end = nullptr;
+		long value = strtol(p, (char **)&end, 10);
+		if (end != p + m_TokenText.length() || value <= 0 || value > 1000)
+			{ reportError(fmt() << "invalid value for '" << prefix << ":target_sdk_version'."); return; }
+		m_Project->androidSetTargetSdkVersion(int(value));
+		return;
+	}
+	else if (m_TokenText == "activity")
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected activity XML after '" << prefix << ":activity'."); return; }
+		m_Project->androidAddActivity(m_TokenText);
+		return;
+	}
+
+	reportError(fmt() << "invalid variable '" << prefix << ":" << m_TokenText << "'.");
+}
+
 void ProjectFileParser::parseTizen()
 {
-	const std::string & prefix = m_TokenText;
+	std::string prefix = m_TokenText;
 
 	if (getToken() != Token::Colon)
 		{ reportError(fmt() << "expected ':' after '" << prefix << "'."); return; }
@@ -888,6 +958,8 @@ void ProjectFileParser::parseFileFlags(const SourceFilePtr & sourceFile, const S
 
 ProjectFileParser::Token ProjectFileParser::getToken()
 {
+	int quote;
+
 	#define DIGITS \
 			 '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9'
 
@@ -976,6 +1048,9 @@ ProjectFileParser::Token ProjectFileParser::getToken()
 			return (m_Token = Token::Literal);
 
 		case '"':
+		case '\'':
+		case '`':
+			quote = ch;
 			m_Buffer.str(std::string());
 			for (;;)
 			{
@@ -983,7 +1058,12 @@ ProjectFileParser::Token ProjectFileParser::getToken()
 				switch (ch)
 				{
 				case '"':
-					break;
+				case '\'':
+				case '`':
+					if (ch == quote)
+						break;
+					m_Buffer << static_cast<char>(ch);
+					continue;
 				case EOF:
 					reportError("unterminated string literal.");
 					return (m_Token = Token::Eof);
@@ -994,6 +1074,8 @@ ProjectFileParser::Token ProjectFileParser::getToken()
 					case 'n': m_Buffer << '\n'; continue;
 					case '\\': m_Buffer << '\\'; continue;
 					case '"': m_Buffer << '"'; continue;
+					case '\'': m_Buffer << '\''; continue;
+					case '`': m_Buffer << '`'; continue;
 					default:
 						reportError(fmt() << "invalid escape sequence '\\" << static_cast<char>(ch) << "'.");
 						return (m_Token = Token::Eof);

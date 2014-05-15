@@ -31,6 +31,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <algorithm>
 #include <memory>
 
 class Project : public std::enable_shared_from_this<Project>
@@ -134,6 +135,31 @@ public:
 	inline bool iosAllowIPad() const { return m_IOSAllowIPad; }
 	inline bool iosAllowIPhone() const { return m_IOSAllowIPhone; }
 
+	// Android
+
+	inline void androidSetTarget(const std::string & target) { m_AndroidTarget = target; }
+	inline const std::string & androidTarget() const { return m_AndroidTarget; }
+
+	inline void androidSetPackage(const std::string & package) { m_AndroidPackage = package; }
+	inline const std::string & androidPackage() const { return m_AndroidPackage; }
+
+	inline void androidSetDisplayName(const std::string & name) { m_AndroidDisplayName = name; }
+	inline const std::string & androidDisplayName() const { return m_AndroidDisplayName; }
+
+	inline void androidSetGlEsVersion(const std::string & ver) { m_AndroidGlEsVersion = ver; }
+	inline const std::string & androidGlEsVersion() const { return m_AndroidGlEsVersion; }
+
+	inline void androidSetMinSdkVersion(int ver)
+		{ m_AndroidMinSdkVersion = std::max(m_AndroidMinSdkVersion, ver); }
+	inline int androidMinSdkVersion() const { return m_AndroidMinSdkVersion; }
+
+	inline void androidSetTargetSdkVersion(int ver)
+		{ m_AndroidTargetSdkVersion = std::max(m_AndroidTargetSdkVersion, ver); }
+	inline int androidTargetSdkVersion() const { return m_AndroidTargetSdkVersion; }
+
+	inline void androidAddActivity(const std::string & activity) { m_AndroidActivities.push_back(activity); }
+	inline const std::vector<std::string> & androidActivities() const { return m_AndroidActivities; }
+
 	// Tizen
 
 	void tizenAddPrivilege(const std::string & url);
@@ -170,6 +196,13 @@ private:
 	std::string m_IOSBundleDisplayName;
 	std::string m_IOSFacebookAppID;
 	std::string m_IOSFacebookDisplayName;
+	std::string m_AndroidTarget;
+	std::string m_AndroidPackage;
+	std::string m_AndroidDisplayName;
+	std::string m_AndroidGlEsVersion;
+	int m_AndroidMinSdkVersion;
+	int m_AndroidTargetSdkVersion;
+	std::vector<std::string> m_AndroidActivities;
 	mutable YipDirectoryPtr m_YipDirectory;
 	bool m_IOSAllowIPad;
 	bool m_IOSAllowIPhone;

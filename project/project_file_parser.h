@@ -85,6 +85,7 @@ private:
 	void parseWinRT();
 	void parseTizen();
 	void parseIOSorOSX();
+	void parseAndroid();
 	void parseLicense();
 
 	Platform::Type parsePlatformMask();
