@@ -208,6 +208,7 @@ void Gen::writeStringsXml()
 void Gen::writeApplicationMk()
 {
 	std::stringstream ss;
+	ss << "NDK_TOOLCHAIN_VERSION := clang\n";
 	ss << "APP_CPPFLAGS := -std=c++11 -frtti -fexceptions\n";
 	ss << "APP_STL := gnustl_static\n";
 	ss << "APP_ABI := armeabi x86\n";		// armeabi-v7 mips
@@ -216,11 +217,33 @@ void Gen::writeApplicationMk()
 
 void Gen::writeAndroidMk()
 {
+	std::string yipDir = pathMakeAbsolute(project->yipDirectory()->path());
+	std::string prjDir = pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), projectName));
+
 	std::stringstream ss;
 	ss << "LOCAL_PATH := /.\n";
 	ss << "include $(CLEAR_VARS)\n";
 	ss << "LOCAL_MODULE := libcode\n";
-	ss << "LOCAL_CFLAGS := \n";
+
+	ss << "LOCAL_CFLAGS :=";
+	ss << " \\\n\t-Wno-deprecated";
+	ss << " \\\n\t\"-I" << pathConcat(yipDir, ".yip-import-proxies") << "\"";
+	for (auto it : project->headerPaths())
+	{
+		const HeaderPathPtr & headerPath = it.second;
+		if (!(headerPath->platforms() & Platform::Android))
+			continue;
+		ss << " \\\n\t\"-I" << headerPath->path() << "\"";
+	}
+	ss << " \\\n\t-D__ANDROID__";
+	for (auto it : project->defines())
+	{
+		const DefinePtr & define = it.second;
+		if (!(define->platforms() & Platform::Android) || !(define->buildTypes() & BuildType::Release))
+			continue;
+		ss << " \\\n\t-D" << define->name();
+	}
+	ss << '\n';
 
 	ss << "LOCAL_SRC_FILES :=";
 	for (auto it : project->sourceFiles())
