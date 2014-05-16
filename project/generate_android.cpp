@@ -47,6 +47,7 @@ namespace
 		void writeApplicationMk();
 		void writeAndroidMk();
 		void writeDefaultProperties();
+		void writeAntProperties();
 		void writeAndroidManifest();
 		void generate();
 	};
@@ -185,6 +186,8 @@ void Gen::writeIml()
 	ss << "    <content url=\"file://$MODULE_DIR$\">\n";
 	ss << "      <sourceFolder url=\"file://$MODULE_DIR$/src\" isTestSource=\"false\" />\n";
 	ss << "      <sourceFolder url=\"file://$MODULE_DIR$/gen\" isTestSource=\"false\" generated=\"true\" />\n";
+	for (const std::string & path : project->androidJavaSourceDirs())
+		ss << "      <sourceFolder url=\"file://" << path << "\" isTestSource=\"false\" generated=\"true\" />\n";
 	ss << "    </content>\n";
 	ss << "    <orderEntry type=\"inheritedJdk\" />\n";
 	ss << "    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\n";
@@ -244,6 +247,23 @@ void Gen::writeDefaultProperties()
 	project->yipDirectory()->writeFile(projectName + "/default.properties", ss.str());
 }
 
+void Gen::writeAntProperties()
+{
+	std::stringstream ss;
+	if (!project->androidJavaSourceDirs().empty())
+	{
+		ss << "source.absolute.dir=";
+		const char * prefix = "";
+		for (const std::string & path : project->androidJavaSourceDirs())
+		{
+			ss << prefix << path;
+			prefix = ":";
+		}
+		ss << '\n';
+	}
+	project->yipDirectory()->writeFile(projectName + "/ant.properties", ss.str());
+}
+
 void Gen::writeAndroidManifest()
 {
 	std::stringstream ss;
@@ -296,6 +316,7 @@ void Gen::generate()
 	writeAndroidMk();
 
 	writeDefaultProperties();
+	writeAntProperties();
 	writeAndroidManifest();
 }
 

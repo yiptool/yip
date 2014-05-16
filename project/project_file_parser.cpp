@@ -788,6 +788,13 @@ void ProjectFileParser::parseAndroid()
 		m_Project->androidAddActivity(m_TokenText);
 		return;
 	}
+	else if (m_TokenText == "java_srcdir")
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected path to the Java source dir after '" << prefix << ":java_srcdir'."); return; }
+		m_Project->androidAddJavaSourceDir(pathMakeAbsolute(m_TokenText, m_ProjectPath));
+		return;
+	}
 
 	reportError(fmt() << "invalid variable '" << prefix << ":" << m_TokenText << "'.");
 }

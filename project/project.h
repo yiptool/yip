@@ -160,6 +160,9 @@ public:
 	inline void androidAddActivity(const std::string & activity) { m_AndroidActivities.push_back(activity); }
 	inline const std::vector<std::string> & androidActivities() const { return m_AndroidActivities; }
 
+	inline void androidAddJavaSourceDir(const std::string & dir) { m_AndroidJavaSourceDirs.insert(dir); }
+	inline const std::set<std::string> & androidJavaSourceDirs() const { return m_AndroidJavaSourceDirs; }
+
 	// Tizen
 
 	void tizenAddPrivilege(const std::string & url);
@@ -200,6 +203,7 @@ private:
 	std::string m_AndroidPackage;
 	std::string m_AndroidDisplayName;
 	std::string m_AndroidGlEsVersion;
+	std::set<std::string> m_AndroidJavaSourceDirs;
 	int m_AndroidMinSdkVersion;
 	int m_AndroidTargetSdkVersion;
 	std::vector<std::string> m_AndroidActivities;

@@ -274,6 +274,13 @@ To use the Facebook SDK on the iOS platform add the following lines into your `Y
 Replace `<app_id>` with your Facebook application ID and `<display_name>` with the Display Name you
 configured in the App Dashboard.
 
+### Java source files for the Android platform
+
+For the Android platform there is a special command `android:java_srcdir` available which provides
+a way to add additional directories with Java source files.
+
+      android:java_srcdir "src"
+
 ### Android target SDK
 
 To specify target SDK for Android, use the `android:target` command:
