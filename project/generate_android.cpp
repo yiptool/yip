@@ -24,8 +24,10 @@
 #include "../util/xml.h"
 #include "../util/path.h"
 #include <map>
+#include <unordered_set>
 #include <sstream>
 #include <cassert>
+#include <iostream>
 #include <memory>
 
 namespace
@@ -35,7 +37,10 @@ namespace
 		ProjectPtr project;
 		std::string projectName;
 		std::string projectPath;
+		std::unordered_set<std::string> srcFiles;
 
+		void generateSrcFiles();
+		void deleteOldSrcFiles(const std::string & path, const std::string & fullpath);
 		void writeIpr();
 		void writeIml();
 		void writeStringsXml();
@@ -67,6 +72,49 @@ static bool isJNIFileType(FileType type)
 		return true;
 	default:
 		return false;
+	}
+}
+
+void Gen::generateSrcFiles()
+{
+	std::string srcDir = pathConcat(projectName, "src");
+	for (auto it : project->sourceFiles())
+	{
+		const SourceFilePtr & file = it.second;
+
+		if (!(file->platforms() & Platform::Android))
+			continue;
+		if (!isJavaFileType(file->type()))
+			continue;
+
+		std::string name = pathConcat(srcDir, file->name());
+		std::string path = pathSimplify(pathConcat(project->yipDirectory()->path(), name));
+
+		pathCreate(pathGetDirectory(path));
+		pathCreateSymLink(file->path(), path);
+
+		srcFiles.insert(pathToUnixSeparators(path));
+	}
+}
+
+void Gen::deleteOldSrcFiles(const std::string & path, const std::string & fullpath)
+{
+	DirEntryList list = pathEnumDirectoryContents(fullpath);
+	for (auto it : list)
+	{
+		std::string file = pathConcat(fullpath, it.name);
+
+		if (it.type == DirEntry_Directory)
+		{
+			deleteOldSrcFiles(pathConcat(path, it.name), file);
+			continue;
+		}
+
+		if (srcFiles.find(file) == srcFiles.end())
+		{
+			std::cout << "killing " << pathConcat(path, it.name).c_str() << std::endl;
+			pathDeleteFile(file.c_str());
+		}
 	}
 }
 
@@ -157,6 +205,8 @@ void Gen::writeStringsXml()
 void Gen::writeApplicationMk()
 {
 	std::stringstream ss;
+	ss << "APP_CPPFLAGS := -std=c++11 -frtti -fexceptions\n";
+	ss << "APP_STL := gnustl_static\n";
 	ss << "APP_ABI := armeabi x86\n";		// armeabi-v7 mips
 	project->yipDirectory()->writeFile(projectName + "/jni/Application.mk", ss.str());
 }
@@ -164,11 +214,24 @@ void Gen::writeApplicationMk()
 void Gen::writeAndroidMk()
 {
 	std::stringstream ss;
-	ss << "LOCAL_PATH := $(call my-dir)\n";
+	ss << "LOCAL_PATH := /.\n";
 	ss << "include $(CLEAR_VARS)\n";
 	ss << "LOCAL_MODULE := libcode\n";
 	ss << "LOCAL_CFLAGS := \n";
-//	ss << "LOCAL_SRC_FILES := gl_code.cpp\n";
+
+	ss << "LOCAL_SRC_FILES :=";
+	for (auto it : project->sourceFiles())
+	{
+		const SourceFilePtr & file = it.second;
+
+		if (!(file->platforms() & Platform::Android))
+			continue;
+		if (!isJNIFileType(file->type()))
+			continue;
+		ss << " \\\n\t" << pathMakeAbsolute(file->path());
+	}
+	ss << '\n';
+
 	ss << "LOCAL_LDLIBS := -llog -lGLESv2\n";
 	ss << "include $(BUILD_SHARED_LIBRARY)\n";
 	project->yipDirectory()->writeFile(projectName + "/jni/Android.mk", ss.str());
@@ -184,7 +247,7 @@ void Gen::writeDefaultProperties()
 void Gen::writeAndroidManifest()
 {
 	std::stringstream ss;
-	ss << "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" ";
+	ss << "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n";
 	ss << "\t\tpackage=\"" << xmlEscape(project->androidPackage()) << "\">\n";
 	ss << "\t<application\n";
 	ss << "\t\t\tandroid:label=\"@string/app_title\">\n";
@@ -194,7 +257,7 @@ void Gen::writeAndroidManifest()
 
 	ss << "\t</application>\n";
 
-	if (!project->androidGlEsVersion().length())
+	if (!project->androidGlEsVersion().empty())
 	{
 		ss << "\t<uses-feature android:glEsVersion=\"" << xmlEscape(project->androidGlEsVersion())
 			<< "\" android:required=\"true\" />\n";
@@ -207,7 +270,7 @@ void Gen::writeAndroidManifest()
 			ss << "android:minSdkVersion=\"" << project->androidMinSdkVersion() << "\" ";
 		if (project->androidTargetSdkVersion() > 0)
 			ss << "android:targetSdkVersion=\"" << project->androidTargetSdkVersion() << "\" ";
-		ss << ">\n";
+		ss << "/>\n";
 	}
 
 	ss << "</manifest>\n";
@@ -219,12 +282,19 @@ void Gen::generate()
 {
 	projectName = "android";
 	projectPath = pathConcat(project->yipDirectory()->path(), projectName);
+	pathCreate(pathConcat(projectPath, "src"));
+
+	generateSrcFiles();
+	deleteOldSrcFiles("src", pathConcat(projectPath, "src"));
 
 	writeIpr();
 	writeIml();
+
 	writeStringsXml();
+
 	writeApplicationMk();
 	writeAndroidMk();
+
 	writeDefaultProperties();
 	writeAndroidManifest();
 }

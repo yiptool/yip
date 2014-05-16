@@ -297,7 +297,7 @@ use the `android:display_name` command:
 
 To specify minimum supported Android version use the `android:min_sdk_version` command:
 
-      android:min_sdk_version 10
+      android:min_sdk_version "10"
 
 This command corresponds to the `minSdkVersion` attribute of the `uses-sdk` element in the
 Android.
@@ -305,7 +305,7 @@ Android.
 To specify a recommended Android version (the one the application was designed to run on),
 use the `android:target_sdk_version` command:
 
-      android:target_sdk_version 19
+      android:target_sdk_version "19"
 
 This command corresponds to the `targetSdkVersion` attribute of the `uses-sdk` element in the
 Android.
