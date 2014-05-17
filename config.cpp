@@ -86,6 +86,7 @@ Config::Config()
 	repos.insert(std::make_pair("math", "https://github.com/yiptool/math.git"));
 	repos.insert(std::make_pair("parse-com", "https://github.com/yiptool/parse-com.git"));
 	repos.insert(std::make_pair("resources", "https://github.com/yiptool/resources.git"));
+	repos.insert(std::make_pair("scenegraph", "https://github.com/yiptool/scenegraph.git"));
 	repos.insert(std::make_pair("stb_image_cxx", "https://github.com/yiptool/stb_image_cxx.git"));
 	repos.insert(std::make_pair("tinyxml-util", "https://github.com/yiptool/tinyxml-util.git"));
 	repos.insert(std::make_pair("ui-helpers", "https://github.com/yiptool/ui-helpers.git"));
