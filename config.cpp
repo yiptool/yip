@@ -56,6 +56,7 @@ Config::Config()
 	repos.insert(std::make_pair("font-opensans-regular", "https://github.com/oss-forks/font-opensans-regular.git"));
 	repos.insert(std::make_pair("font-opensans-semibold", "https://github.com/oss-forks/font-opensans-semibold.git"));
 	repos.insert(std::make_pair("font-opensans-semibolditalic", "https://github.com/oss-forks/font-opensans-semibolditalic.git"));
+	repos.insert(std::make_pair("imgui", "https://github.com/oss-forks/imgui.git"));
 	repos.insert(std::make_pair("inih", "https://github.com/oss-forks/inih.git"));
 	repos.insert(std::make_pair("ios-keyboard-avoiding", "https://github.com/oss-forks/ios-keyboard-avoiding.git"));
 	repos.insert(std::make_pair("ios-star-rating-view", "https://github.com/oss-forks/ios-star-rating-view.git"));
