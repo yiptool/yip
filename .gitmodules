@@ -28,3 +28,6 @@
 [submodule "util/path-util"]
 	path = util/path-util
 	url = https://github.com/yiptool/path-util.git
+[submodule "util/cxx-util"]
+	path = util/cxx-util
+	url = https://github.com/yiptool/cxx-util.git

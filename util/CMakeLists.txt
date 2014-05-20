@@ -2,6 +2,7 @@
 ADD_DEFINITIONS("-DINCLUDE_DIRENT_H=\"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/dirent/dirent.h\"")
 
 ADD_SUBDIRECTORY(path-util)
+ADD_SUBDIRECTORY(cxx-util)
 
 ADD_LIBRARY(util STATIC
 	cxx_escape.cpp
@@ -26,4 +27,4 @@ ADD_LIBRARY(util STATIC
 	xml.h
 )
 
-TARGET_LINK_LIBRARIES(util path-util)
+TARGET_LINK_LIBRARIES(util path-util cxx-util)
