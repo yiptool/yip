@@ -358,6 +358,17 @@ To add an activity to the Android manifest file, use the `android:activity` comm
 You can have as many `android:activity` commands as you like. All of them will be
 added to the manifest file.
 
+Yip is also capable to generate a tiny class in the application package (value of the
+`android:package` command), inherited from the specified activity class. This should be used
+by libraries to give their activities unique name in different applications. For example,
+if you have specified `android:package` to be `com.mysuperapp`, then the following command:
+
+      android:make_activity TestActivity => com.test.Activity
+
+will create class `com.mysuperapp.TestActivity` inherited from `com.test.Activity`. You can
+then specify the `.TestActivity` name in the `android:name` attribute of the `android:activity`
+command, and applications using the library will not conflict for the public name of activity.
+
 ### Privileges on the Samsung Tizen platform
 
 If your application requires certain privileges on the Tizen platform, they

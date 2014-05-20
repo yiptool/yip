@@ -804,6 +804,20 @@ void ProjectFileParser::parseAndroid()
 		m_Project->androidAddJavaSourceDir(pathMakeAbsolute(m_TokenText, m_ProjectPath));
 		return;
 	}
+	else if (m_TokenText == "make_activity")
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected class name after '" << prefix << ":make_activity'."); return; }
+		std::string name = m_TokenText;
+		if (getToken() != Token::Arrow)
+			{ reportError("expected '=>'."); return; }
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected class name after '=>'."); return; }
+		std::string parentClass = m_TokenText;
+		if (!m_Project->androidAddMakeActivity(name, parentClass))
+			reportWarning(fmt() << "duplicate 'make_activity' for class '" << name << "'.");
+		return;
+	}
 
 	reportError(fmt() << "invalid variable '" << prefix << ":" << m_TokenText << "'.");
 }

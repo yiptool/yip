@@ -163,6 +163,11 @@ public:
 	inline void androidAddActivity(const std::string & activity) { m_AndroidActivities.push_back(activity); }
 	inline const std::vector<std::string> & androidActivities() const { return m_AndroidActivities; }
 
+	inline bool androidAddMakeActivity(const std::string & name, const std::string & parent)
+		{ return m_AndroidMakeActivities.insert(std::make_pair(name, parent)).second; }
+	inline const std::map<std::string, std::string> & androidMakeActivities() const
+		{ return m_AndroidMakeActivities; }
+
 	inline void androidAddJavaSourceDir(const std::string & dir) { m_AndroidJavaSourceDirs.insert(dir); }
 	inline const std::set<std::string> & androidJavaSourceDirs() const { return m_AndroidJavaSourceDirs; }
 
@@ -207,6 +212,7 @@ private:
 	std::string m_AndroidPackage;
 	std::string m_AndroidDisplayName;
 	std::string m_AndroidGlEsVersion;
+	std::map<std::string, std::string> m_AndroidMakeActivities;
 	std::set<std::string> m_AndroidJavaSourceDirs;
 	int m_AndroidMinSdkVersion;
 	int m_AndroidTargetSdkVersion;

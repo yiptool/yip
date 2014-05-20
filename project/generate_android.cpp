@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 //
 #include "generate_android.h"
+#include "../util/cxx-util/cxx-util/replace.h"
 #include "../util/xml.h"
 #include "../util/path.h"
 #include <map>
@@ -43,6 +44,7 @@ namespace
 		void deleteOldSrcFiles(const std::string & path, const std::string & fullpath);
 		void writeIpr();
 		void writeIml();
+		void writeMainActivityJava();
 		void writeStringsXml();
 		void writeApplicationMk();
 		void writeAndroidMk();
@@ -196,6 +198,22 @@ void Gen::writeIml()
 	project->yipDirectory()->writeFile(projectName + "/" + projectName + ".iml", ss.str());
 }
 
+void Gen::writeMainActivityJava()
+{
+	std::string package = project->androidPackage();
+
+	for (const std::pair<std::string, std::string> & activity : project->androidMakeActivities())
+	{
+		std::stringstream ss;
+		ss << "package " << package << ";\n";
+		ss << "public final class " << activity.first << " extends " << activity.second << " {\n";
+		ss << "};\n";
+
+		std::string file = projectName + "/gen/" + replace(package, '.', "/") + '/' + activity.first + ".java";
+		project->yipDirectory()->writeFile(file, ss.str());
+	}
+}
+
 void Gen::writeStringsXml()
 {
 	std::stringstream ss;
@@ -333,6 +351,7 @@ void Gen::generate()
 	writeIpr();
 	writeIml();
 
+	writeMainActivityJava();
 	writeStringsXml();
 
 	writeApplicationMk();
