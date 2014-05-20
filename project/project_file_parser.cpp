@@ -951,6 +951,15 @@ void ProjectFileParser::parseFileFlags(const SourceFilePtr & sourceFile, const S
 					sourceFile2->setFileType(type);
 			}
 		}
+		else if (name == "arc")
+		{
+			if (value == "yes")
+				sourceFile->setArcEnabled(true);
+			else if (value == "no")
+				sourceFile->setArcEnabled(false);
+			else
+				reportWarning(fmt() << "invalid value '" << value << "' for option 'arc'.");
+		}
 		else
 			reportWarning(fmt() << "invalid file option '" << name << "'.");
 

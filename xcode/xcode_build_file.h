@@ -38,11 +38,15 @@ public:
 	inline XCodeObject * fileRef() const { return m_FileRef; }
 	inline void setFileRef(XCodeObject * ref) { m_FileRef = ref; }
 
+	inline const std::string & compilerFlags() const { return m_CompilerFlags; }
+	inline void setCompilerFlags(const std::string & flags) { m_CompilerFlags = flags; }
+
 	std::string toString() const;
 
 private:
 	XCodeObject * m_FileRef;
 	XCodeBuildPhase * m_BuildPhase;
+	std::string m_CompilerFlags;
 
 	XCodeBuildFile(XCodeBuildPhase * phase);
 	~XCodeBuildFile();

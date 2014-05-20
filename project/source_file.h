@@ -43,6 +43,9 @@ public:
 	inline Platform::Type platforms() const { return m_Platforms; }
 	inline void setPlatforms(Platform::Type flags) { m_Platforms = flags; }
 
+	inline bool isArcEnabled() const { return m_ArcEnabled; }
+	inline void setArcEnabled(bool flag) { m_ArcEnabled = flag; }
+
 	inline bool isGenerated() const { return m_IsGenerated; }
 	inline void setIsGenerated(bool flag) { m_IsGenerated = flag; }
 
@@ -51,6 +54,7 @@ private:
 	std::string m_Path;
 	FileType m_Type;
 	Platform::Type m_Platforms;
+	bool m_ArcEnabled;
 	bool m_IsGenerated;
 
 	SourceFile(const SourceFile &) = delete;

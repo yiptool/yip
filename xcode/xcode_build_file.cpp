@@ -57,6 +57,9 @@ std::string XCodeBuildFile::toString() const
 	if (m_FileRef)
 		ss << "fileRef = " << objectID(m_FileRef) << "; ";
 
+	if (m_CompilerFlags.length() > 0)
+		ss << "settings = { COMPILER_FLAGS = " << stringLiteral(m_CompilerFlags) << "; }; ";
+
 	ss << "};";
 
 	return ss.str();

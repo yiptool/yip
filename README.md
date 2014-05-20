@@ -88,6 +88,10 @@ Supported options are:
 * Option `type` allows to override type of the file. This allows, for example,
   to compile file with the `.c` extension as an Objective-C source.
 
+* Option `arc` allows to enable or disable Automatic Reference Counting (ARC) for
+  the source file on iOS and OSX platforms. Use values `yes` or `no` to enable or
+  disable ARC, respectively.
+
 ### Preprocessor definitions
 
 Preprocessor definitions for C family of languages could be specified using

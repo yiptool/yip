@@ -27,6 +27,7 @@ SourceFile::SourceFile(const std::string & fileName, const std::string & filePat
 	  m_Path(filePath),
 	  m_Type(determineFileType(filePath)),
 	  m_Platforms(Platform::All),
+	  m_ArcEnabled(false),
 	  m_IsGenerated(false)
 {
 }

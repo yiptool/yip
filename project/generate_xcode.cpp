@@ -297,6 +297,8 @@ void Gen::addSourceFile(XCodeGroup * group, XCodeBuildPhase * phase, const Sourc
 	if (isCompilableFileType(file->type()))
 	{
 		XCodeBuildFile * buildFile = phase->addFile();
+		if (file->isArcEnabled())
+			buildFile->setCompilerFlags("-fobjc-arc");
 		buildFile->setFileRef(ref);
 	}
 }
