@@ -45,6 +45,7 @@ namespace
 		void writeIpr();
 		void writeIml();
 		void writeMainActivityJava();
+		void writeLogCxx();
 		void writeStringsXml();
 		void writeApplicationMk();
 		void writeAndroidMk();
@@ -214,6 +215,46 @@ void Gen::writeMainActivityJava()
 	}
 }
 
+void Gen::writeLogCxx()
+{
+	std::stringstream ss;
+	ss << "#include <android/log.h>\n";
+	ss << "#include <iostream>\n";
+	ss << "namespace\n";
+	ss << "{\n";
+	ss << "\tclass StreamRedirector : public std::streambuf\n";
+	ss << "\t{\n";
+	ss << "\tpublic:\n";
+	ss << "\t\tStreamRedirector(std::ostream & stream, android_LogPriority priority)\n";
+	ss << "\t\t\t: m_OriginalStream(stream),\n";
+	ss << "\t\t\t  m_Priority(priority)\n";
+	ss << "\t\t{\n";
+	ss << "\t\t\tm_OriginalBuf = stream.rdbuf(this);\n";
+	ss << "\t\t}\n";
+	ss << "\t\t~StreamRedirector()\n";
+	ss << "\t\t{\n";
+	ss << "\t\t\tm_OriginalStream.rdbuf(m_OriginalBuf);\n";
+	ss << "\t\t}\n";
+	ss << "\tprotected:\n";
+	ss << "\t\tvirtual std::streamsize xsputn(const char * msg, std::streamsize count) override\n";
+	ss << "\t\t{\n";
+	ss << "\t\t\t__android_log_print(m_Priority, \"C++\", \"%.*s\", int(count), msg);\n";
+	ss << "\t\t\treturn count;\n";
+	ss << "\t\t}\n";
+	ss << "\tprivate:\n";
+	ss << "\t\tstd::ostream & m_OriginalStream;\n";
+	ss << "\t\tstd::streambuf * m_OriginalBuf;\n";
+	ss << "\t\tandroid_LogPriority m_Priority;\n";
+	ss << "\t\tStreamRedirector(const StreamRedirector &) = delete;\n";
+	ss << "\t\tStreamRedirector & operator=(const StreamRedirector &) = delete;\n";
+	ss << "\t};\n";
+	ss << "}\n";
+	ss << "StreamRedirector redir_clog(std::clog, ANDROID_LOG_INFO);\n";
+	ss << "StreamRedirector redir_cout(std::cout, ANDROID_LOG_INFO);\n";
+	ss << "StreamRedirector redir_cerr(std::cerr, ANDROID_LOG_ERROR);\n";
+	project->yipDirectory()->writeFile(projectName + "/jni/log.cpp", ss.str());
+}
+
 void Gen::writeStringsXml()
 {
 	std::stringstream ss;
@@ -264,6 +305,7 @@ void Gen::writeAndroidMk()
 	ss << '\n';
 
 	ss << "LOCAL_SRC_FILES :=";
+	ss << " \\\n\t" << pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), projectName + "/jni/log.cpp"));
 	for (auto it : project->sourceFiles())
 	{
 		const SourceFilePtr & file = it.second;
@@ -351,6 +393,7 @@ void Gen::generate()
 	writeIpr();
 	writeIml();
 
+	writeLogCxx();
 	writeMainActivityJava();
 	writeStringsXml();
 
