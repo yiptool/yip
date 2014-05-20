@@ -118,6 +118,9 @@ public:
 	void iosSetFacebookDisplayName(const std::string & val) { m_IOSFacebookDisplayName = val; }
 	inline const std::string & iosFacebookDisplayName() const { return m_IOSFacebookDisplayName; }
 
+	void iosSetVkAppID(const std::string & val) { m_IOSVkAppID = val; }
+	inline const std::string & iosVkAppID() const { return m_IOSVkAppID; }
+
 	void iosAddFramework(const std::string & name, const std::string & path);
 	inline const std::map<std::string, std::string> & iosFrameworks() const { return m_IOSFrameworks; }
 
@@ -199,6 +202,7 @@ private:
 	std::string m_IOSBundleDisplayName;
 	std::string m_IOSFacebookAppID;
 	std::string m_IOSFacebookDisplayName;
+	std::string m_IOSVkAppID;
 	std::string m_AndroidTarget;
 	std::string m_AndroidPackage;
 	std::string m_AndroidDisplayName;

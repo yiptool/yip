@@ -678,20 +678,36 @@ void Gen::writeInfoPList()
 		ss << "\t<string>" << xmlEscape(project->osxBundleVersion()) << "</string>\n";
 	ss << "\t<key>CFBundleSignature</key>\n";
 	ss << "\t<string>\?\?\?\?</string>\n";
-	if (iOS && !project->iosFacebookAppID().empty())
+	if (iOS && (!project->iosFacebookAppID().empty() || !project->iosVkAppID().empty()))
 	{
 		ss << "\t<key>CFBundleURLTypes</key>\n";
 		ss << "\t<array>\n";
-		ss << "\t\t<dict>\n";
-		ss << "\t\t\t<key>CFBundleTypeRole</key>\n";
-		ss << "\t\t\t<string>Editor</string>\n";
-		ss << "\t\t\t<key>CFBundleURLIconFile</key>\n";
-		ss << "\t\t\t<string>Default</string>\n";
-		ss << "\t\t\t<key>CFBundleURLSchemes</key>\n";
-		ss << "\t\t\t<array>\n";
-		ss << "\t\t\t\t<string>fb" << xmlEscape(project->iosFacebookAppID()) << "</string>\n";
-		ss << "\t\t\t</array>\n";
-		ss << "\t\t</dict>\n";
+		if (!project->iosFacebookAppID().empty())
+		{
+			ss << "\t\t<dict>\n";
+			ss << "\t\t\t<key>CFBundleTypeRole</key>\n";
+			ss << "\t\t\t<string>Editor</string>\n";
+			ss << "\t\t\t<key>CFBundleURLIconFile</key>\n";
+			ss << "\t\t\t<string>Default</string>\n";
+			ss << "\t\t\t<key>CFBundleURLSchemes</key>\n";
+			ss << "\t\t\t<array>\n";
+			ss << "\t\t\t\t<string>fb" << xmlEscape(project->iosFacebookAppID()) << "</string>\n";
+			ss << "\t\t\t</array>\n";
+			ss << "\t\t</dict>\n";
+		}
+		if (!project->iosVkAppID().empty())
+		{
+			ss << "\t\t<dict>\n";
+			ss << "\t\t\t<key>CFBundleTypeRole</key>\n";
+			ss << "\t\t\t<string>Editor</string>\n";
+			ss << "\t\t\t<key>CFBundleURLIconFile</key>\n";
+			ss << "\t\t\t<string>Default</string>\n";
+			ss << "\t\t\t<key>CFBundleURLSchemes</key>\n";
+			ss << "\t\t\t<array>\n";
+			ss << "\t\t\t\t<string>vk" << xmlEscape(project->iosVkAppID()) << "</string>\n";
+			ss << "\t\t\t</array>\n";
+			ss << "\t\t</dict>\n";
+		}
 		ss << "\t</array>\n";
 	}
 	ss << "\t<key>CFBundleVersion</key>\n";

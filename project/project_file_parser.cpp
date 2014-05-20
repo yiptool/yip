@@ -717,6 +717,15 @@ void ProjectFileParser::parseIOSorOSX()
 
 		return;
 	}
+	else if (m_TokenText == "vk_app_id" && iOS)
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected literal after '" << prefix << ":vk_app_id'."); return; }
+
+		m_Project->iosSetVkAppID(m_TokenText);
+
+		return;
+	}
 
 	reportError(fmt() << "invalid variable '" << prefix << ":" << m_TokenText << "'.");
 }

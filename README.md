@@ -278,6 +278,16 @@ To use the Facebook SDK on the iOS platform add the following lines into your `Y
 Replace `<app_id>` with your Facebook application ID and `<display_name>` with the Display Name you
 configured in the App Dashboard.
 
+### VK SDK on iOS
+
+To use the VK (VKontakte) SDK on the iOS platform add the following lines into your `Yipfile`:
+
+      import vk-ios-sdk
+      
+      ios:vk_app_id "<app_id>"
+
+Replace `<app_id>` with your VK application ID.
+
 ### Java source files for the Android platform
 
 For the Android platform there is a special command `android:java_srcdir` available which provides
