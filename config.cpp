@@ -74,6 +74,7 @@ Config::Config()
 	repos.insert(std::make_pair("strtod", "https://github.com/oss-forks/strtod.git"));
 	repos.insert(std::make_pair("tinyobjloader", "https://github.com/oss-forks/tinyobjloader.git"));
 	repos.insert(std::make_pair("tinyxml", "https://github.com/oss-forks/tinyxml.git"));
+	repos.insert(std::make_pair("vk-ios-sdk", "https://github.com/oss-forks/vk-ios-sdk.git"));
 	repos.insert(std::make_pair("zlib", "https://github.com/oss-forks/zlib.git"));
 
 	repos.insert(std::make_pair("amazon-aws-runtime", "https://github.com/yiptool/amazon-aws-runtime.git"));
