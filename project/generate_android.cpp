@@ -347,12 +347,9 @@ void Gen::writeAntProperties()
 	if (!project->androidJavaSourceDirs().empty())
 	{
 		ss << "source.absolute.dir=";
-		const char * prefix = "";
+		ss << pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), projectName + "/src"));
 		for (const std::string & path : project->androidJavaSourceDirs())
-		{
-			ss << prefix << path;
-			prefix = ":";
-		}
+			ss << ':' << path;
 		ss << '\n';
 	}
 	project->yipDirectory()->writeFile(projectName + "/ant.properties", ss.str());
