@@ -49,7 +49,7 @@ void jsonEscape(std::stringstream & ss, const std::string & str)
 			ss << "\\b";
 			break;
 		case '\0':
-			ss << "\u0000";
+			ss << "\\u0000";
 			break;
 		default:
 			ss << ch;
