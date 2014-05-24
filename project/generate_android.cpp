@@ -51,6 +51,7 @@ namespace
 		void writeAndroidMk();
 		void writeDefaultProperties();
 		void writeAntProperties();
+		void writeCustomRulesXml();
 		void writeAndroidManifest();
 		void generate();
 	};
@@ -188,6 +189,7 @@ void Gen::writeIml()
 	ss << "    <exclude-output />\n";
 	ss << "    <content url=\"file://$MODULE_DIR$\">\n";
 	ss << "      <sourceFolder url=\"file://$MODULE_DIR$/src\" isTestSource=\"false\" />\n";
+	ss << "      <sourceFolder url=\"file://$MODULE_DIR$/gen-a\" isTestSource=\"false\" />\n";
 	ss << "      <sourceFolder url=\"file://$MODULE_DIR$/gen\" isTestSource=\"false\" generated=\"true\" />\n";
 	for (const std::string & path : project->androidJavaSourceDirs())
 		ss << "      <sourceFolder url=\"file://" << path << "\" isTestSource=\"false\" generated=\"true\" />\n";
@@ -210,7 +212,7 @@ void Gen::writeMainActivityJava()
 		ss << "public final class " << activity.first << " extends " << activity.second << " {\n";
 		ss << "};\n";
 
-		std::string file = projectName + "/gen/" + replace(package, '.', "/") + '/' + activity.first + ".java";
+		std::string file = projectName + "/gen-a/" + replace(package, '.', "/") + '/' + activity.first + ".java";
 		project->yipDirectory()->writeFile(file, ss.str());
 	}
 }
@@ -348,11 +350,29 @@ void Gen::writeAntProperties()
 	{
 		ss << "source.absolute.dir=";
 		ss << pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), projectName + "/src"));
+		ss << ':' << pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), projectName + "/gen-a"));
 		for (const std::string & path : project->androidJavaSourceDirs())
 			ss << ':' << path;
 		ss << '\n';
 	}
 	project->yipDirectory()->writeFile(projectName + "/ant.properties", ss.str());
+}
+
+void Gen::writeCustomRulesXml()
+{
+	std::stringstream ss;
+	ss << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+	ss << "<project name=\"custom_rules\" basedir=\".\">\n";
+	ss << "\t<target name=\"-pre-build\">\n";
+	ss << "\t\t<mkdir dir=\"${jar.libs.absolute.dir}\" />\n";
+	ss << "\t\t<copy todir=\"${jar.libs.absolute.dir}\">\n";
+	ss << "\t\t\t<fileset dir=\"${sdk.dir}/extras/android/support/v4\">\n";
+	ss << "\t\t\t\t<include name=\"android-support-v4.jar\" />\n";
+	ss << "\t\t\t</fileset>\n";
+	ss << "\t\t</copy>\n";
+	ss << "\t</target>\n";
+	ss << "</project>\n";
+	project->yipDirectory()->writeFile(projectName + "/custom_rules.xml", ss.str());
 }
 
 void Gen::writeAndroidManifest()
@@ -393,7 +413,9 @@ void Gen::generate()
 {
 	projectName = "android";
 	projectPath = pathConcat(project->yipDirectory()->path(), projectName);
+
 	pathCreate(pathConcat(projectPath, "src"));
+	pathCreate(pathConcat(projectPath, "gen-a"));
 
 	generateSrcFiles();
 	deleteOldSrcFiles("src", pathConcat(projectPath, "src"));
@@ -410,6 +432,8 @@ void Gen::generate()
 
 	writeDefaultProperties();
 	writeAntProperties();
+	writeCustomRulesXml();
+
 	writeAndroidManifest();
 }
 
