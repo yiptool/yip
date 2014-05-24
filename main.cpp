@@ -203,6 +203,40 @@ static bool runXCodeBuild(const std::string & projectFile, BuildType::Value buil
 }
 #endif
 
+static bool runAndroidBuild(const std::string & projectPath, BuildType::Value buildType)
+{
+	std::vector<std::string> ndk_build_args;
+	std::vector<std::string> ant_args;
+
+	if (buildType & BuildType::Debug)
+	{
+		ndk_build_args.push_back("NDK_DEBUG=1");
+		ant_args.push_back("debug");
+		buildType &= ~BuildType::Debug;
+	}
+	if (buildType & BuildType::Release)
+	{
+		ndk_build_args.push_back("NDK_DEBUG=0");
+		ant_args.push_back("release");
+		buildType &= ~BuildType::Release;
+	}
+
+	if (ndk_build_args.size() == 0 || ant_args.size() == 0 || ndk_build_args.size() != ant_args.size())
+		return false;
+
+	for (size_t i = 0; i < ndk_build_args.size(); i++)
+	{
+		std::stringstream ss;
+		ss << "cd " + shellEscapeArgument(projectPath) << " && ";
+		ss << "android update project --path . && ";
+		ss << "ndk-build " << ndk_build_args[i] << " && ";
+		ss << "ant " << ant_args[i] << " install";
+		shellExec(ss.str());
+	}
+
+	return (buildType == 0);
+}
+
 static int build(int argc, char ** argv)
 {
 	bool update = false, buildIOS = false, buildIOSSimulator = false;
@@ -297,8 +331,8 @@ static int build(int argc, char ** argv)
 	if (platform & Platform::Android)
 	{
 		std::string projectPath = generateAndroid(project);
-		// FIXME: build the project
-		(void)projectPath;
+		if (runAndroidBuild(projectPath, buildType))
+			platform &= ~Platform::Android;
 		platform &= ~Platform::Android;
 	}
 
