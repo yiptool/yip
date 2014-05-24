@@ -101,6 +101,9 @@ public:
 	void osxAddIcon(ImageSize size, const std::string & path);
 	inline const std::map<ImageSize, std::string> & osxIcons() const { return m_OSXIcons; }
 
+	inline void osxSetDeploymentTarget(const std::string & target) { m_OSXDeploymentTarget = target; }
+	inline const std::string & osxDeploymentTarget() const { return m_OSXDeploymentTarget; }
+
 	// iOS
 
 	void iosSetBundleIdentifier(const std::string & val) { m_IOSBundleIdentifier = val; }
@@ -137,6 +140,9 @@ public:
 	inline void iosSetAllowIPhone(bool flag) { m_IOSAllowIPhone = flag; }
 	inline bool iosAllowIPad() const { return m_IOSAllowIPad; }
 	inline bool iosAllowIPhone() const { return m_IOSAllowIPhone; }
+
+	inline void iosSetDeploymentTarget(const std::string & target) { m_IOSDeploymentTarget = target; }
+	inline const std::string & iosDeploymentTarget() const { return m_IOSDeploymentTarget; }
 
 	// Android
 
@@ -202,12 +208,14 @@ private:
 	std::vector<std::string> m_Licenses;
 	std::string m_OSXBundleIdentifier;
 	std::string m_OSXBundleVersion;
+	std::string m_OSXDeploymentTarget;
 	std::string m_IOSBundleIdentifier;
 	std::string m_IOSBundleVersion;
 	std::string m_IOSBundleDisplayName;
 	std::string m_IOSFacebookAppID;
 	std::string m_IOSFacebookDisplayName;
 	std::string m_IOSVkAppID;
+	std::string m_IOSDeploymentTarget;
 	std::string m_AndroidTarget;
 	std::string m_AndroidPackage;
 	std::string m_AndroidDisplayName;

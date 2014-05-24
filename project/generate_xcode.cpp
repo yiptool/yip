@@ -399,9 +399,9 @@ void Gen::initDebugConfiguration()
 		cfgProjectDebug->setArchs("$(ARCHS_STANDARD)");
 	cfgProjectDebug->setGccOptimizationLevel("0");
 	if (iOS)
-		cfgProjectDebug->setIPhoneOSDeploymentTarget("6.1");				// FIXME: make configurable
+		cfgProjectDebug->setIPhoneOSDeploymentTarget(project->iosDeploymentTarget());
 	else
-		cfgProjectDebug->setMacOSXDeploymentTarget("10.8");					// FIXME: make configurable
+		cfgProjectDebug->setMacOSXDeploymentTarget(project->osxDeploymentTarget());
 	cfgProjectDebug->setSDKRoot(iOS ? "iphoneos" : "macosx");
 
 	std::stringstream family;
@@ -446,9 +446,9 @@ void Gen::initReleaseConfiguration()
 	cfgProjectRelease->setCopyPhaseStrip(true);
 	cfgProjectRelease->setEnableNSAssertions(false);
 	if (iOS)
-		cfgProjectRelease->setIPhoneOSDeploymentTarget("6.1");				// FIXME: make configurable
+		cfgProjectRelease->setIPhoneOSDeploymentTarget(project->iosDeploymentTarget());
 	else
-		cfgProjectRelease->setMacOSXDeploymentTarget("10.8");					// FIXME: make configurable
+		cfgProjectRelease->setMacOSXDeploymentTarget(project->osxDeploymentTarget());
 	cfgProjectRelease->setOnlyActiveArch(false);
 	cfgProjectRelease->setSDKRoot(iOS ? "iphoneos" : "macosx");
 

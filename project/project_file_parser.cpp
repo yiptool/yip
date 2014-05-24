@@ -537,6 +537,18 @@ void ProjectFileParser::parseIOSorOSX()
 
 		return;
 	}
+	else if (m_TokenText == "deployment_target")
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected deployment target after '" << prefix << ":deployment_target'."); return; }
+
+		if (iOS)
+			m_Project->iosSetDeploymentTarget(m_TokenText);
+		else
+			m_Project->osxSetDeploymentTarget(m_TokenText);
+
+		return;
+	}
 	else if (m_TokenText == "icon")
 	{
 		if (getToken() != Token::Literal)

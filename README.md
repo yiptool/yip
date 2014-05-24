@@ -224,6 +224,15 @@ be self-explanatory. The following commands are available:
       osx:bundle_id "com.example.osx_app"
       osx:bundle_ver "3.9"
 
+### Deployment targets on Apple platforms
+
+You can specify minimum supported version for OSX and iOS. The following commands
+are available:
+
+      ios:deployment_target "6.1"
+      
+      osx:deployment_target "10.8"
+
 ### Application icons on Apple platforms
 
 Icons for applications on OSX and iOS could be specified using the `ios:icon`
