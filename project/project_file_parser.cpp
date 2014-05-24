@@ -55,7 +55,11 @@ struct ProjectFileParser::ImageSize
 struct ProjectFileParser::Error : public std::runtime_error
 {
 	inline Error(const std::string & message) : std::runtime_error(message) {}
+  #if __cplusplus < 201103L || (defined(_MSC_VER) && !defined(__clang__))
+	inline ~Error() throw() {}
+  #else
 	inline ~Error() noexcept {}
+  #endif
 };
 
 static bool isValidPathPrefix(const std::string & prefix)
