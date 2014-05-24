@@ -289,7 +289,7 @@ static int build(int argc, char ** argv)
 		updateProjectImports(project);
 	}
 
-	ProjectPtr project = loadProject(platform & Platform::Tizen);
+	ProjectPtr project = loadProject((platform & Platform::Tizen) != 0);
 	if (!project->isValid())
 		return 1;
 
@@ -388,7 +388,7 @@ static int generate(int argc, char ** argv)
 		updateProjectImports(project);
 	}
 
-	ProjectPtr project = loadProject(platform & Platform::Tizen);
+	ProjectPtr project = loadProject((platform & Platform::Tizen) != 0);
 	if (!project->isValid())
 		return 1;
 
