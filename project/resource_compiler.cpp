@@ -31,7 +31,7 @@
 #include <unordered_map>
 #include <iomanip>
 
-#define SKIP_PLATFORMS (Platform::iOS | Platform::OSX)
+#define SKIP_PLATFORMS (Platform::iOS | Platform::OSX | Platform::Android)
 
 typedef std::unordered_map<std::string, std::pair<std::string, Platform::Type>> ResCatalog;
 

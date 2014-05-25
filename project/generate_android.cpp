@@ -38,10 +38,13 @@ namespace
 		ProjectPtr project;
 		std::string projectName;
 		std::string projectPath;
+		std::unordered_set<std::string> assetFiles;
 		std::unordered_set<std::string> srcFiles;
 
 		void generateSrcFiles();
 		void deleteOldSrcFiles(const std::string & path, const std::string & fullpath);
+		void generateAssetFiles();
+		void deleteOldAssetFiles(const std::string & path, const std::string & fullpath);
 		void writeIpr();
 		void writeIml();
 		void writeMainActivityJava();
@@ -116,6 +119,47 @@ void Gen::deleteOldSrcFiles(const std::string & path, const std::string & fullpa
 		}
 
 		if (srcFiles.find(file) == srcFiles.end())
+		{
+			std::cout << "killing " << pathConcat(path, it.name).c_str() << std::endl;
+			pathDeleteFile(file.c_str());
+		}
+	}
+}
+
+void Gen::generateAssetFiles()
+{
+	std::string assetDir = "android/assets";
+	for (auto it : project->resourceFiles())
+	{
+		const SourceFilePtr & file = it.second;
+
+		if (!(file->platforms() & Platform::Android))
+			continue;
+
+		std::string name = pathConcat(assetDir, file->name());
+		std::string path = pathSimplify(pathConcat(project->yipDirectory()->path(), name));
+
+		pathCreate(pathGetDirectory(path));
+		pathCreateSymLink(file->path(), path);
+
+		assetFiles.insert(pathToUnixSeparators(path));
+	}
+}
+
+void Gen::deleteOldAssetFiles(const std::string & path, const std::string & fullpath)
+{
+	DirEntryList list = pathEnumDirectoryContents(fullpath);
+	for (auto it : list)
+	{
+		std::string file = pathConcat(fullpath, it.name);
+
+		if (it.type == DirEntry_Directory)
+		{
+			deleteOldAssetFiles(pathConcat(path, it.name), file);
+			continue;
+		}
+
+		if (assetFiles.find(file) == assetFiles.end())
 		{
 			std::cout << "killing " << pathConcat(path, it.name).c_str() << std::endl;
 			pathDeleteFile(file.c_str());
@@ -209,7 +253,17 @@ void Gen::writeMainActivityJava()
 	{
 		std::stringstream ss;
 		ss << "package " << package << ";\n";
+		ss << "import android.content.res.AssetManager;\n";
+		ss << "import android.os.Bundle;\n";
 		ss << "public final class " << activity.first << " extends " << activity.second << " {\n";
+		ss << "\tprivate static AssetManager assetManager;\n";
+		ss << "\t@Override public void onCreate(Bundle savedInstanceState) {\n";
+		ss << "\t\tassetManager = getAssets();\n";
+		ss << "\t\tsetAssetManager(assetManager);\n";
+		ss << "\t\tsuper.onCreate(savedInstanceState);\n";
+		ss << "\t}\n";
+		ss << "\tprivate static native void setAssetManager(AssetManager manager);\n";
+		ss << "\tstatic { System.loadLibrary(\"code\"); }\n";
 		ss << "};\n";
 
 		std::string file = "android/gen-a/" + replace(package, '.', "/") + '/' + activity.first + ".java";
@@ -220,11 +274,16 @@ void Gen::writeMainActivityJava()
 void Gen::writeLogCxx()
 {
 	std::stringstream ss;
+
+	ss << "#include <jni.h>\n";
 	ss << "#include <android/log.h>\n";
+	ss << "#include <android/asset_manager.h>\n";
+	ss << "#include <android/asset_manager_jni.h>\n";
 	ss << "#include <iostream>\n";
 	ss << "#include <vector>\n";
 	ss << "#include <sstream>\n";
 	ss << "#include <cassert>\n";
+
 	ss << "namespace\n";
 	ss << "{\n";
 	ss << "\tclass StreamRedirector : public std::streambuf\n";
@@ -265,6 +324,26 @@ void Gen::writeLogCxx()
 	ss << "StreamRedirector redir_clog(std::clog, ANDROID_LOG_INFO);\n";
 	ss << "StreamRedirector redir_cout(std::cout, ANDROID_LOG_INFO);\n";
 	ss << "StreamRedirector redir_cerr(std::cerr, ANDROID_LOG_ERROR);\n";
+
+	ss << "namespace Yip {\n";
+	ss << "extern AAssetManager * g_AssetManager_8a09e478cb;\n";
+	ss << "}\n";
+
+	ss << "extern \"C\" {\n";
+
+	std::string package = project->androidPackage();
+	for (const std::pair<std::string, std::string> & activity : project->androidMakeActivities())
+	{
+		std::string fullName = replace(replace(package + '.' + activity.first, '.', "_"), '-', "_");
+		ss << "JNIEXPORT void JNICALL Java_" << fullName << "_setAssetManager(JNIEnv * env, jclass, jobject mgr)\n";
+		ss << "{\n";
+		ss << "\tif (!Yip::g_AssetManager_8a09e478cb)\n";
+		ss << "\t\tYip::g_AssetManager_8a09e478cb = AAssetManager_fromJava(env, mgr);\n";
+		ss << "}\n";
+	}
+
+	ss << "} // extern \"C\"\n";
+
 	project->yipDirectory()->writeFile("android/jni/log.cpp", ss.str());
 }
 
@@ -331,7 +410,7 @@ void Gen::writeAndroidMk()
 	}
 	ss << '\n';
 
-	ss << "LOCAL_LDLIBS := -llog -lGLESv2\n";
+	ss << "LOCAL_LDLIBS := -llog -lGLESv2 -landroid\n";
 	ss << "include $(BUILD_SHARED_LIBRARY)\n";
 	project->yipDirectory()->writeFile("android/jni/Android.mk", ss.str());
 }
@@ -414,11 +493,15 @@ void Gen::generate()
 	projectName = project->projectName();
 	projectPath = pathConcat(project->yipDirectory()->path(), "android");
 
+	pathCreate(pathConcat(projectPath, "assets"));
 	pathCreate(pathConcat(projectPath, "src"));
 	pathCreate(pathConcat(projectPath, "gen-a"));
 
 	generateSrcFiles();
 	deleteOldSrcFiles("src", pathConcat(projectPath, "src"));
+
+	generateAssetFiles();
+	deleteOldAssetFiles("assets", pathConcat(projectPath, "assets"));
 
 	writeIpr();
 	writeIml();
