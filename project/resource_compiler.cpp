@@ -51,7 +51,7 @@ static void makeResourceFile(ResCatalog & cat, const ProjectPtr & project, const
 	if (!project->yipDirectory()->shouldProcessFile(targetPath, resourceFile->path()))
 	{
 		SourceFilePtr sourceFile = project->addSourceFile(targetPath, pathConcat(yipDir, targetPath));
-		sourceFile->setPlatforms(resourceFile->platforms());
+		sourceFile->setPlatforms(resourceFile->platforms() & ~SKIP_PLATFORMS);
 		return;
 	}
 
@@ -104,7 +104,7 @@ static void makeResourceFile(ResCatalog & cat, const ProjectPtr & project, const
 
 	std::string generatedPath = project->yipDirectory()->writeFile(targetPath, ss.str());
 	SourceFilePtr sourceFile = project->addSourceFile(targetPath, generatedPath);
-	sourceFile->setPlatforms(resourceFile->platforms());
+	sourceFile->setPlatforms(resourceFile->platforms() & ~SKIP_PLATFORMS);
 }
 
 void writeResourceCatalog(const ProjectPtr & project, const ResCatalog & cat, Platform::Type platform)
