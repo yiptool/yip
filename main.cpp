@@ -341,7 +341,7 @@ static int build(int argc, char ** argv)
 	if (platform & Platform::Android)
 	{
 		std::string projectPath = generateAndroid(project);
-		if (runAndroidBuild(project->projectName(), projectPath, buildType, install))
+		if (runAndroidBuild(project->projectName(), pathGetDirectory(projectPath), buildType, install))
 			platform &= ~Platform::Android;
 	}
 
