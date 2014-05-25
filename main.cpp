@@ -449,8 +449,8 @@ static int generate(int argc, char ** argv)
 	if (platform & Platform::Android)
 	{
 		std::string generatedFile = generateAndroid(project);
-		// FIXME: open project
-		(void)generatedFile;
+		if (!noOpen)
+			shellExec("open " + shellEscapeArgument(generatedFile));
 		platform &= ~Platform::Android;
 	}
 

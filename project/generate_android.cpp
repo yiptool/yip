@@ -47,6 +47,7 @@ namespace
 		void deleteOldAssetFiles(const std::string & path, const std::string & fullpath);
 		void writeIpr();
 		void writeIml();
+		void writeIws();
 		void writeMainActivityJava();
 		void writeLogCxx();
 		void writeStringsXml();
@@ -55,6 +56,7 @@ namespace
 		void writeDefaultProperties();
 		void writeAntProperties();
 		void writeCustomRulesXml();
+		void writeNdkBuildXml();
 		void writeAndroidManifest();
 		void generate();
 	};
@@ -172,6 +174,9 @@ void Gen::writeIpr()
 	std::stringstream ss;
 	ss << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 	ss << "<project version=\"4\">\n";
+	ss << "  <component name=\"AntConfiguration\">\n";
+	ss << "    <buildFile url=\"file://$PROJECT_DIR$/ndk_build.xml\" />\n";
+	ss << "  </component>\n";
 	ss << "  <component name=\"CompilerConfiguration\">\n";
 	ss << "    <option name=\"DEFAULT_COMPILER\" value=\"Javac\" />\n";
 	ss << "    <resourceExtensions />\n";
@@ -207,14 +212,25 @@ void Gen::writeIpr()
 	ss << "    </modules>\n";
 	ss << "  </component>\n";
 	ss << "  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_1_7\" "
-					"assert-keyword=\"true\" jdk-15=\"true\" project-jdk-name=\"Android API 10 Platform\" "
+					"assert-keyword=\"true\" jdk-15=\"true\" project-jdk-name=\"Android SDK\" "
 					"project-jdk-type=\"Android SDK\">\n";
 	ss << "    <output url=\"file://$PROJECT_DIR$/out\" />\n";
 	ss << "  </component>\n";
 	ss << "  <component name=\"VcsDirectoryMappings\">\n";
 	ss << "    <mapping directory=\"\" vcs=\"\" />\n";
 	ss << "  </component>\n";
+	ss << "  <component name=\"libraryTable\">\n";
+	ss << "    <library name=\"android-support-v4\">\n";
+	ss << "      <CLASSES>\n";
+	// FIXME FIXME FIXME
+	ss << "        <root url=\"jar:///android-sdk/sdk/extras/android/support/v4/android-support-v4.jar!/\" />\n";
+	ss << "      </CLASSES>\n";
+	ss << "      <JAVADOC />\n";
+	ss << "      <SOURCES />\n";
+	ss << "    </library>\n";
+	ss << "  </component>\n";
 	ss << "</project>\n";
+	ss << '\n';
 
 	project->yipDirectory()->writeFile("android/" + projectName + ".ipr", ss.str());
 }
@@ -231,18 +247,65 @@ void Gen::writeIml()
 	ss << "  </component>\n";
 	ss << "  <component name=\"NewModuleRootManager\" inherit-compiler-output=\"true\">\n";
 	ss << "    <exclude-output />\n";
+	for (const std::string & path : project->androidJavaSourceDirs())
+	{
+		std::string fullPath = pathMakeAbsolute(path);
+		ss << "    <content url=\"file://" << xmlEscape(pathGetDirectory(fullPath)) << "\">\n";
+		ss << "      <sourceFolder url=\"file://" << xmlEscape(fullPath) << "\" isTestSource=\"false\" />\n";
+		ss << "    </content>\n";
+	}
 	ss << "    <content url=\"file://$MODULE_DIR$\">\n";
 	ss << "      <sourceFolder url=\"file://$MODULE_DIR$/src\" isTestSource=\"false\" />\n";
 	ss << "      <sourceFolder url=\"file://$MODULE_DIR$/gen-a\" isTestSource=\"false\" />\n";
 	ss << "      <sourceFolder url=\"file://$MODULE_DIR$/gen\" isTestSource=\"false\" generated=\"true\" />\n";
-	for (const std::string & path : project->androidJavaSourceDirs())
-		ss << "      <sourceFolder url=\"file://" << path << "\" isTestSource=\"false\" generated=\"true\" />\n";
 	ss << "    </content>\n";
 	ss << "    <orderEntry type=\"inheritedJdk\" />\n";
 	ss << "    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\n";
+	ss << "    <orderEntry type=\"library\" name=\"android-support-v4\" level=\"project\" />\n";
 	ss << "  </component>\n";
 	ss << "</module>\n";
+	ss << '\n';
 	project->yipDirectory()->writeFile("android/" + projectName + ".iml", ss.str());
+}
+
+void Gen::writeIws()
+{
+	std::stringstream ss;
+	ss << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+	ss << "<project version=\"4\">\n";
+	ss << "  <component name=\"RunManager\" selected=\"Android Application." << xmlEscape(projectName) << "\">\n";
+	ss << "    <configuration default=\"false\" name=\"" << xmlEscape(projectName) << "\" type=\"AndroidRunConfigurationType\" factoryName=\"Android Application\">\n";
+	ss << "      <module name=\"" << xmlEscape(projectName) << "\" />\n";
+	ss << "      <option name=\"ACTIVITY_CLASS\" value=\"\" />\n";
+	ss << "      <option name=\"MODE\" value=\"default_activity\" />\n";
+	ss << "      <option name=\"DEPLOY\" value=\"true\" />\n";
+	ss << "      <option name=\"ARTIFACT_NAME\" value=\"\" />\n";
+	ss << "      <option name=\"TARGET_SELECTION_MODE\" value=\"USB_DEVICE\" />\n";
+	ss << "      <option name=\"USE_LAST_SELECTED_DEVICE\" value=\"false\" />\n";
+	ss << "      <option name=\"PREFERRED_AVD\" value=\"\" />\n";
+	ss << "      <option name=\"USE_COMMAND_LINE\" value=\"true\" />\n";
+	ss << "      <option name=\"COMMAND_LINE\" value=\"\" />\n";
+	ss << "      <option name=\"WIPE_USER_DATA\" value=\"false\" />\n";
+	ss << "      <option name=\"DISABLE_BOOT_ANIMATION\" value=\"false\" />\n";
+	ss << "      <option name=\"NETWORK_SPEED\" value=\"full\" />\n";
+	ss << "      <option name=\"NETWORK_LATENCY\" value=\"none\" />\n";
+	ss << "      <option name=\"CLEAR_LOGCAT\" value=\"false\" />\n";
+	ss << "      <option name=\"SHOW_LOGCAT_AUTOMATICALLY\" value=\"true\" />\n";
+	ss << "      <option name=\"FILTER_LOGCAT_AUTOMATICALLY\" value=\"true\" />\n";
+	ss << "      <RunnerSettings RunnerId=\"AndroidDebugRunner\" />\n";
+	ss << "      <ConfigurationWrapper RunnerId=\"AndroidDebugRunner\" />\n";
+	ss << "      <method>\n";
+	ss << "        <option name=\"AntTarget\" enabled=\"true\" antfile=\"file://$PROJECT_DIR$/ndk_build.xml\" target=\"ndk-build\" />\n";
+	ss << "        <option name=\"Make\" enabled=\"true\" />\n";
+	ss << "      </method>\n";
+	ss << "    </configuration>\n";
+	ss << "    <list size=\"1\">\n";
+	ss << "      <item index=\"0\" class=\"java.lang.String\" itemvalue=\"Android Application." << xmlEscape(projectName) << "\" />\n";
+	ss << "    </list>\n";
+	ss << "  </component>\n";
+	ss << "</project>\n";
+	ss << '\n';
+	project->yipDirectory()->writeFile("android/" + projectName + ".iws", ss.str());
 }
 
 void Gen::writeMainActivityJava()
@@ -454,6 +517,18 @@ void Gen::writeCustomRulesXml()
 	project->yipDirectory()->writeFile("android/custom_rules.xml", ss.str());
 }
 
+void Gen::writeNdkBuildXml()
+{
+	std::stringstream ss;
+	ss << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+	ss << "<project name=\"ndk_build\" default=\"ndk-build\" basedir=\".\">\n";
+	ss << "\t<target name=\"ndk-build\">\n";
+	ss << "\t\t<exec executable=\"ndk-build\" failonerror=\"true\" />\n";
+	ss << "\t</target>\n";
+	ss << "</project>\n";
+	project->yipDirectory()->writeFile("android/ndk_build.xml", ss.str());
+}
+
 void Gen::writeAndroidManifest()
 {
 	std::stringstream ss;
@@ -505,6 +580,7 @@ void Gen::generate()
 
 	writeIpr();
 	writeIml();
+	writeIws();
 
 	writeLogCxx();
 	writeMainActivityJava();
@@ -516,6 +592,7 @@ void Gen::generate()
 	writeDefaultProperties();
 	writeAntProperties();
 	writeCustomRulesXml();
+	writeNdkBuildXml();
 
 	writeAndroidManifest();
 }
@@ -525,5 +602,5 @@ std::string generateAndroid(const ProjectPtr & project)
 	Gen gen;
 	gen.project = project;
 	gen.generate();
-	return gen.projectPath;
+	return pathConcat(gen.projectPath, project->projectName() + ".ipr");
 }
