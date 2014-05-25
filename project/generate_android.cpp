@@ -283,7 +283,7 @@ void Gen::writeApplicationMk()
 	ss << "NDK_TOOLCHAIN_VERSION := clang\n";
 	ss << "APP_CPPFLAGS := -std=c++11 -frtti -fexceptions\n";
 	ss << "APP_STL := gnustl_static\n";
-	ss << "APP_ABI := armeabi x86\n";		// armeabi-v7 mips
+	ss << "APP_ABI := armeabi-v7a x86\n";		// armeabi mips
 	project->yipDirectory()->writeFile(projectName + "/jni/Application.mk", ss.str());
 }
 
