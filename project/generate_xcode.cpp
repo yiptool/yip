@@ -69,6 +69,7 @@ namespace
 		XCodeConfigurationList * preBuildCfgList = nullptr;
 		XCodeConfigurationList * projectCfgList = nullptr;
 		XCodeLegacyTarget * preBuildTarget = nullptr;
+		XCodeNativeTarget * nativeTarget = nullptr;
 
 		/* Methods */
 
@@ -107,6 +108,7 @@ namespace
 		void writeDummyResourceFile();
 		void writeInfoPList();
 		void writeImageAssets();
+		void writeXCScheme();
 
 		// Generating
 		void writePBXProj();
@@ -546,17 +548,17 @@ void Gen::createNativeTarget()
 	preBuildDep->setTarget(preBuildTarget);
 	preBuildDep->setTargetProxy(preBuildProxy);
 
-	XCodeNativeTarget * target = xcodeProject->addNativeTarget();
-	target->setName(projectName);
-	target->setBuildConfigurationList(targetCfgList);
-	target->setProductName(projectName);
-	target->setProductReference(productRef);
-	target->addDependency(preBuildDep);
-	target->addBuildPhase(sourcesBuildPhase);
-	target->addBuildPhase(frameworksBuildPhase);
-	target->addBuildPhase(resourcesBuildPhase);
+	nativeTarget = xcodeProject->addNativeTarget();
+	nativeTarget->setName(projectName);
+	nativeTarget->setBuildConfigurationList(targetCfgList);
+	nativeTarget->setProductName(projectName);
+	nativeTarget->setProductReference(productRef);
+	nativeTarget->addDependency(preBuildDep);
+	nativeTarget->addBuildPhase(sourcesBuildPhase);
+	nativeTarget->addBuildPhase(frameworksBuildPhase);
+	nativeTarget->addBuildPhase(resourcesBuildPhase);
 	for (auto it : copyFilesBuildPhases)
-		target->addBuildPhase(it.second);
+		nativeTarget->addBuildPhase(it.second);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1024,6 +1026,102 @@ void Gen::writeImageAssets()
 	}
 }
 
+void Gen::writeXCScheme()
+{
+	std::stringstream ss;
+	ss << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+	ss << "<Scheme\n";
+	ss << "   LastUpgradeVersion = \"0510\"\n";
+	ss << "   version = \"1.3\">\n";
+	ss << "   <BuildAction\n";
+	ss << "      parallelizeBuildables = \"YES\"\n";
+	ss << "      buildImplicitDependencies = \"YES\">\n";
+	ss << "      <BuildActionEntries>\n";
+	ss << "         <BuildActionEntry\n";
+	ss << "            buildForTesting = \"YES\"\n";
+	ss << "            buildForRunning = \"YES\"\n";
+	ss << "            buildForProfiling = \"YES\"\n";
+	ss << "            buildForArchiving = \"YES\"\n";
+	ss << "            buildForAnalyzing = \"YES\">\n";
+	ss << "            <BuildableReference\n";
+	ss << "               BuildableIdentifier = \"primary\"\n";
+	ss << "               BlueprintIdentifier = \"" << nativeTarget->uniqueID().toString() << "\"\n";
+	ss << "               BuildableName = \"" << projectName << ".app\"\n";
+	ss << "               BlueprintName = \"" << projectName << "\"\n";
+	ss << "               ReferencedContainer = \"container:" << projectName << ".xcodeproj\">\n";
+	ss << "            </BuildableReference>\n";
+	ss << "         </BuildActionEntry>\n";
+	ss << "      </BuildActionEntries>\n";
+	ss << "   </BuildAction>\n";
+	ss << "   <TestAction\n";
+	ss << "      selectedDebuggerIdentifier = \"Xcode.DebuggerFoundation.Debugger.LLDB\"\n";
+	ss << "      selectedLauncherIdentifier = \"Xcode.DebuggerFoundation.Launcher.LLDB\"\n";
+	ss << "      shouldUseLaunchSchemeArgsEnv = \"YES\"\n";
+	ss << "      buildConfiguration = \"Debug\">\n";
+	ss << "      <Testables>\n";
+	ss << "      </Testables>\n";
+	ss << "      <MacroExpansion>\n";
+	ss << "         <BuildableReference\n";
+	ss << "            BuildableIdentifier = \"primary\"\n";
+	ss << "            BlueprintIdentifier = \"" << nativeTarget->uniqueID().toString() << "\"\n";
+	ss << "            BuildableName = \"" << projectName << ".app\"\n";
+	ss << "            BlueprintName = \"" << projectName << "\"\n";
+	ss << "            ReferencedContainer = \"container:" << projectName << ".xcodeproj\">\n";
+	ss << "         </BuildableReference>\n";
+	ss << "      </MacroExpansion>\n";
+	ss << "   </TestAction>\n";
+	ss << "   <LaunchAction\n";
+	ss << "      selectedDebuggerIdentifier = \"Xcode.DebuggerFoundation.Debugger.LLDB\"\n";
+	ss << "      selectedLauncherIdentifier = \"Xcode.DebuggerFoundation.Launcher.LLDB\"\n";
+	ss << "      launchStyle = \"0\"\n";
+	ss << "      useCustomWorkingDirectory = \"NO\"\n";
+	ss << "      buildConfiguration = \"Debug\"\n";
+	ss << "      ignoresPersistentStateOnLaunch = \"NO\"\n";
+	ss << "      debugDocumentVersioning = \"YES\"\n";
+	ss << "      allowLocationSimulation = \"YES\">\n";
+	ss << "      <BuildableProductRunnable>\n";
+	ss << "         <BuildableReference\n";
+	ss << "            BuildableIdentifier = \"primary\"\n";
+	ss << "            BlueprintIdentifier = \"" << nativeTarget->uniqueID().toString() << "\"\n";
+	ss << "            BuildableName = \"" << projectName << ".app\"\n";
+	ss << "            BlueprintName = \"" << projectName << "\"\n";
+	ss << "            ReferencedContainer = \"container:" << projectName << ".xcodeproj\">\n";
+	ss << "         </BuildableReference>\n";
+	ss << "      </BuildableProductRunnable>\n";
+	ss << "      <AdditionalOptions>\n";
+	ss << "      </AdditionalOptions>\n";
+	ss << "   </LaunchAction>\n";
+	ss << "   <ProfileAction\n";
+	ss << "      shouldUseLaunchSchemeArgsEnv = \"YES\"\n";
+	ss << "      savedToolIdentifier = \"\"\n";
+	ss << "      useCustomWorkingDirectory = \"NO\"\n";
+	ss << "      buildConfiguration = \"Release\"\n";
+	ss << "      debugDocumentVersioning = \"YES\">\n";
+	ss << "      <BuildableProductRunnable>\n";
+	ss << "         <BuildableReference\n";
+	ss << "            BuildableIdentifier = \"primary\"\n";
+	ss << "            BlueprintIdentifier = \"" << nativeTarget->uniqueID().toString() << "\"\n";
+	ss << "            BuildableName = \"" << projectName << ".app\"\n";
+	ss << "            BlueprintName = \"" << projectName << "\"\n";
+	ss << "            ReferencedContainer = \"container:" << projectName << ".xcodeproj\">\n";
+	ss << "         </BuildableReference>\n";
+	ss << "      </BuildableProductRunnable>\n";
+	ss << "   </ProfileAction>\n";
+	ss << "   <AnalyzeAction\n";
+	ss << "      buildConfiguration = \"Debug\">\n";
+	ss << "   </AnalyzeAction>\n";
+	ss << "   <ArchiveAction\n";
+	ss << "      buildConfiguration = \"Release\"\n";
+	ss << "      revealArchiveInOrganizer = \"YES\">\n";
+	ss << "   </ArchiveAction>\n";
+	ss << "</Scheme>\n";
+
+	bool chgd = false;
+	project->yipDirectory()
+		->writeFile(projectName + ".xcodeproj/xcshareddata/xcschemes/" + projectName + ".xcscheme", ss.str(), &chgd);
+	somethingChanged = somethingChanged || chgd;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Generating
 
@@ -1057,6 +1155,8 @@ void Gen::generate()
 	writeDummyResourceFile();
 	writeInfoPList();
 	writeImageAssets();
+	writeXCScheme();
+
 	writePBXProj();
 }
 
