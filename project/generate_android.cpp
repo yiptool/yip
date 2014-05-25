@@ -82,7 +82,7 @@ static bool isJNIFileType(FileType type)
 
 void Gen::generateSrcFiles()
 {
-	std::string srcDir = pathConcat(projectName, "src");
+	std::string srcDir = "android/src";
 	for (auto it : project->sourceFiles())
 	{
 		const SourceFilePtr & file = it.second;
@@ -172,7 +172,7 @@ void Gen::writeIpr()
 	ss << "  </component>\n";
 	ss << "</project>\n";
 
-	project->yipDirectory()->writeFile(projectName + "/" + projectName + ".ipr", ss.str());
+	project->yipDirectory()->writeFile("android/" + projectName + ".ipr", ss.str());
 }
 
 void Gen::writeIml()
@@ -198,7 +198,7 @@ void Gen::writeIml()
 	ss << "    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\n";
 	ss << "  </component>\n";
 	ss << "</module>\n";
-	project->yipDirectory()->writeFile(projectName + "/" + projectName + ".iml", ss.str());
+	project->yipDirectory()->writeFile("android/" + projectName + ".iml", ss.str());
 }
 
 void Gen::writeMainActivityJava()
@@ -212,7 +212,7 @@ void Gen::writeMainActivityJava()
 		ss << "public final class " << activity.first << " extends " << activity.second << " {\n";
 		ss << "};\n";
 
-		std::string file = projectName + "/gen-a/" + replace(package, '.', "/") + '/' + activity.first + ".java";
+		std::string file = "android/gen-a/" + replace(package, '.', "/") + '/' + activity.first + ".java";
 		project->yipDirectory()->writeFile(file, ss.str());
 	}
 }
@@ -265,7 +265,7 @@ void Gen::writeLogCxx()
 	ss << "StreamRedirector redir_clog(std::clog, ANDROID_LOG_INFO);\n";
 	ss << "StreamRedirector redir_cout(std::cout, ANDROID_LOG_INFO);\n";
 	ss << "StreamRedirector redir_cerr(std::cerr, ANDROID_LOG_ERROR);\n";
-	project->yipDirectory()->writeFile(projectName + "/jni/log.cpp", ss.str());
+	project->yipDirectory()->writeFile("android/jni/log.cpp", ss.str());
 }
 
 void Gen::writeStringsXml()
@@ -274,7 +274,7 @@ void Gen::writeStringsXml()
 	ss << "<resources>\n";
 	ss << "\t<string name=\"app_title\">" << xmlEscape(project->androidDisplayName()) << "</string>\n";
 	ss << "</resources>\n";
-	project->yipDirectory()->writeFile(projectName + "/res/values/strings.xml", ss.str());
+	project->yipDirectory()->writeFile("android/res/values/strings.xml", ss.str());
 }
 
 void Gen::writeApplicationMk()
@@ -284,13 +284,13 @@ void Gen::writeApplicationMk()
 	ss << "APP_CPPFLAGS := -std=c++11 -frtti -fexceptions\n";
 	ss << "APP_STL := gnustl_static\n";
 	ss << "APP_ABI := armeabi-v7a x86\n";		// armeabi mips
-	project->yipDirectory()->writeFile(projectName + "/jni/Application.mk", ss.str());
+	project->yipDirectory()->writeFile("android/jni/Application.mk", ss.str());
 }
 
 void Gen::writeAndroidMk()
 {
 	std::string yipDir = pathMakeAbsolute(project->yipDirectory()->path());
-	std::string prjDir = pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), projectName));
+	std::string prjDir = pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), "android"));
 
 	std::stringstream ss;
 	ss << "LOCAL_PATH := /.\n";
@@ -318,7 +318,7 @@ void Gen::writeAndroidMk()
 	ss << '\n';
 
 	ss << "LOCAL_SRC_FILES :=";
-	ss << " \\\n\t" << pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), projectName + "/jni/log.cpp"));
+	ss << " \\\n\t" << pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), "android/jni/log.cpp"));
 	for (auto it : project->sourceFiles())
 	{
 		const SourceFilePtr & file = it.second;
@@ -333,14 +333,14 @@ void Gen::writeAndroidMk()
 
 	ss << "LOCAL_LDLIBS := -llog -lGLESv2\n";
 	ss << "include $(BUILD_SHARED_LIBRARY)\n";
-	project->yipDirectory()->writeFile(projectName + "/jni/Android.mk", ss.str());
+	project->yipDirectory()->writeFile("android/jni/Android.mk", ss.str());
 }
 
 void Gen::writeDefaultProperties()
 {
 	std::stringstream ss;
 	ss << "target=" << project->androidTarget() << '\n';
-	project->yipDirectory()->writeFile(projectName + "/default.properties", ss.str());
+	project->yipDirectory()->writeFile("android/default.properties", ss.str());
 }
 
 void Gen::writeAntProperties()
@@ -349,13 +349,13 @@ void Gen::writeAntProperties()
 	if (!project->androidJavaSourceDirs().empty())
 	{
 		ss << "source.absolute.dir=";
-		ss << pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), projectName + "/src"));
-		ss << ':' << pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), projectName + "/gen-a"));
+		ss << pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), "android/src"));
+		ss << ':' << pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), "android/gen-a"));
 		for (const std::string & path : project->androidJavaSourceDirs())
 			ss << ':' << path;
 		ss << '\n';
 	}
-	project->yipDirectory()->writeFile(projectName + "/ant.properties", ss.str());
+	project->yipDirectory()->writeFile("android/ant.properties", ss.str());
 }
 
 void Gen::writeCustomRulesXml()
@@ -372,7 +372,7 @@ void Gen::writeCustomRulesXml()
 	ss << "\t\t</copy>\n";
 	ss << "\t</target>\n";
 	ss << "</project>\n";
-	project->yipDirectory()->writeFile(projectName + "/custom_rules.xml", ss.str());
+	project->yipDirectory()->writeFile("android/custom_rules.xml", ss.str());
 }
 
 void Gen::writeAndroidManifest()
@@ -406,13 +406,13 @@ void Gen::writeAndroidManifest()
 
 	ss << "</manifest>\n";
 
-	project->yipDirectory()->writeFile(projectName + "/AndroidManifest.xml", ss.str());
+	project->yipDirectory()->writeFile("android/AndroidManifest.xml", ss.str());
 }
 
 void Gen::generate()
 {
-	projectName = "android";
-	projectPath = pathConcat(project->yipDirectory()->path(), projectName);
+	projectName = project->projectName();
+	projectPath = pathConcat(project->yipDirectory()->path(), "android");
 
 	pathCreate(pathConcat(projectPath, "src"));
 	pathCreate(pathConcat(projectPath, "gen-a"));

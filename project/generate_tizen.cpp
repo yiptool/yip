@@ -87,7 +87,7 @@ static bool isHeaderFileType(FileType type)
 
 void Gen::generateSrcFiles()
 {
-	std::string srcDir = pathConcat(projectName, "src");
+	std::string srcDir = "tizen/src";
 	for (auto it : project->sourceFiles())
 	{
 		const SourceFilePtr & file = it.second;
@@ -168,12 +168,12 @@ void Gen::writeManifest()
 	ss << "\t\t</UiApp>\n";
 	ss << "\t</Apps>\n";
 	ss << "</Manifest>\n";
-	project->yipDirectory()->writeFile(pathConcat(projectName, "manifest.xml"), ss.str());
+	project->yipDirectory()->writeFile("tizen/manifest.xml", ss.str());
 }
 
 void Gen::writeProjectFile()
 {
-	std::string prjDir = pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), projectName));
+	std::string prjDir = pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), "tizen"));
 
 	std::stringstream ss;
 	ss << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
@@ -275,13 +275,13 @@ void Gen::writeProjectFile()
 	ss << "\t\t</filter>\n";
 	ss << "\t</filteredResources>\n";
 	ss << "</projectDescription>\n";
-	project->yipDirectory()->writeFile(pathConcat(projectName, ".project"), ss.str());
+	project->yipDirectory()->writeFile("tizen/.project", ss.str());
 }
 
 void Gen::writeCProjectFile()
 {
 	std::string yipDir = pathMakeAbsolute(project->yipDirectory()->path());
-	std::string prjDir = pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), projectName));
+	std::string prjDir = pathMakeAbsolute(pathConcat(project->yipDirectory()->path(), "tizen"));
 
 	std::string headerPaths;
 	{
@@ -1077,7 +1077,7 @@ void Gen::writeCProjectFile()
 	ss << "\t<storageModule moduleId=\"com.samsung.tizen.nativeapp.projectInfo\" version=\"1.0.0\"/>\n";
 	ss << "\t<storageModule moduleId=\"refreshScope\"/>\n";
 	ss << "</cproject>\n";
-	project->yipDirectory()->writeFile(pathConcat(projectName, ".cproject"), ss.str());
+	project->yipDirectory()->writeFile("tizen/.cproject", ss.str());
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1085,8 +1085,8 @@ void Gen::writeCProjectFile()
 
 void Gen::generate()
 {
-	projectName = "tizen";
-	projectPath = pathConcat(project->yipDirectory()->path(), projectName);
+	projectName = project->projectName();
+	projectPath = pathConcat(project->yipDirectory()->path(), "tizen");
 
 	generateSrcFiles();
 	deleteOldSrcFiles("src", pathConcat(projectPath, "src"));

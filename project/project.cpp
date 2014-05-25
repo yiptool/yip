@@ -26,7 +26,8 @@
 #include "../util/cxx_escape.h"
 
 Project::Project(const std::string & prjPath)
-	: m_ProjectPath(prjPath),
+	: m_ProjectName("unnamed"),
+	  m_ProjectPath(prjPath),
 	  m_OSXBundleIdentifier("com.zapolnov.${PRODUCT_NAME:rfc1034identifier}"),
 	  m_OSXBundleVersion("1.0"),
 	  m_OSXDeploymentTarget("10.8"),

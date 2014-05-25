@@ -208,7 +208,8 @@ static bool runXCodeBuild(const std::string & projectFile, BuildType::Value buil
 }
 #endif
 
-static bool runAndroidBuild(const std::string & projectPath, BuildType::Value buildType, bool install)
+static bool runAndroidBuild(const std::string & projectName, const std::string & projectPath,
+	BuildType::Value buildType, bool install)
 {
 	std::vector<std::string> ndk_build_args;
 	std::vector<std::string> ant_args;
@@ -233,9 +234,9 @@ static bool runAndroidBuild(const std::string & projectPath, BuildType::Value bu
 	{
 		std::stringstream ss;
 		ss << "cd " + shellEscapeArgument(projectPath) << " && ";
-		ss << "android update project --path . && ";
+		ss << "android update project --path . --name " << shellEscapeArgument(projectName) << " && ";
 		ss << "ndk-build " << ndk_build_args[i] << " && ";
-		ss << " && ant " << ant_args[i];
+		ss << "ant " << ant_args[i];
 		if (install && i == ndk_build_args.size() - 1)
 			ss << " install";
 		shellExec(ss.str());
@@ -340,7 +341,7 @@ static int build(int argc, char ** argv)
 	if (platform & Platform::Android)
 	{
 		std::string projectPath = generateAndroid(project);
-		if (runAndroidBuild(projectPath, buildType, install))
+		if (runAndroidBuild(project->projectName(), projectPath, buildType, install))
 			platform &= ~Platform::Android;
 	}
 

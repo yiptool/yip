@@ -62,6 +62,9 @@ public:
 	inline bool isValid() const { return m_Valid; }
 	inline void setValid(bool flag) { m_Valid = flag; }
 
+	inline void setProjectName(const std::string & name) { m_ProjectName = name; }
+	inline const std::string & projectName() const { return m_ProjectName; }
+
 	inline const std::string & projectPath() const { return m_ProjectPath; }
 	const YipDirectoryPtr & yipDirectory() const;
 
@@ -191,6 +194,7 @@ public:
 	void generateLicenseData();
 
 private:
+	std::string m_ProjectName;
 	std::string m_ProjectPath;
 	std::map<std::string, HeaderPathPtr> m_HeaderPaths;
 	std::map<std::string, SourceFilePtr> m_SourceFiles;

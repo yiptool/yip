@@ -46,6 +46,7 @@ namespace
 
 		// Private
 		std::string projectName;
+		std::string projectDir;
 		std::shared_ptr<XCodeProject> xcodeProject;
 		bool somethingChanged = false;
 		XCodeBuildPhase * frameworksBuildPhase = nullptr;
@@ -630,7 +631,7 @@ void Gen::writeDummyResourceFile()
 	buildFile->setFileRef(dummyFileRef);
 
 	bool changed = false;
-	project->yipDirectory()->writeFile(projectName + "/.dummy", std::string(), &changed);
+	project->yipDirectory()->writeFile(projectDir + "/.dummy", std::string(), &changed);
 	somethingChanged = somethingChanged || changed;
 }
 
@@ -770,7 +771,7 @@ void Gen::writeInfoPList()
 	ss << "</plist>\n";
 
 	bool changed = false;
-	project->yipDirectory()->writeFile(projectName + "/Info.plist", ss.str(), &changed);
+	project->yipDirectory()->writeFile(projectDir + "/Info.plist", ss.str(), &changed);
 	somethingChanged = somethingChanged || changed;
 }
 
@@ -788,7 +789,7 @@ void Gen::writeImageAssets()
 
 	std::string assetsDir = pathConcat(
 		project->yipDirectory()->path(),
-		projectName + "/Images.xcassets/AppIcon.appiconset"
+		projectDir + "/Images.xcassets/AppIcon.appiconset"
 	);
 
 	std::stringstream ss;
@@ -915,14 +916,14 @@ void Gen::writeImageAssets()
 
 	bool changed = false;
 	project->yipDirectory()
-		->writeFile(projectName + "/Images.xcassets/AppIcon.appiconset/Contents.json", ss.str(), &changed);
+		->writeFile(projectDir + "/Images.xcassets/AppIcon.appiconset/Contents.json", ss.str(), &changed);
 	somethingChanged = somethingChanged || changed;
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	assetsDir = pathConcat(
 		project->yipDirectory()->path(),
-		projectName + "/Images.xcassets/LaunchImage.launchimage"
+		projectDir + "/Images.xcassets/LaunchImage.launchimage"
 	);
 
 	if (iOS)
@@ -1021,7 +1022,7 @@ void Gen::writeImageAssets()
 
 		bool chgd = false;
 		project->yipDirectory()
-			->writeFile(projectName + "/Images.xcassets/LaunchImage.launchimage/Contents.json", ss2.str(), &chgd);
+			->writeFile(projectDir + "/Images.xcassets/LaunchImage.launchimage/Contents.json", ss2.str(), &chgd);
 		somethingChanged = somethingChanged || chgd;
 	}
 }
@@ -1118,7 +1119,7 @@ void Gen::writeXCScheme()
 
 	bool chgd = false;
 	project->yipDirectory()
-		->writeFile(projectName + ".xcodeproj/xcshareddata/xcschemes/" + projectName + ".xcscheme", ss.str(), &chgd);
+		->writeFile(projectDir + ".xcodeproj/xcshareddata/xcschemes/" + projectName + ".xcscheme", ss.str(), &chgd);
 	somethingChanged = somethingChanged || chgd;
 }
 
@@ -1128,14 +1129,15 @@ void Gen::writeXCScheme()
 void Gen::writePBXProj()
 {
 	bool chd = false;
-	project->yipDirectory()->writeFile(projectName + ".xcodeproj/project.pbxproj", xcodeProject->toString(), &chd);
+	project->yipDirectory()->writeFile(projectDir + ".xcodeproj/project.pbxproj", xcodeProject->toString(), &chd);
 	somethingChanged = somethingChanged || chd;
 }
 
 void Gen::generate()
 {
-	projectName = (iOS ? "ios" : "osx");
-	projectPath = pathConcat(project->yipDirectory()->path(), projectName) + ".xcodeproj";
+	projectName = project->projectName();
+	projectDir = pathConcat((iOS ? "ios" : "osx"), projectName);
+	projectPath = pathConcat(project->yipDirectory()->path(), projectDir) + ".xcodeproj";
 
 	xcodeProject = std::make_shared<XCodeProject>();
 	xcodeProject->setOrganizationName("");									// FIXME: make configurable

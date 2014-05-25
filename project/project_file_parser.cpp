@@ -99,6 +99,7 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const std::st
 	if (!m_Stream.is_open() || m_Stream.fail() || m_Stream.bad())
 		throw std::runtime_error(fmt() << "unable to open file '" << filename << "'.");
 
+	m_CommandHandlers.insert(std::make_pair("project_name", &ProjectFileParser::parseProjectName));
 	m_CommandHandlers.insert(std::make_pair("sources", &ProjectFileParser::parseSources));
 	m_CommandHandlers.insert(std::make_pair("app_sources", &ProjectFileParser::parseAppSources));
 	m_CommandHandlers.insert(std::make_pair("public_headers", &ProjectFileParser::parsePublicHeaders));
@@ -208,6 +209,14 @@ void ProjectFileParser::doParse(const ProjectPtr & project, bool resolveImports)
 		}
 		break;
 	}
+}
+
+void ProjectFileParser::parseProjectName()
+{
+	if (getToken() != Token::Literal)
+		reportError(fmt() << "expected project name after 'project_name'.");
+	else
+		m_Project->setProjectName(m_TokenText);
 }
 
 void ProjectFileParser::parseSources()

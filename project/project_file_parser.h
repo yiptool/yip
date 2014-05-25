@@ -75,6 +75,7 @@ private:
 
 	void doParse(const ProjectPtr & project, bool resolveImports);
 
+	void parseProjectName();
 	void parseSources();
 	void parseAppSources();
 	void parsePublicHeaders();
