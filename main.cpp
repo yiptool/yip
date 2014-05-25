@@ -63,7 +63,6 @@ static void usage()
 	    "     By default, yip builds for the current platform. This can be overriden by\n"
 	    "     specifying one or more of the following options:\n"                     /*|*/
 	    "       -a, --android       Build for Android.\n"                             /*|*/
-	    "       -b, --build-only    Do not call `adb install` when building for Android.\n"
 	  #ifdef __APPLE__
 	    "       -i, --ios           Build for iOS.\n"                                 /*|*/
 	    "       -j, --ios-sym       Build for iOS simulator.\n"                       /*|*/
@@ -88,11 +87,16 @@ static void usage()
 	    "     build, add the following option to the command-line:\n"                 /*|*/
 	    "       -u, --update        Update imports.\n"                                /*|*/
 	    "\n"                                                                          /*|*/
+	    "     By default, when building for Android, yip attempts to install the\n"   /*|*/
+	    "     resulting APK file onto the connected device. If this is not the wanted\n"
+	    "     behavior, add the following option to the command-line:\n"              /*|*/
+	    "       -b, --build-only    Do not call `adb install` when building for Android.\n"
+	    "\n"                                                                          /*|*/
 	    " * generate (gen): Generate project file but do not build.\n"                /*|*/
 	    "\n"                                                                          /*|*/
 	    "     By default, yip generates project file for the current platform only.\n"/*|*/
 	    "     This can be overriden by specifying one or more of the following options:\n"
-	    "       -a, --android       Generate project for Android.\n"                  /*|*/
+	    "       -a, --android       Generate project files for Android.\n"            /*|*/
 //	    "       -c, --cmake         Generate project files for CMake.\n"              /*|*/
 	    "       -i, --ios           Generate XCode project for iOS.\n"                /*|*/
 	    "       -o, --osx           Generate XCode project for OSX" << apple_default << ".\n"
