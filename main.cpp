@@ -62,51 +62,52 @@ static void usage()
 	    "\n"                                                                          /*|*/
 	    "     By default, yip builds for the current platform. This can be overriden by\n"
 	    "     specifying one or more of the following options:\n"                     /*|*/
-	    "       -a, --android  Build for Android.\n"                                  /*|*/
+	    "       -a, --android       Build for Android.\n"                             /*|*/
+	    "       -b, --build-only    Do not call `adb install` when building for Android.\n"
 	  #ifdef __APPLE__
-	    "       -i, --ios      Build for iOS.\n"                                      /*|*/
-	    "       -j, --ios-sym  Build for iOS simulator.\n"                            /*|*/
+	    "       -i, --ios           Build for iOS.\n"                                 /*|*/
+	    "       -j, --ios-sym       Build for iOS simulator.\n"                       /*|*/
 	  #endif
-//	    "       -m, --mingw    Build for Windows using MinGW.\n"                      /*|*/
+//	    "       -m, --mingw         Build for Windows using MinGW.\n"                 /*|*/
 	  #ifdef __APPLE__
-	    "       -o, --osx      Build for OSX" << apple_default << ".\n"               /*|*/
+	    "       -o, --osx           Build for OSX" << apple_default << ".\n"          /*|*/
 	  #endif
-//	    "       -p, --pnacl    Build for PNaCl.\n"                                    /*|*/
-//	    "       -q, --qt       Build for Qt.\n"                                       /*|*/
-	    "       -t, --tizen    Build for Tizen.\n"                                    /*|*/
+//	    "       -p, --pnacl         Build for PNaCl.\n"                               /*|*/
+//	    "       -q, --qt            Build for Qt.\n"                                  /*|*/
+	    "       -t, --tizen         Build for Tizen.\n"                               /*|*/
 //	  #if defined(_WIN64) || defined(_WIN32)
-//	    "       -w, --winrt    Build for Windows.\n"                                  /*|*/
+//	    "       -w, --winrt         Build for Windows.\n"                             /*|*/
 //	  #endif
 	    "\n"                                                                          /*|*/
 	    "     By default, yip builds the debug build. To override this, one or more\n"/*|*/
 	    "     of the following options could be used:\n"                              /*|*/
-	    "       -d, --debug    Build the debug build.\n"                              /*|*/
-	    "       -r, --release  Build the release build.\n"                            /*|*/
+	    "       -d, --debug         Build the debug build.\n"                         /*|*/
+	    "       -r, --release       Build the release build.\n"                       /*|*/
 	    "\n"                                                                          /*|*/
 	    "     If you wish to download latest versions of imports before performing the\n"
 	    "     build, add the following option to the command-line:\n"                 /*|*/
-	    "       -u, --update   Update imports.\n"                                     /*|*/
+	    "       -u, --update        Update imports.\n"                                /*|*/
 	    "\n"                                                                          /*|*/
 	    " * generate (gen): Generate project file but do not build.\n"                /*|*/
 	    "\n"                                                                          /*|*/
 	    "     By default, yip generates project file for the current platform only.\n"/*|*/
 	    "     This can be overriden by specifying one or more of the following options:\n"
-	    "       -a, --android  Generate project for Android.\n"                       /*|*/
-//	    "       -c, --cmake    Generate project files for CMake.\n"                   /*|*/
-	    "       -i, --ios      Generate XCode project for iOS.\n"                     /*|*/
-	    "       -o, --osx      Generate XCode project for OSX" << apple_default << ".\n"
-//	    "       -p, --pnacl    Generate project files for PNaCl.\n"                   /*|*/
-	    "       -t, --tizen    Generate project files for Tizen.\n"                   /*|*/
-//	    "       -v, --vs2012   Generate project files for Visual Studio 2012.\n"      /*|*/
+	    "       -a, --android       Generate project for Android.\n"                  /*|*/
+//	    "       -c, --cmake         Generate project files for CMake.\n"              /*|*/
+	    "       -i, --ios           Generate XCode project for iOS.\n"                /*|*/
+	    "       -o, --osx           Generate XCode project for OSX" << apple_default << ".\n"
+//	    "       -p, --pnacl         Generate project files for PNaCl.\n"              /*|*/
+	    "       -t, --tizen         Generate project files for Tizen.\n"              /*|*/
+//	    "       -v, --vs2012        Generate project files for Visual Studio 2012.\n" /*|*/
 	    "\n"                                                                          /*|*/
 	    "     Yip will open the generated project file in the IDE after generating\n" /*|*/
 	    "     (except when generating multiple projects were requested). If this is not\n"
 	    "     intended, then the following option could be specified:\n"              /*|*/
-	    "       -n, --no-open  Do not open project file in the IDE.\n"                /*|*/
+	    "       -n, --no-open       Do not open project file in the IDE.\n"           /*|*/
 	    "\n"                                                                          /*|*/
 	    "     If you wish to download latest versions of imports before generating,\n"/*|*/
 	    "     add the following option to the command-line:\n"                        /*|*/
-	    "       -u, --update   Update imports.\n"                                     /*|*/
+	    "       -u, --update        Update imports.\n"                                /*|*/
 	    "\n"                                                                          /*|*/
 	    "     All generated project files are stored into the .yip subdirectory in your\n"
 	    "     source directory.\n"                                                    /*|*/
@@ -203,7 +204,7 @@ static bool runXCodeBuild(const std::string & projectFile, BuildType::Value buil
 }
 #endif
 
-static bool runAndroidBuild(const std::string & projectPath, BuildType::Value buildType)
+static bool runAndroidBuild(const std::string & projectPath, BuildType::Value buildType, bool install)
 {
 	std::vector<std::string> ndk_build_args;
 	std::vector<std::string> ant_args;
@@ -230,7 +231,9 @@ static bool runAndroidBuild(const std::string & projectPath, BuildType::Value bu
 		ss << "cd " + shellEscapeArgument(projectPath) << " && ";
 		ss << "android update project --path . && ";
 		ss << "ndk-build " << ndk_build_args[i] << " && ";
-		ss << "ant " << ant_args[i] << " install";
+		ss << " && ant " << ant_args[i];
+		if (install && i == ndk_build_args.size() - 1)
+			ss << " install";
 		shellExec(ss.str());
 	}
 
@@ -239,7 +242,7 @@ static bool runAndroidBuild(const std::string & projectPath, BuildType::Value bu
 
 static int build(int argc, char ** argv)
 {
-	bool update = false, buildIOS = false, buildIOSSimulator = false;
+	bool update = false, buildIOS = false, buildIOSSimulator = false, install = true;
 	BuildType::Value buildType = BuildType::Unspecified;
 	Platform::Type platform = Platform::None;
 
@@ -247,6 +250,8 @@ static int build(int argc, char ** argv)
 	{
 		if (argv[i][0] != '-')
 			throw std::runtime_error(fmt() << "invalid parameter '" << argv[i] << "'.");
+		else if (!strcmp(argv[i], "-b") || !strcmp(argv[i], "--build-only"))
+			install = false;
 		else if (!strcmp(argv[i], "-u") || !strcmp(argv[i], "--update"))
 			update = true;
 		else if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--debug"))
@@ -331,7 +336,7 @@ static int build(int argc, char ** argv)
 	if (platform & Platform::Android)
 	{
 		std::string projectPath = generateAndroid(project);
-		if (runAndroidBuild(projectPath, buildType))
+		if (runAndroidBuild(projectPath, buildType, install))
 			platform &= ~Platform::Android;
 		platform &= ~Platform::Android;
 	}
