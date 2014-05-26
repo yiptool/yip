@@ -79,12 +79,14 @@ Config::Config()
 
 	repos.insert(std::make_pair("amazon-aws-runtime", "https://github.com/yiptool/amazon-aws-runtime.git"));
 	repos.insert(std::make_pair("amazon-aws-s3", "https://github.com/yiptool/amazon-aws-s3.git"));
+	repos.insert(std::make_pair("android-jni-util", "https://github.com/yiptool/android-jni-util.git"));
 	repos.insert(std::make_pair("box2d-debug-renderer", "https://github.com/yiptool/box2d-debug-renderer.git"));
 	repos.insert(std::make_pair("cxx-util", "https://github.com/yiptool/cxx-util.git"));
 	repos.insert(std::make_pair("facebook-sdk", "https://github.com/yiptool/facebook-sdk.git"));
 	repos.insert(std::make_pair("game-main", "https://github.com/yiptool/game-main.git"));
 	repos.insert(std::make_pair("gles2", "https://github.com/yiptool/gles2.git"));
 	repos.insert(std::make_pair("gles2-util", "https://github.com/yiptool/gles2-util.git"));
+	repos.insert(std::make_pair("jni-util", "https://github.com/yiptool/jni-util.git"));
 	repos.insert(std::make_pair("ios-util", "https://github.com/yiptool/ios-util.git"));
 	repos.insert(std::make_pair("math", "https://github.com/yiptool/math.git"));
 	repos.insert(std::make_pair("parse-com", "https://github.com/yiptool/parse-com.git"));
