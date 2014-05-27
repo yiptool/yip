@@ -137,6 +137,13 @@ void Project::iosAddLaunchImage(ImageSize size, const std::string & path)
 		throw std::runtime_error("duplicate launch image of the same size.");
 }
 
+void Project::iosAddViewController(const IOSViewController & cntrl)
+{
+	if (!m_IOSViewControllerNames.insert(cntrl.name).second)
+		throw std::runtime_error(fmt() << "duplicate iOS view controller '" << cntrl.name << "'.");
+	m_IOSViewControllers.push_back(cntrl);
+}
+
 void Project::tizenAddPrivilege(const std::string & url)
 {
 	m_TizenPrivileges.insert(url);

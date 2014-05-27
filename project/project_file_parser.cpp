@@ -792,6 +792,85 @@ void ProjectFileParser::parseIOSorOSX()
 
 		return;
 	}
+	else if (m_TokenText == "view_controller" && iOS)
+	{
+		std::unordered_set<std::string> sourceFiles;
+		Project::IOSViewController cntrl;
+
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected view controller name after '" << prefix << ":view_controller'."); return; }
+		cntrl.name = m_TokenText;
+
+		if (getToken() != Token::Literal)
+			{ reportError("expected parent view controller name."); return; }
+		cntrl.parentClass = m_TokenText;
+
+		if (getToken() != Token::LCurly)
+			{ reportError("expected '{'."); return; }
+		for (;;)
+		{
+			if (getToken() != Token::Literal)
+				{ reportError("expected device family/orientation name."); return; }
+
+			SourceFilePtr * target = nullptr;
+			if (m_TokenText == "iphone_portrait")
+				target = &cntrl.iphonePortrait;
+			else if (m_TokenText == "iphone_landscape")
+				target = &cntrl.iphoneLandscape;
+			else if (m_TokenText == "ipad_portrait")
+				target = &cntrl.ipadPortrait;
+			else if (m_TokenText == "ipad_landscape")
+				target = &cntrl.ipadLandscape;
+			else
+				{ reportError(fmt() << "invalid device family/orientation name '" << m_TokenText << "'."); }
+
+			if (target->get() != nullptr)
+				{ reportError(fmt() << "duplicate family/orientation '" << m_TokenText << "'."); }
+
+			if (getToken() != Token::Arrow)
+				{ reportError("expected '=>'."); return; }
+
+			if (getToken() != Token::Literal)
+				{ reportError("expected XML file name."); return; }
+
+			std::string name = m_TokenText;
+			std::string path = pathMakeAbsolute(name, m_ProjectPath);
+			if (sourceFiles.insert(path).second)
+			{
+				try {
+					*target = m_Project->addSourceFile(name, path);
+					(*target)->setPlatforms(Platform::iOS);
+					(*target)->setFileType(FILE_TEXT_XML);
+				} catch (const Error &) {
+					throw;
+				} catch (const std::exception & e) {
+					reportWarning(e.what());
+				}
+			}
+
+			switch (getToken())
+			{
+			case Token::RCurly:
+				break;
+			case Token::Comma:
+				continue;
+			default:
+				reportError("expected '}'.");
+				return;
+			}
+			break;
+		}
+
+		try {
+			m_Project->iosAddViewController(cntrl);
+		} catch (const Error &) {
+			throw;
+		} catch (const std::exception & e) {
+			reportWarning(e.what());
+		}
+
+		return;
+	}
 
 	reportError(fmt() << "invalid variable '" << prefix << ":" << m_TokenText << "'.");
 }

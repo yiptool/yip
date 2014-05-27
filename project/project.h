@@ -30,6 +30,7 @@
 #include "../util/git.h"
 #include <vector>
 #include <map>
+#include <unordered_set>
 #include <set>
 #include <algorithm>
 #include <memory>
@@ -54,6 +55,16 @@ public:
 		IMAGESIZE_LAUNCH_IPHONE5_RETINA,		// 640x1136
 		IMAGESIZE_LAUNCH_IPAD_PORTRAIT,			// 768x1024
 		IMAGESIZE_LAUNCH_IPAD_PORTRAIT_RETINA,	// 1536x2048
+	};
+
+	struct IOSViewController
+	{
+		std::string name;
+		std::string parentClass;
+		SourceFilePtr iphonePortrait;
+		SourceFilePtr iphoneLandscape;
+		SourceFilePtr ipadPortrait;
+		SourceFilePtr ipadLandscape;
 	};
 
 	Project(const std::string & prjPath);
@@ -147,6 +158,9 @@ public:
 	inline void iosSetDeploymentTarget(const std::string & target) { m_IOSDeploymentTarget = target; }
 	inline const std::string & iosDeploymentTarget() const { return m_IOSDeploymentTarget; }
 
+	void iosAddViewController(const IOSViewController & cntrl);
+	inline const std::vector<IOSViewController> & iosViewControllers() const { return m_IOSViewControllers; }
+
 	// Android
 
 	inline void androidSetTarget(const std::string & target) { m_AndroidTarget = target; }
@@ -204,6 +218,8 @@ private:
 	std::map<std::string, std::string> m_OSXFrameworks;
 	std::map<std::string, std::string> m_IOSFrameworks;
 	std::map<ImageSize, std::string> m_OSXIcons;
+	std::vector<IOSViewController> m_IOSViewControllers;
+	std::unordered_set<std::string> m_IOSViewControllerNames;
 	std::map<ImageSize, std::string> m_IOSIcons;
 	std::map<ImageSize, std::string> m_IOSLaunchImages;
 	std::set<std::string> m_IOSFonts;

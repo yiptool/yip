@@ -25,6 +25,7 @@
 #include "project/generate_android.h"
 #include "project/generate_tizen.h"
 #include "project/resource_compiler.h"
+#include "project/ui_compiler.h"
 #include "3rdparty/libgit2/include/git2/threads.h"
 #include "xcode/xcode_unique_id.h"
 #include "util/fmt.h"
@@ -304,6 +305,7 @@ static int build(int argc, char ** argv)
 		return 1;
 
 	project->generateLicenseData();
+	compileUI(project);
 	compileResources(project);
 
 	if (platform & Platform::OSX)
@@ -402,6 +404,7 @@ static int generate(int argc, char ** argv)
 		return 1;
 
 	project->generateLicenseData();
+	compileUI(project);
 	compileResources(project);
 
 	size_t numPlatforms = 0;
@@ -502,6 +505,7 @@ static int xcodePrebuild(int argc, char ** argv)
 		return 1;
 
 	project->generateLicenseData();
+	compileUI(project);
 	compileResources(project);
 
 	bool changed = false;

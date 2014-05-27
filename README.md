@@ -164,6 +164,22 @@ Please note that there is a
 [convenient cross-platform library](https://github.com/zapolnov/yip-resources)
 for resource loading.
 
+### User interface declarations
+
+Yip is able to generate source code for user interface on various platforms.
+User interface layout is described in XML files.
+
+To generate a descendant of `UIViewController` for iOS from the given XML file,
+use the `ios:view_controller` directive:
+
+      ios:view_controller MyViewController UIViewController
+      {
+         iphone_portrait => ui/iphone_portrait.xml,
+         iphone_landscape => ui/iphone_landscape.xml,
+         ipad_portrait => ui/ipad_portrait.xml,
+         ipad_landscape => ui/ipad_landscape.xml
+      }
+
 ### Application source files
 
 Source files specified in the `source` directive are compiled both when project
