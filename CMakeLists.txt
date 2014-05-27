@@ -27,6 +27,7 @@ ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/libpng")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/inih")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/sqlite3")
 ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/lua")
+ADD_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/tinyxml")
 
 FETCH_SUBMODULE("${CMAKE_SOURCE_DIR}/3rdparty/dirent" "include/dirent")
 

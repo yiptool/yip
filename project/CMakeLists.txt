@@ -25,3 +25,5 @@ ADD_LIBRARY(project STATIC
 	yip_directory.cpp
 	yip_directory.h
 )
+
+TARGET_LINK_LIBRARIES(project tinyxml)

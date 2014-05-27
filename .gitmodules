@@ -31,3 +31,6 @@
 [submodule "util/cxx-util"]
 	path = util/cxx-util
 	url = https://github.com/yiptool/cxx-util.git
+[submodule "3rdparty/tinyxml"]
+	path = 3rdparty/tinyxml
+	url = https://github.com/oss-forks/tinyxml.git
