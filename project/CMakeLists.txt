@@ -20,10 +20,6 @@ ADD_LIBRARY(project STATIC
 	resource_compiler.h
 	source_file.cpp
 	source_file.h
-	ui_compiler.cpp
-	ui_compiler.h
 	yip_directory.cpp
 	yip_directory.h
 )
-
-TARGET_LINK_LIBRARIES(project tinyxml-util tinyxml)

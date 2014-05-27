@@ -21,6 +21,8 @@
 // THE SOFTWARE.
 //
 #include "ui_compiler.h"
+#include "../3rdparty/tinyxml/tinyxml.h"
+#include "../util/tinyxml-util/tinyxml-util.h"
 #include "../util/path.h"
 #include "../util/sha1.h"
 #include <string>

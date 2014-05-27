@@ -23,7 +23,7 @@
 #ifndef __ce3285bffeb3da6e8614f2cdfcde12e2__
 #define __ce3285bffeb3da6e8614f2cdfcde12e2__
 
-#include "project.h"
+#include "../project/project.h"
 
 void compileUI(const ProjectPtr & project);
 

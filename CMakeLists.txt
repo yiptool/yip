@@ -69,6 +69,7 @@ ENDIF()
 ADD_SUBDIRECTORY(util)
 ADD_SUBDIRECTORY(project)
 ADD_SUBDIRECTORY(xcode)
+ADD_SUBDIRECTORY(ui_compiler)
 
 ADD_EXECUTABLE(yip
 	config.cpp
@@ -76,6 +77,6 @@ ADD_EXECUTABLE(yip
 	main.cpp
 )
 
-TARGET_LINK_LIBRARIES(yip project xcode util inih libgit2 libpng sqlite3 lua)
+TARGET_LINK_LIBRARIES(yip project xcode util inih libgit2 libpng sqlite3 lua ui_compiler)
 
 INSTALL(TARGETS yip RUNTIME DESTINATION "bin")
