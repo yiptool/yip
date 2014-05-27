@@ -180,6 +180,8 @@ use the `ios:view_controller` directive:
          ipad_landscape => ui/ipad_landscape.xml
       }
 
+For more information see [User interface layout file format](README_LAYOUT.md)
+
 ### Application source files
 
 Source files specified in the `source` directive are compiled both when project

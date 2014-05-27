@@ -25,6 +25,7 @@
 #include "../util/image.h"
 #include "../util/fmt.h"
 #include "../util/path.h"
+#include <unordered_map>
 #include <cassert>
 #include <stdexcept>
 #include <sstream>
@@ -794,7 +795,7 @@ void ProjectFileParser::parseIOSorOSX()
 	}
 	else if (m_TokenText == "view_controller" && iOS)
 	{
-		std::unordered_set<std::string> sourceFiles;
+		std::unordered_map<std::string, SourceFilePtr> sourceFiles;
 		Project::IOSViewController cntrl;
 
 		if (getToken() != Token::Literal)
@@ -835,7 +836,11 @@ void ProjectFileParser::parseIOSorOSX()
 
 			std::string name = m_TokenText;
 			std::string path = pathMakeAbsolute(name, m_ProjectPath);
-			if (sourceFiles.insert(path).second)
+
+			auto it = sourceFiles.find(path);
+			if (it != sourceFiles.end())
+				*target = it->second;
+			else
 			{
 				try {
 					*target = m_Project->addSourceFile(name, path);
@@ -846,6 +851,7 @@ void ProjectFileParser::parseIOSorOSX()
 				} catch (const std::exception & e) {
 					reportWarning(e.what());
 				}
+				sourceFiles.insert(std::make_pair(path, *target));
 			}
 
 			switch (getToken())
