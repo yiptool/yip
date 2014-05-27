@@ -21,11 +21,17 @@
 // THE SOFTWARE.
 //
 #include "ui_widget.h"
+#include "ui_layout.h"
+#include "ui_group.h"
+#include "ui_button.h"
+#include "ui_label.h"
+#include "ui_image.h"
 #include "../util/tinyxml-util/tinyxml-util.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 
-UIWidget::UIWidget()
-	: m_BackgroundColor(UIColor::clear),
+UIWidget::UIWidget(UILayout * layout)
+	: m_Layout(layout),
+	  m_BackgroundColor(UIColor::clear),
 	  m_X(0.0f),
 	  m_Y(0.0f),
 	  m_Width(0.0f),
@@ -41,6 +47,20 @@ UIWidget::~UIWidget()
 {
 }
 
+UIWidgetPtr UIWidget::create(UILayout * layout, const std::string & className)
+{
+	if (className == "group")
+		return std::make_shared<UIGroup>(layout);
+	else if (className == "button")
+		return std::make_shared<UIButton>(layout);
+	else if (className == "label")
+		return std::make_shared<UILabel>(layout);
+	else if (className == "image")
+		return std::make_shared<UIImage>(layout);
+
+	throw std::runtime_error(fmt() << "invalid widget class '" << className << "'.");
+}
+
 void UIWidget::parse(const TiXmlElement * element)
 {
 	bool hasXScale = false, hasYScale = false, hasWidthScale = false, hasHeightScale = false, hasID = false;
@@ -53,6 +73,8 @@ void UIWidget::parse(const TiXmlElement * element)
 		if (name == "id")
 		{
 			m_ID = attr->ValueStr();
+			if (!m_Layout->m_WidgetMap.insert(std::make_pair(m_ID, shared_from_this())).second)
+				throw std::runtime_error(xmlError(attr, fmt() << "duplicate id '" << m_ID << "'."));
 			hasID = true;
 		}
 		else if (name == "bgcolor")
@@ -177,15 +199,15 @@ void UIWidget::parse(const TiXmlElement * element)
 	afterParseAttributes(element);
 }
 
-void beforeParseAttributes(const TiXmlElement *)
+void UIWidget::beforeParseAttributes(const TiXmlElement *)
 {
 }
 
-bool parseAttribute(const TiXmlAttribute *)
+bool UIWidget::parseAttribute(const TiXmlAttribute *)
 {
 	return false;
 }
 
-void afterParseAttributes(const TiXmlElement *)
+void UIWidget::afterParseAttributes(const TiXmlElement *)
 {
 }

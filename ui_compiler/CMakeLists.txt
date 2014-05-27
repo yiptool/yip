@@ -1,9 +1,19 @@
 
 ADD_LIBRARY(ui_compiler STATIC
+	ui_button.cpp
+	ui_button.h
 	ui_color.cpp
 	ui_color.h
 	ui_compiler.cpp
 	ui_compiler.h
+	ui_group.cpp
+	ui_group.h
+	ui_image.cpp
+	ui_image.h
+	ui_label.cpp
+	ui_label.h
+	ui_layout.cpp
+	ui_layout.h
 	ui_scale_mode.cpp
 	ui_scale_mode.h
 	ui_widget.cpp

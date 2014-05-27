@@ -29,14 +29,20 @@
 #include <string>
 #include <memory>
 
-class UIWidget
+class UILayout;
+
+class UIWidget;
+typedef std::shared_ptr<UIWidget> UIWidgetPtr;
+
+class UIWidget : public std::enable_shared_from_this<UIWidget>
 {
 public:
-	UIWidget();
+	UIWidget(UILayout * layout);
 	~UIWidget();
 
-	void parse(const TiXmlElement * element);
+	static UIWidgetPtr create(UILayout * layout, const std::string & className);
 
+	inline UILayout * layout() const { return m_Layout; }
 	inline const std::string & id() const { return m_ID; }
 
 	inline const UIColor & backgroundColor() const { return m_BackgroundColor; }
@@ -51,12 +57,15 @@ public:
 	inline UIScaleMode widthScaleMode() const { return m_WidthScaleMode; }
 	inline UIScaleMode heightScaleMode() const { return m_HeightScaleMode; }
 
+	void parse(const TiXmlElement * element);
+
 protected:
 	virtual void beforeParseAttributes(const TiXmlElement * element);
 	virtual bool parseAttribute(const TiXmlAttribute * attr);
 	virtual void afterParseAttributes(const TiXmlElement * element);
 
 private:
+	UILayout * m_Layout;
 	std::string m_ID;
 	UIColor m_BackgroundColor;
 	float m_X;
@@ -71,7 +80,5 @@ private:
 	UIWidget(const UIWidget &) = delete;
 	UIWidget & operator=(const UIWidget &) = delete;
 };
-
-typedef std::shared_ptr<UIWidget> UIWidgetPtr;
 
 #endif
