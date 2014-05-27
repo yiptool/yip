@@ -1,6 +1,8 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
+ADD_DEFINITIONS(-DBUILDING_YIP)
+
 ##################################################################################################################
 ## 3rdparty libraries
 

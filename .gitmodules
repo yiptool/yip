@@ -34,3 +34,9 @@
 [submodule "3rdparty/tinyxml"]
 	path = 3rdparty/tinyxml
 	url = https://github.com/oss-forks/tinyxml.git
+[submodule "util/tinyxml-util"]
+	path = util/tinyxml-util
+	url = https://github.com/yiptool/tinyxml-util.git
+[submodule "util/strtod"]
+	path = util/strtod
+	url = https://github.com/oss-forks/strtod.git
