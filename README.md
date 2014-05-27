@@ -187,6 +187,14 @@ project is build. There is an 'app_defines' directive:
          BUILDING_APP
       }
 
+Moreover, it is possible to specify resources to be included only when project
+is build. There is an 'app_resources' directive:
+
+      app_resources
+      {
+         resource_file1.pak
+      }
+
 ### Libraries on Microsoft Windows
 
 Libraries on Microsoft Windows could be linked using the `winrt:library`

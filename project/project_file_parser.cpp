@@ -107,6 +107,7 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const std::st
 	m_CommandHandlers.insert(std::make_pair("app_defines", &ProjectFileParser::parseAppDefines));
 	m_CommandHandlers.insert(std::make_pair("import", &ProjectFileParser::parseImport));
 	m_CommandHandlers.insert(std::make_pair("resources", &ProjectFileParser::parseResources));
+	m_CommandHandlers.insert(std::make_pair("app_resources", &ProjectFileParser::parseAppResources));
 	m_CommandHandlers.insert(std::make_pair("winrt", &ProjectFileParser::parseWinRT));
 	m_CommandHandlers.insert(std::make_pair("ios", &ProjectFileParser::parseIOSorOSX));
 	m_CommandHandlers.insert(std::make_pair("osx", &ProjectFileParser::parseIOSorOSX));
@@ -463,6 +464,46 @@ void ProjectFileParser::parseResources()
 			throw;
 		} catch (const std::exception & e) {
 			reportWarning(e.what());
+		}
+
+		getToken();
+	}
+
+	if (m_Token != Token::RCurly)
+		reportError("expected '}'.");
+}
+
+void ProjectFileParser::parseAppResources()
+{
+	Platform::Type platforms = m_DefaultPlatformMask;
+	if (getToken() == Token::Colon)
+	{
+		getToken();
+		platforms = parsePlatformMask();
+	}
+
+	if (m_Token != Token::LCurly)
+		{ reportError("expected '{'."); return; }
+
+	getToken();
+	while (m_Token != Token::RCurly && m_Token != Token::Eof)
+	{
+		if (m_Token != Token::Literal)
+			{ reportError("expected file name."); return; }
+
+		std::string name = m_TokenText;
+		std::string path = pathMakeAbsolute(name, m_ProjectPath);
+
+		if (m_PathPrefix.length() == 0)
+		{
+			try {
+				SourceFilePtr sourceFile = m_Project->addResourceFile(name, path);
+				sourceFile->setPlatforms(platforms);
+			} catch (const Error &) {
+				throw;
+			} catch (const std::exception & e) {
+				reportWarning(e.what());
+			}
 		}
 
 		getToken();
