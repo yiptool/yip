@@ -101,7 +101,7 @@ static std::string iosClassForWidget(UIWidget::Kind kind)
 	{
 	case UIWidget::Group: return "UIView";
 	case UIWidget::Label: return "UILabel";
-	case UIWidget::Image: return "UIImage";
+	case UIWidget::Image: return "UIImageView";
 	case UIWidget::Button: return "UIButton";
 	}
 
@@ -173,7 +173,7 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 		for (auto it : widgetKinds)
 		{
 			sh << "@property (nonatomic, readonly, retain) " << iosClassForWidget(it.second)
-				<< ' ' << it.first << ";\n";
+				<< " * " << it.first << ";\n";
 		}
 		sh << "-(id)init;\n";
 		sh << "-(void)dealloc;\n";
