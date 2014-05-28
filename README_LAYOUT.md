@@ -21,11 +21,13 @@ The following widgets are available:
 
 The following attributes are available for all widgets and groups:
 
-  * `id`: unique ID of the widget - **this attribute is mandatory**.
+  * `id`: unique ID of the widget.
   * `bgcolor`: background color of the widget.
   * `pos`: X and Y coordinates of the top left corner of the widget, relative to it's parent group.
   * `size`: width and height of the widget.
   * `scale`: scale mode.
+  * `align`: alignment of widget after applying scale (this is only meaningful when scale mode is not
+  `default`).
 
 ### Unique ID
 
@@ -88,3 +90,26 @@ The following values are available for the scale mode:
   * `horz`: use horizontal scale ratio.
   * `vert`: use vertical scale ratio.
   * `avg`: use an average of horizontal and vertical scale ratio.
+
+### Alignment
+
+When scaling is applied to the widget and scale mode is not `default`, widget size will differ from
+the size of the area allocated for it. In this case, position of the widget inside of this area can
+be specified with the `align` attribute.
+
+Alignment is a comma-separated list of one or more of the following values:
+
+  * `hcenter`: center widget horizontally.
+  * `left`: bind left side of the widget to the left side of the allocated area.
+  * `right`: bind right side of the widget to the right side of the allocated area.
+  * `vcenter`: center widget vertically.
+  * `top`: bind top side of the widget to the top side of the allocated area.
+  * `bottom`: bind bottom side of the widget to the bottom side of the allocated area.
+
+Also the following shortcuts are available:
+
+  * `center` is the same as `vcenter,hcenter`
+  * `tl` is the same as `top,left`
+  * `bl` is the same as `bottom,left`
+  * `tr` is the same as `top,right`
+  * `br` is the same as `bottom,right`

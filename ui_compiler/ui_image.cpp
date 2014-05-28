@@ -25,7 +25,7 @@
 #include "../util/cxx-util/cxx-util/fmt.h"
 
 UIImage::UIImage(UILayout * layout)
-	: UIWidget(layout)
+	: UIWidget(layout, UIWidget::Image)
 {
 }
 

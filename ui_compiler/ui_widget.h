@@ -25,6 +25,7 @@
 
 #include "ui_scale_mode.h"
 #include "ui_color.h"
+#include "ui_alignment.h"
 #include "../3rdparty/tinyxml/tinyxml.h"
 #include <string>
 #include <memory>
@@ -37,12 +38,22 @@ typedef std::shared_ptr<UIWidget> UIWidgetPtr;
 class UIWidget : public std::enable_shared_from_this<UIWidget>
 {
 public:
-	UIWidget(UILayout * layout);
+	enum Kind
+	{
+		Group = 0,
+		Label,
+		Image,
+		Button
+	};
+
+	UIWidget(UILayout * layout, Kind kind);
 	~UIWidget();
 
 	static UIWidgetPtr create(UILayout * layout, const std::string & className);
 
 	inline UILayout * layout() const { return m_Layout; }
+
+	inline Kind kind() const { return m_Kind; }
 	inline const std::string & id() const { return m_ID; }
 
 	inline const UIColor & backgroundColor() const { return m_BackgroundColor; }
@@ -57,6 +68,8 @@ public:
 	inline UIScaleMode widthScaleMode() const { return m_WidthScaleMode; }
 	inline UIScaleMode heightScaleMode() const { return m_HeightScaleMode; }
 
+	inline UIAlignment alignment() const { return m_Alignment; }
+
 	void parse(const TiXmlElement * element);
 
 protected:
@@ -66,6 +79,7 @@ protected:
 
 private:
 	UILayout * m_Layout;
+	Kind m_Kind;
 	std::string m_ID;
 	UIColor m_BackgroundColor;
 	float m_X;
@@ -76,6 +90,7 @@ private:
 	UIScaleMode m_YScaleMode;
 	UIScaleMode m_WidthScaleMode;
 	UIScaleMode m_HeightScaleMode;
+	UIAlignment m_Alignment;
 
 	UIWidget(const UIWidget &) = delete;
 	UIWidget & operator=(const UIWidget &) = delete;

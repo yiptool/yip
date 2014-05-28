@@ -25,7 +25,7 @@
 #include "../util/cxx-util/cxx-util/fmt.h"
 
 UIGroup::UIGroup(UILayout * layout)
-	: UIWidget(layout)
+	: UIWidget(layout, UIWidget::Group)
 {
 }
 

@@ -383,7 +383,10 @@ void Gen::initDebugConfiguration()
 		cfgTargetDebug->setCombineHiDpiImages(true);
 	else
 		cfgTargetDebug->setAssetCatalogLaunchImageName("LaunchImage");
+
 	cfgTargetDebug->addHeaderSearchPath(pathConcat(project->yipDirectory()->path(), ".yip-import-proxies"));
+	if (iOS)
+		cfgTargetDebug->addHeaderSearchPath(pathConcat(project->yipDirectory()->path(), ".yip-ios-view-controllers"));
 
 	for (auto it : project->headerPaths())
 	{
@@ -429,7 +432,10 @@ void Gen::initReleaseConfiguration()
 		cfgTargetRelease->setCombineHiDpiImages(true);
 	else
 		cfgTargetRelease->setAssetCatalogLaunchImageName("LaunchImage");
+
 	cfgTargetRelease->addHeaderSearchPath(pathConcat(project->yipDirectory()->path(), ".yip-import-proxies"));
+	if (iOS)
+		cfgTargetRelease->addHeaderSearchPath(pathConcat(project->yipDirectory()->path(), ".yip-ios-view-controllers"));
 
 	for (auto it : project->headerPaths())
 	{

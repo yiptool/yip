@@ -20,20 +20,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "ui_button.h"
-#include "../util/tinyxml-util/tinyxml-util.h"
-#include "../util/cxx-util/cxx-util/fmt.h"
+#ifndef __93225bb9bf181ba8e83876676b936577__
+#define __93225bb9bf181ba8e83876676b936577__
 
-UIButton::UIButton(UILayout * layout)
-	: UIWidget(layout, UIWidget::Button)
-{
-}
+#include "../3rdparty/tinyxml/tinyxml.h"
+#include <string>
 
-UIButton::~UIButton()
+enum UIAlignment
 {
-}
+	UIAlignUnspecified = 0,
+	UIAlignLeft = 0x01,
+	UIAlignRight = 0x02,
+	UIAlignHCenter = 0x03,
+	UIAlignTop = 0x10,
+	UIAlignBottom = 0x20,
+	UIAlignVCenter = 0x30,
 
-bool UIButton::parseAttribute(const TiXmlAttribute *)
-{
-	return false;
-}
+	UIAlignTopLeft = UIAlignTop | UIAlignLeft,
+	UIAlignTopRight = UIAlignTop | UIAlignRight,
+	UIAlignBottomLeft = UIAlignBottom | UIAlignLeft,
+	UIAlignBottomRight = UIAlignBottom | UIAlignRight,
+	UIAlignCenter = UIAlignHCenter | UIAlignVCenter,
+
+	UIAlignHorizontalMask = 0x03,
+	UIAlignVerticalMask = 0x30,
+};
+
+UIAlignment uiAlignmentFromString(const std::string & str);
+UIAlignment uiAlignmentFromAttr(const TiXmlAttribute * attr);
+
+#endif

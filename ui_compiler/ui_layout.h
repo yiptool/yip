@@ -26,6 +26,7 @@
 #include "ui_widget.h"
 #include <string>
 #include <vector>
+#include <memory>
 #include <unordered_map>
 
 class UILayout
@@ -37,9 +38,13 @@ public:
 	inline float width() const { return m_Width; }
 	inline float height() const { return m_Height; }
 
+	inline const std::unordered_map<std::string, UIWidgetPtr> & widgetMap() const { return m_WidgetMap; }
+	UIWidgetPtr widgetForID(const std::string & id) const;
+
 	void parse(const TiXmlDocument * doc);
 
 private:
+	size_t m_NextUniqueID;
 	std::vector<UIWidgetPtr> m_Widgets;
 	std::unordered_map<std::string, UIWidgetPtr> m_WidgetMap;
 	float m_Width;
@@ -50,5 +55,7 @@ private:
 
 	friend class UIWidget;
 };
+
+typedef std::shared_ptr<UILayout> UILayoutPtr;
 
 #endif

@@ -29,8 +29,10 @@
 #include "../util/tinyxml-util/tinyxml-util.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 
-UIWidget::UIWidget(UILayout * layout)
+UIWidget::UIWidget(UILayout * layout, Kind kind)
 	: m_Layout(layout),
+	  m_Kind(kind),
+	  m_ID(fmt() << "_widget" << m_Layout->m_NextUniqueID++),
 	  m_BackgroundColor(UIColor::clear),
 	  m_X(0.0f),
 	  m_Y(0.0f),
@@ -39,7 +41,8 @@ UIWidget::UIWidget(UILayout * layout)
 	  m_XScaleMode(UIScaleDefault),
 	  m_YScaleMode(UIScaleDefault),
 	  m_WidthScaleMode(UIScaleDefault),
-	  m_HeightScaleMode(UIScaleDefault)
+	  m_HeightScaleMode(UIScaleDefault),
+	  m_Alignment(UIAlignUnspecified)
 {
 }
 
@@ -63,7 +66,7 @@ UIWidgetPtr UIWidget::create(UILayout * layout, const std::string & className)
 
 void UIWidget::parse(const TiXmlElement * element)
 {
-	bool hasXScale = false, hasYScale = false, hasWidthScale = false, hasHeightScale = false, hasID = false;
+	bool hasXScale = false, hasYScale = false, hasWidthScale = false, hasHeightScale = false;
 
 	beforeParseAttributes(element);
 
@@ -75,7 +78,6 @@ void UIWidget::parse(const TiXmlElement * element)
 			m_ID = attr->ValueStr();
 			if (!m_Layout->m_WidgetMap.insert(std::make_pair(m_ID, shared_from_this())).second)
 				throw std::runtime_error(xmlError(attr, fmt() << "duplicate id '" << m_ID << "'."));
-			hasID = true;
 		}
 		else if (name == "bgcolor")
 			m_BackgroundColor = UIColor::fromAttr(attr);
@@ -186,15 +188,14 @@ void UIWidget::parse(const TiXmlElement * element)
 			hasWidthScale = true;
 			hasHeightScale = true;
 		}
+		else if (name == "align")
+			m_Alignment = uiAlignmentFromAttr(attr);
 		else
 		{
 			if (!parseAttribute(attr))
 				throw std::runtime_error(xmlError(attr, fmt() << "unknown attribute '" << name << "'."));
 		}
 	}
-
-	if (!hasID)
-		throw std::runtime_error(xmlMissingAttribute(element, "id"));
 
 	afterParseAttributes(element);
 }

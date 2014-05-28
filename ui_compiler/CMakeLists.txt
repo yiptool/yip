@@ -1,5 +1,7 @@
 
 ADD_LIBRARY(ui_compiler STATIC
+	ui_alignment.cpp
+	ui_alignment.h
 	ui_button.cpp
 	ui_button.h
 	ui_color.cpp

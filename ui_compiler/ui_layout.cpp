@@ -24,13 +24,22 @@
 #include "../util/tinyxml-util/tinyxml-util.h"
 
 UILayout::UILayout()
-	: m_Width(0.0f),
+	: m_NextUniqueID(1),
+	  m_Width(0.0f),
 	  m_Height(0.0f)
 {
 }
 
 UILayout::~UILayout()
 {
+}
+
+UIWidgetPtr UILayout::widgetForID(const std::string & id) const
+{
+	auto it = m_WidgetMap.find(id);
+	if (it != m_WidgetMap.end())
+		return it->second;
+	return UIWidgetPtr();
 }
 
 void UILayout::parse(const TiXmlDocument * doc)

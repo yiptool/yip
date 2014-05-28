@@ -20,20 +20,57 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "ui_button.h"
+#include "ui_alignment.h"
 #include "../util/tinyxml-util/tinyxml-util.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
+#include <stdexcept>
+#include <unordered_map>
 
-UIButton::UIButton(UILayout * layout)
-	: UIWidget(layout, UIWidget::Button)
+static const std::unordered_map<std::string, UIAlignment> g_AlignmentNames = {
+	{ "left", UIAlignLeft },
+	{ "right", UIAlignRight },
+	{ "hcenter", UIAlignHCenter },
+	{ "top", UIAlignTop },
+	{ "bottom", UIAlignBottom },
+	{ "vcenter", UIAlignVCenter },
+	{ "tl", UIAlignTopLeft },
+	{ "tr", UIAlignTopRight },
+	{ "bl", UIAlignBottomLeft },
+	{ "br", UIAlignBottomRight },
+	{ "center", UIAlignCenter },
+};
+
+UIAlignment uiAlignmentFromString(const std::string & str)
 {
+	UIAlignment align = UIAlignUnspecified;
+	size_t off, pos = 0;
+
+	do
+	{
+		off = str.find(',', pos);
+		std::string name = (off != std::string::npos ? str.substr(pos, off - pos) : str.substr(pos));
+
+		auto it = g_AlignmentNames.find(name);
+		if (it == g_AlignmentNames.end())
+			throw std::runtime_error(fmt() << "invalid alignment '" << name << "'.");
+
+		align = static_cast<UIAlignment>(align | it->second);
+
+		pos = off + 1;
+	}
+	while (off != std::string::npos);
+
+	return align;
 }
 
-UIButton::~UIButton()
+UIAlignment uiAlignmentFromAttr(const TiXmlAttribute * attr)
 {
-}
-
-bool UIButton::parseAttribute(const TiXmlAttribute *)
-{
-	return false;
+	try
+	{
+		return uiAlignmentFromString(attr->ValueStr());
+	}
+	catch (const std::exception & e)
+	{
+		throw std::runtime_error(xmlError(attr, e.what()));
+	}
 }
