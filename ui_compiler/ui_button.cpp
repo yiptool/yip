@@ -33,6 +33,10 @@ UIButton::~UIButton()
 {
 }
 
+void UIButton::iosGenerateInitCode(std::stringstream & ss)
+{
+}
+
 bool UIButton::parseAttribute(const TiXmlAttribute *)
 {
 	return false;

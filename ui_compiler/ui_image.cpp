@@ -33,6 +33,10 @@ UIImage::~UIImage()
 {
 }
 
+void UIImage::iosGenerateInitCode(std::stringstream & ss)
+{
+}
+
 bool UIImage::parseAttribute(const TiXmlAttribute *)
 {
 	return false;

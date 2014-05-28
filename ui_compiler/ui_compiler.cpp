@@ -33,8 +33,20 @@
 #include <iostream>
 #include <sstream>
 
+namespace
+{
+	struct WidgetInfo
+	{
+		UIWidget::Kind kind;
+		UIWidgetPtr iphonePortrait;
+		UIWidgetPtr iphoneLandscape;
+		UIWidgetPtr ipadPortrait;
+		UIWidgetPtr ipadLandscape;
+	};
+}
+
 typedef std::unordered_map<SourceFilePtr, UILayoutPtr> LayoutMap;
-typedef std::unordered_map<std::string, UIWidget::Kind> WidgetKinds;
+typedef std::unordered_map<std::string, WidgetInfo> WidgetInfos;
 
 static UILayoutPtr uiLoadLayout(LayoutMap & layouts, const SourceFilePtr & sourceFile)
 {
@@ -64,32 +76,53 @@ static UILayoutPtr uiLoadLayout(LayoutMap & layouts, const SourceFilePtr & sourc
 	return layout;
 }
 
-static WidgetKinds uiGetWidgetKinds(const std::initializer_list<UILayoutPtr> & layouts)
+static WidgetInfos uiGetWidgetInfos(const std::initializer_list<UILayoutPtr> & layouts)
 {
-	WidgetKinds kinds;
+	WidgetInfos infos;
 
 	for (const UILayoutPtr & layout : layouts)
 	{
 		if (!layout)
 			continue;
 
+		size_t index = 0;
 		for (auto it : layout->widgetMap())
 		{
 			const std::string & widgetID = it.first;
 			const UIWidgetPtr & widget = it.second;
 
-			auto jt = kinds.find(widgetID);
-			if (jt == kinds.end())
-				kinds.insert(std::make_pair(widgetID, widget->kind()));
-			else if (jt->second != widget->kind())
+			WidgetInfo * infoPtr;
+
+			auto jt = infos.find(widgetID);
+			if (jt == infos.end())
 			{
-				throw std::runtime_error(fmt() << "id '"
-					<< widgetID << "' corresponds to different widgets in different layout files.");
+				WidgetInfo info;
+				info.kind = widget->kind();
+				infoPtr = &infos.insert(std::make_pair(widgetID, info)).first->second;
 			}
+			else
+			{
+				infoPtr = &jt->second;
+				if (jt->second.kind != widget->kind())
+				{
+					throw std::runtime_error(fmt() << "id '"
+						<< widgetID << "' corresponds to different widgets in different layout files.");
+				}
+			}
+
+			switch (index)
+			{
+			case 0: infoPtr->iphonePortrait = widget; break;
+			case 1: infoPtr->iphoneLandscape = widget; break;
+			case 2: infoPtr->ipadPortrait = widget; break;
+			case 3: infoPtr->ipadLandscape = widget; break;
+			}
+
+			++index;
 		}
 	}
 
-	return kinds;
+	return infos;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -160,7 +193,8 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 		UILayoutPtr ipadPortrait = uiLoadLayout(layouts, cntrl.ipadPortrait);
 		UILayoutPtr ipadLandscape = uiLoadLayout(layouts, cntrl.ipadLandscape);
 
-		WidgetKinds widgetKinds = uiGetWidgetKinds({
+		WidgetInfos widgetInfos = uiGetWidgetInfos({
+			// Don't change order of this items: it's important
 			iphonePortrait,
 			iphoneLandscape,
 			ipadPortrait,
@@ -170,9 +204,9 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 		std::stringstream sh;
 		sh << "#import <UIKit/UIKit.h>\n";
 		sh << "@interface " << cntrl.name << " : " << cntrl.parentClass << "\n";
-		for (auto it : widgetKinds)
+		for (auto it : widgetInfos)
 		{
-			sh << "@property (nonatomic, readonly, retain) " << iosClassForWidget(it.second)
+			sh << "@property (nonatomic, readonly, retain) " << iosClassForWidget(it.second.kind)
 				<< " * " << it.first << ";\n";
 		}
 		sh << "-(id)init;\n";
@@ -182,21 +216,24 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 		std::stringstream sm;
 		sm << "#import \"" << targetName << ".h\"\n";
 		sm << "@implementation " << cntrl.name << '\n';
-		for (auto it : widgetKinds)
+		for (auto it : widgetInfos)
 			sm << "@synthesize " << it.first << ";\n";
 		sm << "-(id)init\n";
 		sm << "{\n";
 		sm << "\tself = [super init];\n";
 		sm << "\tif (self)\n";
 		sm << "\t{\n";
-		for (auto it : widgetKinds)
-			sm << "\t\t" << it.first << " = " << iosInitForWidget(it.second) << ";\n";
+		for (auto it : widgetInfos)
+		{
+			sm << "\t\t" << it.first << " = " << iosInitForWidget(it.second.kind) << ";\n";
+//			sm << "\t\t" << it.second->iosGenerateInitCode() << ";\n";
+		}
 		sm << "\t}\n";
 		sm << "\treturn self;\n";
 		sm << "}\n";
 		sm << "-(void)dealloc\n";
 		sm << "{\n";
-		for (auto it : widgetKinds)
+		for (auto it : widgetInfos)
 		{
 			sm << "\t[" << it.first << " release];\n";
 			sm << "\t" << it.first << " = nil;\n";

@@ -32,6 +32,8 @@ public:
 	UIGroup(UILayout * layout);
 	~UIGroup();
 
+	void iosGenerateInitCode(std::stringstream & ss) override;
+
 protected:
 	void afterParseAttributes(const TiXmlElement * element) override;
 

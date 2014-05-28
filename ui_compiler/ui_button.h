@@ -32,6 +32,8 @@ public:
 	UIButton(UILayout * layout);
 	~UIButton();
 
+	void iosGenerateInitCode(std::stringstream & ss) override;
+
 protected:
 	virtual bool parseAttribute(const TiXmlAttribute * attr);
 

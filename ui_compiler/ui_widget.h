@@ -72,6 +72,8 @@ public:
 
 	void parse(const TiXmlElement * element);
 
+	virtual void iosGenerateInitCode(std::stringstream & ss) = 0;
+
 protected:
 	virtual void beforeParseAttributes(const TiXmlElement * element);
 	virtual bool parseAttribute(const TiXmlAttribute * attr);

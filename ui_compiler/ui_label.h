@@ -32,6 +32,8 @@ public:
 	UILabel(UILayout * layout);
 	~UILabel();
 
+	void iosGenerateInitCode(std::stringstream & ss) override;
+
 protected:
 	virtual bool parseAttribute(const TiXmlAttribute * attr);
 

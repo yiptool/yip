@@ -33,6 +33,10 @@ UILabel::~UILabel()
 {
 }
 
+void UILabel::iosGenerateInitCode(std::stringstream & ss)
+{
+}
+
 bool UILabel::parseAttribute(const TiXmlAttribute *)
 {
 	return false;

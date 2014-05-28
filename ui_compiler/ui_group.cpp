@@ -33,6 +33,10 @@ UIGroup::~UIGroup()
 {
 }
 
+void UIGroup::iosGenerateInitCode(std::stringstream & ss)
+{
+}
+
 void UIGroup::afterParseAttributes(const TiXmlElement * element)
 {
 	for (const TiXmlElement * child = element->FirstChildElement(); child; child = child->NextSiblingElement())
