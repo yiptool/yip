@@ -418,6 +418,18 @@ could be requested using the `tizen:privilege` command:
 
       tizen:privilege "http://tizen.org/privilege/power"
 
+### TODO lists
+
+You can specify a list of tasks for the code in the `Yipfile` using the `todo` directive:
+
+      todo {
+        "Fix annoying bug",
+        "Fix another not-so-annoying bug" before "2015-01-01"
+      }
+
+Tasks will be reported as compiler warnings. You can also specify the date the task should
+be done before. Outdated tasks cause compilation failure.
+
 ### License handling
 
 License for the project could be specified in the `Yipfile` using the

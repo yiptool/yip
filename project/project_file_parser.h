@@ -89,6 +89,7 @@ private:
 	void parseIOSorOSX();
 	void parseAndroid();
 	void parseLicense();
+	void parseToDo();
 
 	Platform::Type parsePlatformMask();
 	Platform::Type parsePlatformName();

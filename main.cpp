@@ -305,6 +305,7 @@ static int build(int argc, char ** argv)
 		return 1;
 
 	project->generateLicenseData();
+	project->generateToDo();
 	compileUI(project);
 	compileResources(project);
 
@@ -404,6 +405,7 @@ static int generate(int argc, char ** argv)
 		return 1;
 
 	project->generateLicenseData();
+	project->generateToDo();
 	compileUI(project);
 	compileResources(project);
 
@@ -505,6 +507,7 @@ static int xcodePrebuild(int argc, char ** argv)
 		return 1;
 
 	project->generateLicenseData();
+	project->generateToDo();
 	compileUI(project);
 	compileResources(project);
 

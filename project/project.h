@@ -57,6 +57,22 @@ public:
 		IMAGESIZE_LAUNCH_IPAD_PORTRAIT_RETINA,	// 1536x2048
 	};
 
+	struct ToDo
+	{
+		std::string message;
+		int year;
+		int month;
+		int day;
+
+		inline ToDo(const std::string & msg, int y, int m, int d)
+			: message(msg),
+			  year(y),
+			  month(m),
+			  day(d)
+		{
+		}
+	};
+
 	struct IOSViewController
 	{
 		std::string name;
@@ -95,6 +111,10 @@ public:
 
 	void addHeaderPath(const std::string & path, Platform::Type platform);
 	inline const std::map<std::string, HeaderPathPtr> & headerPaths() const { return m_HeaderPaths; }
+
+	inline void addToDo(const std::string & message, int year, int month, int day)
+		{ m_ToDo.push_back(ToDo(message, year, month, day)); }
+	inline const std::vector<ToDo> & toDo() const { return m_ToDo; }
 
 	// WinRT
 
@@ -206,10 +226,12 @@ public:
 	// Code generation
 
 	void generateLicenseData();
+	void generateToDo();
 
 private:
 	std::string m_ProjectName;
 	std::string m_ProjectPath;
+	std::vector<ToDo> m_ToDo;
 	std::map<std::string, HeaderPathPtr> m_HeaderPaths;
 	std::map<std::string, SourceFilePtr> m_SourceFiles;
 	std::map<std::string, SourceFilePtr> m_ResourceFiles;

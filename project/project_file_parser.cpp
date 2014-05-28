@@ -115,6 +115,7 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const std::st
 	m_CommandHandlers.insert(std::make_pair("android", &ProjectFileParser::parseAndroid));
 	m_CommandHandlers.insert(std::make_pair("tizen", &ProjectFileParser::parseTizen));
 	m_CommandHandlers.insert(std::make_pair("license", &ProjectFileParser::parseLicense));
+	m_CommandHandlers.insert(std::make_pair("todo", &ProjectFileParser::parseToDo));
 }
 
 ProjectFileParser::~ProjectFileParser()
@@ -999,6 +1000,47 @@ void ProjectFileParser::parseLicense()
 	if (getToken() != Token::Literal)
 		reportError("expected license text after 'license'.");
 	m_Project->addLicense(m_TokenText);
+}
+
+void ProjectFileParser::parseToDo()
+{
+	if (getToken() != Token::LCurly)
+		reportError("expected '{'.");
+
+	if (getToken() == Token::RCurly)
+		return;
+
+	for (;;)
+	{
+		if (m_Token != Token::Literal)
+			{ reportError("expected todo message."); return; }
+		std::string message = m_TokenText;
+
+		int year = -1, month = -1, day = -1;
+		if (getToken() == Token::Literal)
+		{
+			if (m_TokenText != "before")
+				{ reportError("expected 'before' or ','."); return; }
+
+			if (getToken() != Token::Literal)
+				{ reportError("expected date after 'before'."); return; }
+
+			if (sscanf(m_TokenText.c_str(), "%d-%d-%d", &year, &month, &day) != 3
+					|| year < 0 || month < 0 || day < 0)
+				{ reportError(fmt() << "invalid date '" << m_TokenText << "'."); return; }
+
+			getToken();
+		}
+
+		m_Project->addToDo(message, year, month, day);
+
+		if (m_Token == Token::Comma)
+			getToken();
+		else if (m_Token == Token::RCurly)
+			break;
+		else
+			{ reportError("expected '}'."); return; }
+	}
 }
 
 Platform::Type ProjectFileParser::parsePlatformMask()

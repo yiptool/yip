@@ -24,6 +24,7 @@
 #include "../util/sha1.h"
 #include "../util/fmt.h"
 #include "../util/cxx_escape.h"
+#include <ctime>
 
 Project::Project(const std::string & prjPath)
 	: m_ProjectName("unnamed"),
@@ -203,5 +204,43 @@ void Project::generateLicenseData()
 	ss2 << "#endif\n";
 	path = yipDirectory()->writeFile(".yip-import-proxies/yip/licenses.h", ss2.str());
 	sourceFile = addSourceFile("yip/licenses.h", path);
+	sourceFile->setIsGenerated(true);
+}
+
+void Project::generateToDo()
+{
+	if (m_ToDo.empty())
+		return;
+
+	time_t curTime = time(NULL);
+	const struct tm * tm = localtime(&curTime);
+	int year = tm->tm_year + 1900;
+	int month = tm->tm_mon + 1;
+	int day = tm->tm_mday;
+
+	std::stringstream ss;
+	ss << "#if defined(_MSC_VER) || defined(__GNUC__) || defined(__clang__)\n";
+	for (const ToDo & toDo : m_ToDo)
+	{
+		std::stringstream ss2;
+		ss2 << toDo.message;
+		if (toDo.year >= 0 && toDo.month >= 0 && toDo.day >= 0)
+		{
+			char buf[256];
+			sprintf(buf, "%04d-%02d-%02d", toDo.year, toDo.month, toDo.day);
+			ss2 << " (before " << buf << ")";
+
+			if (toDo.year < year || (toDo.year == year && (toDo.month < month ||
+					(toDo.month == month && toDo.day < day))))
+				throw std::runtime_error(fmt() << "*** TODO HAS EXPIRED ***\n" << ss2.str());
+		}
+
+		ss << "#pragma message(\"";
+		cxxEscape(ss, ss2.str());
+		ss << "\")\n";
+	}
+	ss << "#endif\n";
+	std::string path = yipDirectory()->writeFile("todos.cpp", ss.str());
+	SourceFilePtr sourceFile = addSourceFile("yip/todos.cpp", path);
 	sourceFile->setIsGenerated(true);
 }
