@@ -22,6 +22,7 @@
 //
 #include "yip_directory.h"
 #include "project.h"
+#include "../util/cxx-util/cxx-util/write_file.h"
 #include "../util/fmt.h"
 #include "../util/path.h"
 #include "../util/sha1.h"
@@ -170,35 +171,7 @@ std::string YipDirectory::writeFile(const std::string & path, const std::string 
 		pathCreate(dir);
 
 	// Write the file
-	FILE * f = fopen(file.c_str(), "wb");
-	if (!f)
-	{
-		int err = errno;
-		throw std::runtime_error(fmt() << "unable to create file '" << file << "': " << strerror(err));
-	}
-	try
-	{
-		fwrite(data.data(), 1, data.size(), f);
-		if (ferror(f))
-		{
-			int err = errno;
-			throw std::runtime_error(fmt() << "unable to write file '" << file << "': " << strerror(err));
-		}
-
-		fflush(f);
-		if (ferror(f))
-		{
-			int err = errno;
-			throw std::runtime_error(fmt() << "unable to write file '" << file << "': " << strerror(err));
-		}
-	}
-	catch (...)
-	{
-		fclose(f);
-		remove(file.c_str());
-		throw;
-	}
-	fclose(f);
+	::writeFile(file, data);
 
 	// Store information about file into the database
 	m_DB->exec(fmt() << "REPLACE INTO files (path, size, time, sha1) VALUES (?, " << data.size() << ", "
