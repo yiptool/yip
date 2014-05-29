@@ -178,7 +178,7 @@ use the `ios:view_controller` directive:
          ipad => ui/ipad.xml
       }
 
-For more information see [User interface layout file format](README_LAYOUT.md)
+For more information see [User interface layout file format](README_UI.md).
 
 ### Application source files
 
