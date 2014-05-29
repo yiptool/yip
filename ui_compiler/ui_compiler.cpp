@@ -127,6 +127,9 @@ static WidgetInfos uiGetWidgetInfos(const std::initializer_list<UILayoutPtr> & l
 static void generateIOSCommonCode(const ProjectPtr & project)
 {
 	std::stringstream ss;
+	ss << "#ifndef __fbaf7bcc319b33e8a39e16ddff3f11c7__\n";
+	ss << "#define __fbaf7bcc319b33e8a39e16ddff3f11c7__\n";
+	ss << '\n';
 	ss << "namespace YIP\n";
 	ss << "{\n";
 	ss << "\ttemplate <unsigned char ALIGN> CGRect iosLayoutRect(float x, float y, float w, float h,\n";
@@ -138,18 +141,20 @@ static void generateIOSCommonCode(const ProjectPtr & project)
 	ss << "\t\tfloat widgetH = h * hScale;\n";
 	ss << "\t\n";
 	ss << "\t\tif ((ALIGN & " << UIAlignHorizontalMask << ") == " << UIAlignHCenter << ")\n";
-	ss << "\t\t\twidgetX += (w * horzScale - widgetW) * 0.5f\n";
+	ss << "\t\t\twidgetX += (w * horzScale - widgetW) * 0.5f;\n";
 	ss << "\t\telse if ((ALIGN & " << UIAlignHorizontalMask << ") == " << UIAlignRight << ")\n";
 	ss << "\t\t\twidgetX += w * horzScale - widgetW;\n";
 	ss << "\t\n";
 	ss << "\t\tif ((ALIGN & " << UIAlignVerticalMask << ") == " << UIAlignVCenter << ")\n";
-	ss << "\t\t\twidgetY += (h * vertScale - widgetH) * 0.5f\n";
+	ss << "\t\t\twidgetY += (h * vertScale - widgetH) * 0.5f;\n";
 	ss << "\t\telse if ((ALIGN & " << UIAlignVerticalMask << ") == " << UIAlignBottom << ")\n";
 	ss << "\t\t\twidgetY += h * vertScale - widgetH;\n";
 	ss << "\t\n";
 	ss << "\t\treturn CGRectMake(widgetX, widgetY, widgetW, widgetH);\n";
 	ss << "\t}\n";
 	ss << "}\n";
+	ss << '\n';
+	ss << "#endif\n";
 
 	std::string targetPath = ".yip-ios-view-controllers/ios_layout.h";
 	std::string generatedPath = project->yipDirectory()->writeFile(targetPath, ss.str());
@@ -169,7 +174,7 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 
 	std::string targetName = cntrl.name;
 	std::string targetPathH = pathConcat(".yip-ios-view-controllers/yip-ios", targetName) + ".h";
-	std::string targetPathM = pathConcat(".yip-ios-view-controllers/yip-ios", targetName) + ".m";
+	std::string targetPathM = pathConcat(".yip-ios-view-controllers/yip-ios", targetName) + ".mm";
 
 	bool shouldProcessFile =
 		(cntrl.iphone.get() &&
@@ -213,7 +218,6 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 
 		std::stringstream sm;
 		sm << "#import \"" << targetName << ".h\"\n";
-		sm << "#import <algorithm>\n";
 		sm << "#import \"../ios_layout.h\"\n";
 		sm << '\n';
 		sm << "@implementation " << cntrl.name << '\n';
@@ -343,6 +347,7 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 				sm << " | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight";
 			sm << ";\n";
 		}
+		sm << "\treturn 0;\n";
 		sm << "}\n";
 		sm << '\n';
 		sm << "@end\n";

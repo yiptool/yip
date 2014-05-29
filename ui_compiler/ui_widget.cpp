@@ -251,8 +251,8 @@ static std::string iosScaleFunc(UIScaleMode mode, bool horz)
 	switch (mode)
 	{
 	case UIScaleDefault: return (horz ? "horzScale" : "vertScale");
-	case UIScaleMin: return "std::min(horzScale, vertScale)";
-	case UIScaleMax: return "std::max(horzScale, vertScale)";
+	case UIScaleMin: return "MIN(horzScale, vertScale)";
+	case UIScaleMax: return "MAX(horzScale, vertScale)";
 	case UIScaleHorz: return "horzScale";
 	case UIScaleVert: return "vertScale";
 	case UIScaleAvg: return "((horzScale + vertScale) * 0.5f)";
@@ -277,8 +277,8 @@ static void iosGenerateLayoutCode(const UIWidget * wd, const std::string & prefi
 	std::string wMode = iosScaleFunc(!landscape ? wd->widthScaleMode() : wd->landscapeWidthScaleMode(), true);
 	std::string hMode = iosScaleFunc(!landscape ? wd->heightScaleMode() : wd->landscapeHeightScaleMode(), false);
 
-	ss << prefix << wd->id() << ".frame = iosLayoutRect<" << alignment << ">(" << x << ", " << y << ", " << w
-		<< ", " << h << ", " << xMode << ", " << yMode << ", " << wMode << ", " << hMode
+	ss << prefix << wd->id() << ".frame = YIP::iosLayoutRect<" << alignment << ">(" << x << ", " << y << ", "
+		<< w << ", " << h << ", " << xMode << ", " << yMode << ", " << wMode << ", " << hMode
 		<< ", horzScale, vertScale);\n";
 }
 
