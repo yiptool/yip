@@ -33,6 +33,7 @@
 #include <unordered_set>
 #include <set>
 #include <algorithm>
+#include <ctime>
 #include <memory>
 
 class Project : public std::enable_shared_from_this<Project>
@@ -86,6 +87,10 @@ public:
 
 	inline bool isValid() const { return m_Valid; }
 	inline void setValid(bool flag) { m_Valid = flag; }
+
+	inline bool hasModificationTime() const { return m_HasModificationTime; }
+	inline time_t modificationTime() const { return m_ModificationTime; }
+	inline void setModificationTime(time_t time) { m_ModificationTime = time; m_HasModificationTime = true; }
 
 	inline void setProjectName(const std::string & name) { m_ProjectName = name; }
 	inline const std::string & projectName() const { return m_ProjectName; }
@@ -229,6 +234,8 @@ public:
 private:
 	std::string m_ProjectName;
 	std::string m_ProjectPath;
+	time_t m_ModificationTime;
+	bool m_HasModificationTime;
 	std::vector<ToDo> m_ToDo;
 	std::map<std::string, HeaderPathPtr> m_HeaderPaths;
 	std::map<std::string, SourceFilePtr> m_SourceFiles;

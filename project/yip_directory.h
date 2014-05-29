@@ -28,18 +28,22 @@
 #include <memory>
 #include <string>
 
+class Project;
+
 class YipDirectory
 {
 public:
-	YipDirectory(const std::string & projectPath);
+	YipDirectory(const std::string & projectPath, const Project * project);
 	~YipDirectory();
 
 	inline const std::string & path() const { return m_Path; }
+	inline const Project * project() const { return m_Project; }
 
 	bool didBuildTizen() const;
 	void setDidBuildTizen();
 
-	bool shouldProcessFile(const std::string & path, const std::string & sourcePath);
+	bool shouldProcessFile(const std::string & path, const std::string & sourcePath,
+		bool rebuildIfProjectFileChanged);
 
 	std::string writeFile(const std::string & path, const std::string & data, bool * changed = nullptr);
 	std::string writeIncludeWrapper(const std::string & name, const std::string & originalIncludePath);
@@ -51,6 +55,7 @@ public:
 
 private:
 	std::string m_Path;
+	const Project * m_Project;
 	SQLiteDatabasePtr m_DB;
 
 	void initDB();

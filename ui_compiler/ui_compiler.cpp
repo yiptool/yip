@@ -173,11 +173,11 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 
 	bool shouldProcessFile =
 		(cntrl.iphone.get() &&
-			project->yipDirectory()->shouldProcessFile(targetPathH, cntrl.iphone->path()) &&
-			project->yipDirectory()->shouldProcessFile(targetPathM, cntrl.iphone->path())) ||
+			project->yipDirectory()->shouldProcessFile(targetPathH, cntrl.iphone->path(), true) &&
+			project->yipDirectory()->shouldProcessFile(targetPathM, cntrl.iphone->path(), true)) ||
 		(cntrl.ipad.get() &&
-			project->yipDirectory()->shouldProcessFile(targetPathH, cntrl.ipad->path()) &&
-			project->yipDirectory()->shouldProcessFile(targetPathM, cntrl.ipad->path()));
+			project->yipDirectory()->shouldProcessFile(targetPathH, cntrl.ipad->path(), true) &&
+			project->yipDirectory()->shouldProcessFile(targetPathM, cntrl.ipad->path(), true));
 	if (!shouldProcessFile)
 	{
 		sourceFileH = project->addSourceFile(targetPathH, pathConcat(yipDir, targetPathH));

@@ -178,6 +178,10 @@ void ProjectFileParser::reportError(const std::string & message)
 
 void ProjectFileParser::doParse(const ProjectPtr & project, bool resolveImports)
 {
+	time_t modificationTime = pathGetModificationTime(m_FileName);
+	if (!project->hasModificationTime() || modificationTime > project->modificationTime())
+		project->setModificationTime(modificationTime);
+
 	m_Project = project.get();
 	m_ResolveImports = resolveImports;
 

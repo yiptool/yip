@@ -21,17 +21,20 @@
 // THE SOFTWARE.
 //
 #include "yip_directory.h"
+#include "project.h"
 #include "../util/fmt.h"
 #include "../util/path.h"
 #include "../util/sha1.h"
+#include <cassert>
 #include <iostream>
 #include <cerrno>
 #include <cstring>
 
 #define DATABASE_VERSION 1
 
-YipDirectory::YipDirectory(const std::string & prjPath)
-	: m_Path(pathConcat(prjPath, ".yip"))
+YipDirectory::YipDirectory(const std::string & prjPath, const Project * project)
+	: m_Path(pathConcat(prjPath, ".yip")),
+	  m_Project(project)
 {
 	pathCreate(m_Path);
 	m_Path = pathMakeCanonical(m_Path);
@@ -54,7 +57,8 @@ void YipDirectory::setDidBuildTizen()
 	m_DB->exec(fmt() << "REPLACE INTO did_build_tizen (id, value) VALUES (1, 1)");
 }
 
-bool YipDirectory::shouldProcessFile(const std::string & path, const std::string & sourcePath)
+bool YipDirectory::shouldProcessFile(const std::string & path, const std::string & sourcePath,
+	bool rebuildIfProjectFileChanged)
 {
 	std::string targetFile = pathSimplify(pathConcat(m_Path, path));
 
@@ -84,7 +88,13 @@ bool YipDirectory::shouldProcessFile(const std::string & path, const std::string
 		return true;
 
 	// Check whether file has been modified since last build.
-	if (pathGetModificationTime(sourcePath) > old_time)
+	time_t modificationTime = pathGetModificationTime(sourcePath);
+	if (modificationTime > old_time)
+		return true;
+
+	// Also rebuild the file if Yipfile has been modified since last build
+	if (rebuildIfProjectFileChanged &&
+			m_Project->hasModificationTime() && m_Project->modificationTime() > old_time)
 		return true;
 
 	return false;
@@ -137,6 +147,12 @@ std::string YipDirectory::writeFile(const std::string & path, const std::string 
 		std::cout << "keeping " << path << std::endl;
 		if (changed)
 			*changed = false;
+
+		assert(has_sha1);
+		m_DB->exec(fmt() << "REPLACE INTO files (path, size, time, sha1) VALUES (?, " << data.size() << ", "
+			<< time(nullptr) << ", ?)", { file, new_sha1 });
+		transaction.commit();
+
 		return file;
 	}
 

@@ -48,7 +48,7 @@ static void makeResourceFile(ResCatalog & cat, const ProjectPtr & project, const
 
 	// Do not regenerate output file if input file did not change
 
-	if (!project->yipDirectory()->shouldProcessFile(targetPath, resourceFile->path()))
+	if (!project->yipDirectory()->shouldProcessFile(targetPath, resourceFile->path(), false))
 	{
 		SourceFilePtr sourceFile = project->addSourceFile(targetPath, pathConcat(yipDir, targetPath));
 		sourceFile->setIsGenerated(true);

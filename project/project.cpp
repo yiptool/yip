@@ -24,11 +24,12 @@
 #include "../util/sha1.h"
 #include "../util/fmt.h"
 #include "../util/cxx_escape.h"
-#include <ctime>
 
 Project::Project(const std::string & prjPath)
 	: m_ProjectName("unnamed"),
 	  m_ProjectPath(prjPath),
+	  m_ModificationTime(time(nullptr)),
+	  m_HasModificationTime(false),
 	  m_OSXBundleIdentifier("com.zapolnov.${PRODUCT_NAME:rfc1034identifier}"),
 	  m_OSXBundleVersion("1.0"),
 	  m_OSXDeploymentTarget("10.8"),
@@ -55,7 +56,7 @@ Project::~Project()
 const YipDirectoryPtr & Project::yipDirectory() const
 {
 	if (!m_YipDirectory)
-		m_YipDirectory = std::make_shared<YipDirectory>(m_ProjectPath);
+		m_YipDirectory = std::make_shared<YipDirectory>(m_ProjectPath, this);
 	return m_YipDirectory;
 }
 
@@ -212,7 +213,7 @@ void Project::generateToDo()
 	if (m_ToDo.empty())
 		return;
 
-	time_t curTime = time(NULL);
+	time_t curTime = time(nullptr);
 	const struct tm * tm = localtime(&curTime);
 	int year = tm->tm_year + 1900;
 	int month = tm->tm_mon + 1;
