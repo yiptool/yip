@@ -815,14 +815,10 @@ void ProjectFileParser::parseIOSorOSX()
 				{ reportError("expected device family/orientation name."); return; }
 
 			SourceFilePtr * target = nullptr;
-			if (m_TokenText == "iphone_portrait")
-				target = &cntrl.iphonePortrait;
-			else if (m_TokenText == "iphone_landscape")
-				target = &cntrl.iphoneLandscape;
-			else if (m_TokenText == "ipad_portrait")
-				target = &cntrl.ipadPortrait;
-			else if (m_TokenText == "ipad_landscape")
-				target = &cntrl.ipadLandscape;
+			if (m_TokenText == "iphone")
+				target = &cntrl.iphone;
+			else if (m_TokenText == "ipad")
+				target = &cntrl.ipad;
 			else
 				{ reportError(fmt() << "invalid device family/orientation name '" << m_TokenText << "'."); }
 

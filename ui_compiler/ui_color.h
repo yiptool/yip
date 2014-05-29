@@ -57,6 +57,10 @@ struct UIColor
 	{
 	}
 
+	std::string iosValue() const;
+
+	inline bool operator==(const UIColor & c) const { return r == c.r && g == c.g && b == c.b && a == c.a; }
+
 	static UIColor fromString(const std::string & str);
 	static UIColor fromAttr(const TiXmlAttribute * attr);
 };

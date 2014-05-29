@@ -26,6 +26,7 @@
 #include "../util/cxx-util/cxx-util/unhex.h"
 #include <stdexcept>
 #include <unordered_map>
+#include <sstream>
 
 const UIColor UIColor::clear(0.0f, 0.0f, 0.0f, 0.0f);
 const UIColor UIColor::black(0.0f, 0.0f, 0.0f, 1.0f);
@@ -60,6 +61,21 @@ static const std::unordered_map<std::string, UIColor> g_ColorNames = {
 	{ "purple", UIColor::purple },
 	{ "brown", UIColor::brown },
 };
+
+std::string UIColor::iosValue() const
+{
+	for (auto it : g_ColorNames)
+	{
+		if (*this == it.second)
+			return fmt() << "[UIColor " << it.first << "Color]";
+	}
+
+	std::stringstream ss;
+	ss << "[UIColor colorWithRed:" << r / 255.0f << " green:" << g / 255.0f << " blue:" << b / 255.0f
+		<< " alpha:" << a << "]";
+
+	return ss.str();
+}
 
 UIColor UIColor::fromString(const std::string & str)
 {

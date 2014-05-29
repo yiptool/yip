@@ -29,10 +29,12 @@
 class UILabel : public UIWidget
 {
 public:
-	UILabel(UILayout * layout);
+	UILabel(UILayout * layout, UIGroup * parentGroup);
 	~UILabel();
 
-	void iosGenerateInitCode(std::stringstream & ss) override;
+	const char * iosClassName() const override { return "UILabel"; }
+	void iosGenerateInitCode(const std::string & prefix, std::stringstream & ss) override;
+	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 protected:
 	virtual bool parseAttribute(const TiXmlAttribute * attr);

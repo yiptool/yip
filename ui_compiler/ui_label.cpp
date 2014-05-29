@@ -24,8 +24,8 @@
 #include "../util/tinyxml-util/tinyxml-util.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 
-UILabel::UILabel(UILayout * layout)
-	: UIWidget(layout, UIWidget::Label)
+UILabel::UILabel(UILayout * layout, UIGroup * parentGroup)
+	: UIWidget(layout, parentGroup, UIWidget::Label)
 {
 }
 
@@ -33,8 +33,15 @@ UILabel::~UILabel()
 {
 }
 
-void UILabel::iosGenerateInitCode(std::stringstream & ss)
+void UILabel::iosGenerateInitCode(const std::string & prefix, std::stringstream & ss)
 {
+	ss << prefix << id() << " = [[UILabel alloc] initWithFrame:CGRectZero];\n";
+	UIWidget::iosGenerateInitCode(prefix, ss);
+}
+
+void UILabel::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIWidget::iosGenerateLayoutCode(prefix, ss);
 }
 
 bool UILabel::parseAttribute(const TiXmlAttribute *)

@@ -29,10 +29,12 @@
 class UIButton : public UIWidget
 {
 public:
-	UIButton(UILayout * layout);
+	UIButton(UILayout * layout, UIGroup * parentGroup);
 	~UIButton();
 
-	void iosGenerateInitCode(std::stringstream & ss) override;
+	const char * iosClassName() const override { return "UIButton"; }
+	void iosGenerateInitCode(const std::string & prefix, std::stringstream & ss) override;
+	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 protected:
 	virtual bool parseAttribute(const TiXmlAttribute * attr);

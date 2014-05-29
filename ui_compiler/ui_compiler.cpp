@@ -38,10 +38,8 @@ namespace
 	struct WidgetInfo
 	{
 		UIWidget::Kind kind;
-		UIWidgetPtr iphonePortrait;
-		UIWidgetPtr iphoneLandscape;
-		UIWidgetPtr ipadPortrait;
-		UIWidgetPtr ipadLandscape;
+		UIWidgetPtr ipad;
+		UIWidgetPtr iphone;
 	};
 }
 
@@ -80,12 +78,13 @@ static WidgetInfos uiGetWidgetInfos(const std::initializer_list<UILayoutPtr> & l
 {
 	WidgetInfos infos;
 
+	size_t index = 0;
 	for (const UILayoutPtr & layout : layouts)
 	{
+		++index;
 		if (!layout)
 			continue;
 
-		size_t index = 0;
 		for (auto it : layout->widgetMap())
 		{
 			const std::string & widgetID = it.first;
@@ -112,13 +111,10 @@ static WidgetInfos uiGetWidgetInfos(const std::initializer_list<UILayoutPtr> & l
 
 			switch (index)
 			{
-			case 0: infoPtr->iphonePortrait = widget; break;
-			case 1: infoPtr->iphoneLandscape = widget; break;
-			case 2: infoPtr->ipadPortrait = widget; break;
-			case 3: infoPtr->ipadLandscape = widget; break;
+			case 1: infoPtr->iphone = widget; break;
+			case 2: infoPtr->ipad = widget; break;
+			default: assert(false); throw std::runtime_error("internal error: invalid layout index.");
 			}
-
-			++index;
 		}
 	}
 
@@ -128,32 +124,39 @@ static WidgetInfos uiGetWidgetInfos(const std::initializer_list<UILayoutPtr> & l
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // iOS
 
-static std::string iosClassForWidget(UIWidget::Kind kind)
+static void generateIOSCommonCode(const ProjectPtr & project)
 {
-	switch (kind)
-	{
-	case UIWidget::Group: return "UIView";
-	case UIWidget::Label: return "UILabel";
-	case UIWidget::Image: return "UIImageView";
-	case UIWidget::Button: return "UIButton";
-	}
+	std::stringstream ss;
+	ss << "namespace YIP\n";
+	ss << "{\n";
+	ss << "\ttemplate <unsigned char ALIGN> CGRect iosLayoutRect(float x, float y, float w, float h,\n";
+	ss << "\t\tfloat xScale, float yScale, float wScale, float hScale, float horzScale, float vertScale)\n";
+	ss << "\t{\n";
+	ss << "\t\tfloat widgetX = x * xScale;\n";
+	ss << "\t\tfloat widgetY = y * yScale;\n";
+	ss << "\t\tfloat widgetW = w * wScale;\n";
+	ss << "\t\tfloat widgetH = h * hScale;\n";
+	ss << "\t\n";
+	ss << "\t\tif ((ALIGN & " << UIAlignHorizontalMask << ") == " << UIAlignHCenter << ")\n";
+	ss << "\t\t\twidgetX += (w * horzScale - widgetW) * 0.5f\n";
+	ss << "\t\telse if ((ALIGN & " << UIAlignHorizontalMask << ") == " << UIAlignRight << ")\n";
+	ss << "\t\t\twidgetX += w * horzScale - widgetW;\n";
+	ss << "\t\n";
+	ss << "\t\tif ((ALIGN & " << UIAlignVerticalMask << ") == " << UIAlignVCenter << ")\n";
+	ss << "\t\t\twidgetY += (h * vertScale - widgetH) * 0.5f\n";
+	ss << "\t\telse if ((ALIGN & " << UIAlignVerticalMask << ") == " << UIAlignBottom << ")\n";
+	ss << "\t\t\twidgetY += h * vertScale - widgetH;\n";
+	ss << "\t\n";
+	ss << "\t\treturn CGRectMake(widgetX, widgetY, widgetW, widgetH);\n";
+	ss << "\t}\n";
+	ss << "}\n";
 
-	assert(false);
-	throw std::runtime_error("invalid widget class.");
-}
+	std::string targetPath = ".yip-ios-view-controllers/ios_layout.h";
+	std::string generatedPath = project->yipDirectory()->writeFile(targetPath, ss.str());
 
-static std::string iosInitForWidget(UIWidget::Kind kind)
-{
-	switch (kind)
-	{
-	case UIWidget::Group: return "[[UIView alloc] initWithFrame:CGRectZero]";
-	case UIWidget::Label: return "[[UILabel alloc] initWithFrame:CGRectZero]";
-	case UIWidget::Image: return "[[UIImageView alloc] initWithImage:nil]";
-	case UIWidget::Button: return "[[UIButton buttonWithType:UIButtonTypeCustom] retain]";
-	}
-
-	assert(false);
-	throw std::runtime_error("invalid widget class.");
+	SourceFilePtr sourceFile = project->addSourceFile(targetPath, generatedPath);
+	sourceFile->setIsGenerated(true);
+	sourceFile->setPlatforms(Platform::iOS);
 }
 
 static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & project,
@@ -169,18 +172,12 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 	std::string targetPathM = pathConcat(".yip-ios-view-controllers/yip-ios", targetName) + ".m";
 
 	bool shouldProcessFile =
-		(cntrl.iphonePortrait.get() &&
-			project->yipDirectory()->shouldProcessFile(targetPathH, cntrl.iphonePortrait->path()) &&
-			project->yipDirectory()->shouldProcessFile(targetPathM, cntrl.iphonePortrait->path())) ||
-		(cntrl.iphoneLandscape.get() &&
-			project->yipDirectory()->shouldProcessFile(targetPathH, cntrl.iphoneLandscape->path()) &&
-			project->yipDirectory()->shouldProcessFile(targetPathM, cntrl.iphoneLandscape->path())) ||
-		(cntrl.ipadPortrait.get() &&
-			project->yipDirectory()->shouldProcessFile(targetPathH, cntrl.ipadPortrait->path()) &&
-			project->yipDirectory()->shouldProcessFile(targetPathM, cntrl.ipadPortrait->path())) ||
-		(cntrl.ipadLandscape.get() &&
-			project->yipDirectory()->shouldProcessFile(targetPathH, cntrl.ipadLandscape->path()) &&
-			project->yipDirectory()->shouldProcessFile(targetPathM, cntrl.ipadLandscape->path()));
+		(cntrl.iphone.get() &&
+			project->yipDirectory()->shouldProcessFile(targetPathH, cntrl.iphone->path()) &&
+			project->yipDirectory()->shouldProcessFile(targetPathM, cntrl.iphone->path())) ||
+		(cntrl.ipad.get() &&
+			project->yipDirectory()->shouldProcessFile(targetPathH, cntrl.ipad->path()) &&
+			project->yipDirectory()->shouldProcessFile(targetPathM, cntrl.ipad->path()));
 	if (!shouldProcessFile)
 	{
 		sourceFileH = project->addSourceFile(targetPathH, pathConcat(yipDir, targetPathH));
@@ -188,25 +185,26 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 	}
 	else
 	{
-		UILayoutPtr iphonePortrait = uiLoadLayout(layouts, cntrl.iphonePortrait);
-		UILayoutPtr iphoneLandscape = uiLoadLayout(layouts, cntrl.iphoneLandscape);
-		UILayoutPtr ipadPortrait = uiLoadLayout(layouts, cntrl.ipadPortrait);
-		UILayoutPtr ipadLandscape = uiLoadLayout(layouts, cntrl.ipadLandscape);
+		UILayoutPtr iphoneLayout = uiLoadLayout(layouts, cntrl.iphone);
+		UILayoutPtr ipadLayout = uiLoadLayout(layouts, cntrl.ipad);
 
 		WidgetInfos widgetInfos = uiGetWidgetInfos({
 			// Don't change order of this items: it's important
-			iphonePortrait,
-			iphoneLandscape,
-			ipadPortrait,
-			ipadLandscape
+			iphoneLayout,
+			ipadLayout,
 		});
+
+		bool hasIPhone = iphoneLayout.get() != nullptr;
+		bool hasIPad = ipadLayout.get() != nullptr;
 
 		std::stringstream sh;
 		sh << "#import <UIKit/UIKit.h>\n";
+		sh << '\n';
 		sh << "@interface " << cntrl.name << " : " << cntrl.parentClass << "\n";
 		for (auto it : widgetInfos)
 		{
-			sh << "@property (nonatomic, readonly, retain) " << iosClassForWidget(it.second.kind)
+			const UIWidgetPtr & widget = (it.second.iphone.get() ? it.second.iphone : it.second.ipad);
+			sh << "@property (nonatomic, readonly, retain) " << widget->iosClassName()
 				<< " * " << it.first << ";\n";
 		}
 		sh << "-(id)init;\n";
@@ -215,22 +213,51 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 
 		std::stringstream sm;
 		sm << "#import \"" << targetName << ".h\"\n";
+		sm << "#import <algorithm>\n";
+		sm << "#import \"../ios_layout.h\"\n";
+		sm << '\n';
 		sm << "@implementation " << cntrl.name << '\n';
+		sm << '\n';
 		for (auto it : widgetInfos)
 			sm << "@synthesize " << it.first << ";\n";
+		sm << '\n';
 		sm << "-(id)init\n";
 		sm << "{\n";
 		sm << "\tself = [super init];\n";
 		sm << "\tif (self)\n";
 		sm << "\t{\n";
-		for (auto it : widgetInfos)
+		if (hasIPhone)
 		{
-			sm << "\t\t" << it.first << " = " << iosInitForWidget(it.second.kind) << ";\n";
-//			sm << "\t\t" << it.second->iosGenerateInitCode() << ";\n";
+			sm << "\t\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)\n";
+			sm << "\t\t{\n";
+			for (auto it : widgetInfos)
+			{
+				if (it.second.iphone.get())
+					it.second.iphone->iosGenerateInitCode("\t\t\t", sm);
+			}
+//			for (const UIWidgetPtr & widget : )
+//			{
+//			}
+			sm << "\t\t}\n";
+		}
+		if (hasIPad)
+		{
+			sm << "\t\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)\n";
+			sm << "\t\t{\n";
+			for (auto it : widgetInfos)
+			{
+				if (it.second.ipad.get())
+					it.second.ipad->iosGenerateInitCode("\t\t\t", sm);
+			}
+//			for (const UIWidgetPtr & widget : )
+//			{
+//			}
+			sm << "\t\t}\n";
 		}
 		sm << "\t}\n";
 		sm << "\treturn self;\n";
 		sm << "}\n";
+		sm << '\n';
 		sm << "-(void)dealloc\n";
 		sm << "{\n";
 		for (auto it : widgetInfos)
@@ -240,6 +267,90 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 		}
 		sm << "\t[super dealloc];\n";
 		sm << "}\n";
+		sm << '\n';
+		sm << "-(void)viewWillLayoutSubviews\n";
+		sm << "{\n";
+		sm << "\t[super viewWillLayoutSubviews];\n";
+		sm << '\n';
+		sm << "\tCGRect frame = self.view.frame;\n";
+		sm << "\tBOOL landscape = UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation);\n";
+		sm << '\n';
+		sm << "\t(void)frame;\n";
+		sm << "\t(void)landscape;\n";
+		sm << '\n';
+		if (hasIPhone)
+		{
+			sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)\n";
+			sm << "\t{\n";
+			sm << "\t\tconst float horzScale = frame.size.width / (landscape ? "
+				<< iphoneLayout->landscapeWidth() << " : " << iphoneLayout->width() << ");\n";
+			sm << "\t\tconst float vertScale = frame.size.height / (landscape ? "
+				<< iphoneLayout->landscapeHeight() << " : " << iphoneLayout->height() << ");\n";
+			sm << '\n';
+			sm << "\t\t(void)horzScale;\n";
+			sm << "\t\t(void)vertScale;\n";
+			for (auto it : widgetInfos)
+			{
+				const UIWidgetPtr & w = it.second.iphone;
+				if (!w.get())
+					continue;
+				sm << '\n';
+				w->iosGenerateLayoutCode("\t\t", sm);
+			}
+			sm << "\t}\n";
+		}
+		if (hasIPad)
+		{
+			sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)\n";
+			sm << "\t{\n";
+			sm << "\t\tconst float horzScale = frame.size.width / (landscape ? "
+				<< ipadLayout->landscapeWidth() << " : " << ipadLayout->width() << ");\n";
+			sm << "\t\tconst float vertScale = frame.size.height / (landscape ? "
+				<< ipadLayout->landscapeHeight() << " : " << ipadLayout->height() << ");\n";
+			sm << '\n';
+			sm << "\t\t(void)horzScale;\n";
+			sm << "\t\t(void)vertScale;\n";
+			for (auto it : widgetInfos)
+			{
+				const UIWidgetPtr & w = it.second.ipad;
+				if (!w.get())
+					continue;
+				sm << '\n';
+				w->iosGenerateLayoutCode("\t\t", sm);
+			}
+			sm << "\t}\n";
+		}
+		sm << "}\n";
+		sm << '\n';
+		sm << "-(BOOL)shouldAutoRotate\n";
+		sm << "{\n";
+		sm << "\treturn YES;\n";
+		sm << "}\n";
+		sm << '\n';
+		sm << "-(NSUInteger)supportedInterfaceOrientations\n";
+		sm << "{\n";
+		if (hasIPhone)
+		{
+			sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)\n";
+			sm << "\t\treturn 0";
+			if (iphoneLayout->allowPortrait())
+				sm << " | UIInterfaceOrientationMaskPortrait";
+			if (iphoneLayout->allowLandscape())
+				sm << " | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight";
+			sm << ";\n";
+		}
+		if (hasIPad)
+		{
+			sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)\n";
+			sm << "\t\treturn 0";
+			if (iphoneLayout->allowPortrait())
+				sm << " | UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown";
+			if (iphoneLayout->allowLandscape())
+				sm << " | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight";
+			sm << ";\n";
+		}
+		sm << "}\n";
+		sm << '\n';
 		sm << "@end\n";
 
 		std::string generatedPathH = project->yipDirectory()->writeFile(targetPathH, sh.str());
@@ -260,6 +371,8 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 
 void compileUI(const ProjectPtr & project)
 {
+	generateIOSCommonCode(project);
+
 	LayoutMap layouts;
 	for (const Project::IOSViewController & cntrl : project->iosViewControllers())
 		generateIOSViewController(layouts, project, cntrl);

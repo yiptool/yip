@@ -31,6 +31,7 @@
 #include <memory>
 
 class UILayout;
+class UIGroup;
 
 class UIWidget;
 typedef std::shared_ptr<UIWidget> UIWidgetPtr;
@@ -46,12 +47,13 @@ public:
 		Button
 	};
 
-	UIWidget(UILayout * layout, Kind kind);
+	UIWidget(UILayout * layout, UIGroup * parentGroup, Kind kind);
 	~UIWidget();
 
-	static UIWidgetPtr create(UILayout * layout, const std::string & className);
+	static UIWidgetPtr create(UILayout * layout, UIGroup * parentGroup, const std::string & className);
 
 	inline UILayout * layout() const { return m_Layout; }
+	inline UIGroup * parentGroup() const { return m_Parent; }
 
 	inline Kind kind() const { return m_Kind; }
 	inline const std::string & id() const { return m_ID; }
@@ -63,16 +65,29 @@ public:
 	inline float width() const { return m_Width; }
 	inline float height() const { return m_Height; }
 
+	inline float landscapeX() const { return m_LandscapeX; }
+	inline float landscapeY() const { return m_LandscapeY; }
+	inline float landscapeWidth() const { return m_LandscapeWidth; }
+	inline float landscapeHeight() const { return m_LandscapeHeight; }
+
 	inline UIScaleMode xScaleMode() const { return m_XScaleMode; }
 	inline UIScaleMode yScaleMode() const { return m_YScaleMode; }
 	inline UIScaleMode widthScaleMode() const { return m_WidthScaleMode; }
 	inline UIScaleMode heightScaleMode() const { return m_HeightScaleMode; }
 
+	inline UIScaleMode landscapeXScaleMode() const { return m_LandscapeXScaleMode; }
+	inline UIScaleMode landscapeYScaleMode() const { return m_LandscapeYScaleMode; }
+	inline UIScaleMode landscapeWidthScaleMode() const { return m_LandscapeWidthScaleMode; }
+	inline UIScaleMode landscapeHeightScaleMode() const { return m_LandscapeHeightScaleMode; }
+
 	inline UIAlignment alignment() const { return m_Alignment; }
+	inline UIAlignment landscapeAlignment() const { return m_LandscapeAlignment; }
 
 	void parse(const TiXmlElement * element);
 
-	virtual void iosGenerateInitCode(std::stringstream & ss) = 0;
+	virtual const char * iosClassName() const = 0;
+	virtual void iosGenerateInitCode(const std::string & prefix, std::stringstream & ss);
+	virtual void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss);
 
 protected:
 	virtual void beforeParseAttributes(const TiXmlElement * element);
@@ -81,6 +96,7 @@ protected:
 
 private:
 	UILayout * m_Layout;
+	UIGroup * m_Parent;
 	Kind m_Kind;
 	std::string m_ID;
 	UIColor m_BackgroundColor;
@@ -88,14 +104,26 @@ private:
 	float m_Y;
 	float m_Width;
 	float m_Height;
+	float m_LandscapeX;
+	float m_LandscapeY;
+	float m_LandscapeWidth;
+	float m_LandscapeHeight;
 	UIScaleMode m_XScaleMode;
 	UIScaleMode m_YScaleMode;
 	UIScaleMode m_WidthScaleMode;
 	UIScaleMode m_HeightScaleMode;
+	UIScaleMode m_LandscapeXScaleMode;
+	UIScaleMode m_LandscapeYScaleMode;
+	UIScaleMode m_LandscapeWidthScaleMode;
+	UIScaleMode m_LandscapeHeightScaleMode;
 	UIAlignment m_Alignment;
+	UIAlignment m_LandscapeAlignment;
 
 	UIWidget(const UIWidget &) = delete;
 	UIWidget & operator=(const UIWidget &) = delete;
 };
+
+void uiFloatPairFromAttr(const TiXmlAttribute * attr, float * outX, float * outY,
+	float * outLandscapeX, float * outLandscapeY);
 
 #endif

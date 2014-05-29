@@ -77,10 +77,8 @@ public:
 	{
 		std::string name;
 		std::string parentClass;
-		SourceFilePtr iphonePortrait;
-		SourceFilePtr iphoneLandscape;
-		SourceFilePtr ipadPortrait;
-		SourceFilePtr ipadLandscape;
+		SourceFilePtr ipad;
+		SourceFilePtr iphone;
 	};
 
 	Project(const std::string & prjPath);

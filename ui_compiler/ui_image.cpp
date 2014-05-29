@@ -24,8 +24,8 @@
 #include "../util/tinyxml-util/tinyxml-util.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 
-UIImage::UIImage(UILayout * layout)
-	: UIWidget(layout, UIWidget::Image)
+UIImage::UIImage(UILayout * layout, UIGroup * parentGroup)
+	: UIWidget(layout, parentGroup, UIWidget::Image)
 {
 }
 
@@ -33,8 +33,15 @@ UIImage::~UIImage()
 {
 }
 
-void UIImage::iosGenerateInitCode(std::stringstream & ss)
+void UIImage::iosGenerateInitCode(const std::string & prefix, std::stringstream & ss)
 {
+	ss << prefix << id() << " = [[UIImageView alloc] initWithImage:nil];\n";
+	UIWidget::iosGenerateInitCode(prefix, ss);
+}
+
+void UIImage::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIWidget::iosGenerateLayoutCode(prefix, ss);
 }
 
 bool UIImage::parseAttribute(const TiXmlAttribute *)

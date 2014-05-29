@@ -24,8 +24,8 @@
 #include "../util/tinyxml-util/tinyxml-util.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 
-UIGroup::UIGroup(UILayout * layout)
-	: UIWidget(layout, UIWidget::Group)
+UIGroup::UIGroup(UILayout * layout, UIGroup * parentGroup)
+	: UIWidget(layout, parentGroup, UIWidget::Group)
 {
 }
 
@@ -33,8 +33,15 @@ UIGroup::~UIGroup()
 {
 }
 
-void UIGroup::iosGenerateInitCode(std::stringstream & ss)
+void UIGroup::iosGenerateInitCode(const std::string & prefix, std::stringstream & ss)
 {
+	ss << prefix << id() << " = [[UIView alloc] initWithFrame:CGRectZero];\n";
+	UIWidget::iosGenerateInitCode(prefix, ss);
+}
+
+void UIGroup::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIWidget::iosGenerateLayoutCode(prefix, ss);
 }
 
 void UIGroup::afterParseAttributes(const TiXmlElement * element)
@@ -43,7 +50,7 @@ void UIGroup::afterParseAttributes(const TiXmlElement * element)
 	{
 		UIWidgetPtr widget;
 		try {
-			widget = UIWidget::create(layout(), child->ValueStr());
+			widget = UIWidget::create(layout(), this, child->ValueStr());
 		} catch (const std::exception & e) {
 			throw std::runtime_error(xmlError(child, e.what()));
 		}

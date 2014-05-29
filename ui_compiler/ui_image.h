@@ -29,10 +29,12 @@
 class UIImage : public UIWidget
 {
 public:
-	UIImage(UILayout * layout);
+	UIImage(UILayout * layout, UIGroup * parentGroup);
 	~UIImage();
 
-	void iosGenerateInitCode(std::stringstream & ss) override;
+	const char * iosClassName() const override { return "UIImageView"; }
+	void iosGenerateInitCode(const std::string & prefix, std::stringstream & ss) override;
+	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 protected:
 	virtual bool parseAttribute(const TiXmlAttribute * attr);

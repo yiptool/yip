@@ -35,8 +35,14 @@ public:
 	UILayout();
 	~UILayout();
 
+	inline bool allowPortrait() const { return m_AllowPortrait; }
+	inline bool allowLandscape() const { return m_AllowLandscape; }
+
 	inline float width() const { return m_Width; }
 	inline float height() const { return m_Height; }
+
+	inline float landscapeWidth() const { return m_LandscapeWidth; }
+	inline float landscapeHeight() const { return m_LandscapeHeight; }
 
 	inline const std::unordered_map<std::string, UIWidgetPtr> & widgetMap() const { return m_WidgetMap; }
 	UIWidgetPtr widgetForID(const std::string & id) const;
@@ -49,6 +55,10 @@ private:
 	std::unordered_map<std::string, UIWidgetPtr> m_WidgetMap;
 	float m_Width;
 	float m_Height;
+	float m_LandscapeWidth;
+	float m_LandscapeHeight;
+	bool m_AllowPortrait;
+	bool m_AllowLandscape;
 
 	UILayout(const UILayout &) = delete;
 	UILayout & operator=(const UILayout &) = delete;

@@ -24,8 +24,8 @@
 #include "../util/tinyxml-util/tinyxml-util.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 
-UIButton::UIButton(UILayout * layout)
-	: UIWidget(layout, UIWidget::Button)
+UIButton::UIButton(UILayout * layout, UIGroup * parentGroup)
+	: UIWidget(layout, parentGroup, UIWidget::Button)
 {
 }
 
@@ -33,8 +33,15 @@ UIButton::~UIButton()
 {
 }
 
-void UIButton::iosGenerateInitCode(std::stringstream & ss)
+void UIButton::iosGenerateInitCode(const std::string & prefix, std::stringstream & ss)
 {
+	ss << prefix << id() << " = [[UIButton buttonWithType:UIButtonTypeCustom] retain];\n";
+	UIWidget::iosGenerateInitCode(prefix, ss);
+}
+
+void UIButton::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIWidget::iosGenerateLayoutCode(prefix, ss);
 }
 
 bool UIButton::parseAttribute(const TiXmlAttribute *)

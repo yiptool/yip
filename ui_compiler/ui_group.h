@@ -29,10 +29,12 @@
 class UIGroup : public UIWidget
 {
 public:
-	UIGroup(UILayout * layout);
+	UIGroup(UILayout * layout, UIGroup * parentGroup);
 	~UIGroup();
 
-	void iosGenerateInitCode(std::stringstream & ss) override;
+	const char * iosClassName() const override { return "UIView"; }
+	void iosGenerateInitCode(const std::string & prefix, std::stringstream & ss) override;
+	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 protected:
 	void afterParseAttributes(const TiXmlElement * element) override;

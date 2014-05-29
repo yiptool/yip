@@ -22,11 +22,16 @@
 //
 #include "ui_layout.h"
 #include "../util/tinyxml-util/tinyxml-util.h"
+#include "../util/cxx-util/cxx-util/fmt.h"
 
 UILayout::UILayout()
 	: m_NextUniqueID(1),
 	  m_Width(0.0f),
-	  m_Height(0.0f)
+	  m_Height(0.0f),
+	  m_LandscapeWidth(0.0f),
+	  m_LandscapeHeight(0.0f),
+	  m_AllowPortrait(false),
+	  m_AllowLandscape(false)
 {
 }
 
@@ -50,20 +55,29 @@ void UILayout::parse(const TiXmlDocument * doc)
 	{
 		const std::string & name = attr->NameTStr();
 		if (name == "size")
+			uiFloatPairFromAttr(attr, &m_Width, &m_Height, &m_LandscapeWidth, &m_LandscapeHeight);
+		else if (name == "portrait")
 		{
-			std::vector<float> values;
-			if (!xmlAttrToCommaSeparatedFloatList(attr, values) || values.size() != 2)
+			if (!xmlAttrToBool(attr, m_AllowPortrait))
 				throw std::runtime_error(xmlInvalidAttributeValue(attr));
-			m_Width = values[0];
-			m_Height = values[1];
 		}
+		else if (name == "landscape")
+		{
+			if (!xmlAttrToBool(attr, m_AllowLandscape))
+				throw std::runtime_error(xmlInvalidAttributeValue(attr));
+		}
+		else
+			throw std::runtime_error(xmlError(attr, fmt() << "unknown attribute '" << name << "'."));
 	}
+
+	if (!m_AllowPortrait && !m_AllowLandscape)
+		throw std::runtime_error(xmlError(element, "neither portrait, nor landscape orientation were allowed."));
 
 	for (const TiXmlElement * child = element->FirstChildElement(); child; child = child->NextSiblingElement())
 	{
 		UIWidgetPtr widget;
 		try {
-			widget = UIWidget::create(this, child->ValueStr());
+			widget = UIWidget::create(this, nullptr, child->ValueStr());
 		} catch (const std::exception & e) {
 			throw std::runtime_error(xmlError(child, e.what()));
 		}
