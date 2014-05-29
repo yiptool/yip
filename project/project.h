@@ -61,12 +61,16 @@ public:
 	struct ToDo
 	{
 		std::string message;
+		std::string file;
+		int line;
 		int year;
 		int month;
 		int day;
 
-		inline ToDo(const std::string & msg, int y, int m, int d)
+		inline ToDo(const std::string & f, int l, const std::string & msg, int y, int m, int d)
 			: message(msg),
+			  file(f),
+			  line(l),
 			  year(y),
 			  month(m),
 			  day(d)
@@ -115,8 +119,9 @@ public:
 	void addHeaderPath(const std::string & path, Platform::Type platform);
 	inline const std::map<std::string, HeaderPathPtr> & headerPaths() const { return m_HeaderPaths; }
 
-	inline void addToDo(const std::string & message, int year, int month, int day)
-		{ m_ToDo.push_back(ToDo(message, year, month, day)); }
+	inline void addToDo(const std::string & file, int line, const std::string & message,
+			int year = -1, int month = -1, int day = -1)
+		{ m_ToDo.push_back(ToDo(file, line, message, year, month, day)); }
 	inline const std::vector<ToDo> & toDo() const { return m_ToDo; }
 
 	// WinRT

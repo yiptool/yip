@@ -1032,7 +1032,7 @@ void ProjectFileParser::parseToDo()
 			getToken();
 		}
 
-		m_Project->addToDo(message, year, month, day);
+		m_Project->addToDo(m_FileName, m_TokenLine, message, year, month, day);
 
 		if (m_Token == Token::Comma)
 			getToken();
