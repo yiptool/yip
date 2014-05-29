@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 //
 #include "ui_button.h"
+#include "../util/cxx_escape.h"
 #include "../util/tinyxml-util/tinyxml-util.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 
@@ -37,6 +38,20 @@ void UIButton::iosGenerateInitCode(const std::string & prefix, std::stringstream
 {
 	ss << prefix << id() << " = [[UIButton buttonWithType:UIButtonTypeCustom] retain];\n";
 	UIWidget::iosGenerateInitCode(prefix, ss);
+
+	if (!m_Title.empty())
+	{
+		ss << prefix << '[' << id() << " setTitle:@\"";
+		cxxEscape(ss, m_Title);
+		ss << "\" forState:UIControlStateNormal];\n";
+	}
+
+	if (!m_Image.empty())
+	{
+		ss << prefix << '[' << id() << " setImage:[UIImage imageNamed:@\"";
+		cxxEscape(ss, m_Image);
+		ss << "\"] forState:UIControlStateNormal];\n";
+	}
 }
 
 void UIButton::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
@@ -44,7 +59,18 @@ void UIButton::iosGenerateLayoutCode(const std::string & prefix, std::stringstre
 	UIWidget::iosGenerateLayoutCode(prefix, ss);
 }
 
-bool UIButton::parseAttribute(const TiXmlAttribute *)
+bool UIButton::parseAttribute(const TiXmlAttribute * attr)
 {
+	if (attr->NameTStr() == "title")
+	{
+		m_Title = attr->ValueStr();
+		return true;
+	}
+	else if (attr->NameTStr() == "image")
+	{
+		m_Image = attr->ValueStr();
+		return true;
+	}
+
 	return false;
 }

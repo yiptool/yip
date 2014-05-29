@@ -32,6 +32,9 @@ public:
 	UIButton(UILayout * layout, UIGroup * parentGroup);
 	~UIButton();
 
+	inline const std::string & title() const { return m_Title; }
+	inline const std::string & image() const { return m_Image; }
+
 	const char * iosClassName() const override { return "UIButton"; }
 	void iosGenerateInitCode(const std::string & prefix, std::stringstream & ss) override;
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
@@ -40,6 +43,9 @@ protected:
 	virtual bool parseAttribute(const TiXmlAttribute * attr);
 
 private:
+	std::string m_Title;
+	std::string m_Image;
+
 	UIButton(const UIButton &) = delete;
 	UIButton & operator=(const UIButton &) = delete;
 };
