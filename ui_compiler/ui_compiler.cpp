@@ -230,28 +230,22 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 		{
 			sm << "\t\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)\n";
 			sm << "\t\t{\n";
-			for (auto it : widgetInfos)
+			for (const UIWidgetPtr & widget : iphoneLayout->widgets())
 			{
-				if (it.second.iphone.get())
-					it.second.iphone->iosGenerateInitCode("\t\t\t", sm);
+				widget->iosGenerateInitCode("\t\t\t", sm);
+				sm << "\t\t\t[self.view addSubview:" << widget->id() << "];\n";
 			}
-//			for (const UIWidgetPtr & widget : )
-//			{
-//			}
 			sm << "\t\t}\n";
 		}
 		if (hasIPad)
 		{
 			sm << "\t\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)\n";
 			sm << "\t\t{\n";
-			for (auto it : widgetInfos)
+			for (const UIWidgetPtr & widget : ipadLayout->widgets())
 			{
-				if (it.second.ipad.get())
-					it.second.ipad->iosGenerateInitCode("\t\t\t", sm);
+				widget->iosGenerateInitCode("\t\t\t", sm);
+				sm << "\t\t\t[self.view addSubview:" << widget->id() << "];\n";
 			}
-//			for (const UIWidgetPtr & widget : )
-//			{
-//			}
 			sm << "\t\t}\n";
 		}
 		sm << "\t}\n";

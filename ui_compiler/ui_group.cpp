@@ -37,6 +37,12 @@ void UIGroup::iosGenerateInitCode(const std::string & prefix, std::stringstream 
 {
 	ss << prefix << id() << " = [[UIView alloc] initWithFrame:CGRectZero];\n";
 	UIWidget::iosGenerateInitCode(prefix, ss);
+
+	for (const UIWidgetPtr & widget : m_Widgets)
+	{
+		widget->iosGenerateInitCode(prefix, ss);
+		ss << prefix << "[" << id() << " addSubview:" << widget->id() << "];\n";
+	}
 }
 
 void UIGroup::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
