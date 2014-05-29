@@ -174,10 +174,8 @@ use the `ios:view_controller` directive:
 
       ios:view_controller MyViewController UIViewController
       {
-         iphone_portrait => ui/iphone_portrait.xml,
-         iphone_landscape => ui/iphone_landscape.xml,
-         ipad_portrait => ui/ipad_portrait.xml,
-         ipad_landscape => ui/ipad_landscape.xml
+         iphone => ui/iphone.xml,
+         ipad => ui/ipad.xml
       }
 
 For more information see [User interface layout file format](README_LAYOUT.md)

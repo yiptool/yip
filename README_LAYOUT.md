@@ -3,11 +3,21 @@
 
 User interface layout file is an XML file.
 
-Root element should be named `layout` and should contain a mandatory attribute `size` which
-contains a pair of comma-separated floating-point numbers representing width and height for
-which this UI layout was originally designed.
+Root element should be named `layout` and should contain some mandatory attributes:
 
-Each non-root element in this file represents a UI widget or a widget group. Widget group may
+  * `size` is a size of the layout; it may have one of the following formats: `xx,yy` or `xx,yy/xx,yy`.
+  Here `xx` and `yy` are floating-point numbers representing width and height respectively. This numbers
+  represent an initialial size of the layout, that is - the original size of the mockup. In the latter form
+  (the one with the slash), first pair represents dimensions of the portrait layout and the second pair
+  represents dimensions of the landscape layout.
+
+  * `portrait` is a boolean value (either `yes` or `no`); set it to `yes` if your layout supports portrait
+  orientations.
+
+  * `landscape` is a boolean value (either `yes` or `no`); set it to `yes` if your layout supports landscape
+  orientations.
+
+Each non-root element in the UI file represents a UI widget or a widget group. Widget group may
 have children widgets or groups.
 
 ## Widgets
@@ -23,11 +33,18 @@ The following attributes are available for all widgets and groups:
 
   * `id`: unique ID of the widget.
   * `bgcolor`: background color of the widget.
-  * `pos`: X and Y coordinates of the top left corner of the widget, relative to it's parent group.
-  * `size`: width and height of the widget.
-  * `scale`: scale mode.
+  * `pos`: Comma-separated X and Y coordinates of the top left corner of the widget, relative to it's
+  parent group. You may specify two pairs, separated with a slash (`/`) - the first one will represent
+  position for the portrait orientation and the second one will represent position for the landscape
+  orientation.
+  * `size`: Comma-separated width and height of the widget. You may specify two pairs, separated with
+  a slash (`/`) - the first one will represent size for the portrait orientation and the second one
+  will represent size for the landscape orientation.
+  * `scale`: scale mode. You may specify two scale modes, separated with a slash (`/`) - one for the
+  portrait orientation and one for the landscape orientation.
   * `align`: alignment of widget after applying scale (this is only meaningful when scale mode is not
-  `default`).
+  `default`). You may specify two alignments, separated with a slash (`/`) - one for the
+  portrait orientation and one for the landscape orientation.
 
 ### Unique ID
 
@@ -38,8 +55,9 @@ have the same identifier.
 
 ### Position and size
 
-Position and size should be specified as a pair of comma-separated floating-point numbers. The default
-value for both is `0, 0`.
+Position and size should be specified as a pair of comma-separated floating-point numbers. You may specify
+two pairs, separated with a slash (`/`) - the first one will represent position or size for the portrait
+orientation and the second one - for the landscape orientation.
 
 ### Colors
 
@@ -91,6 +109,9 @@ The following values are available for the scale mode:
   * `vert`: use vertical scale ratio.
   * `avg`: use an average of horizontal and vertical scale ratio.
 
+You may specify two scale modes, separated with a slash (`/`) - one for the portrait orientation and one
+for the landscape orientation.
+
 ### Alignment
 
 When scaling is applied to the widget and scale mode is not `default`, widget size will differ from
@@ -113,3 +134,13 @@ Also the following shortcuts are available:
   * `bl` is the same as `bottom,left`
   * `tr` is the same as `top,right`
   * `br` is the same as `bottom,right`
+
+You may specify two alignments, separated with a slash (`/`) - one for the portrait orientation and one for
+the landscape orientation.
+
+## Button
+
+For a button you may additionaly specify the following attributes:
+
+  * `title`: text to display on the button.
+  * `image`: icon to display on the button.
