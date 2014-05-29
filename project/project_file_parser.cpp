@@ -24,7 +24,7 @@
 #include "../config.h"
 #include "../util/image.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
-#include "../util/path.h"
+#include "../util/path-util/path-util.h"
 #include <unordered_map>
 #include <cassert>
 #include <stdexcept>

@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 //
 #include "config.h"
-#include "util/path.h"
+#include "util/path-util/path-util.h"
 #include "util/cxx-util/cxx-util/fmt.h"
 #include "3rdparty/inih/ini.h"
 #include <cerrno>

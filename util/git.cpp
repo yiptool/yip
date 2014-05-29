@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 //
 #include "git.h"
-#include "path.h"
+#include "path-util/path-util.h"
 #include "cxx-util/cxx-util/fmt.h"
 #include <cstring>
 #include <iostream>

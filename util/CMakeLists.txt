@@ -17,7 +17,6 @@ ADD_LIBRARY(util STATIC
 	image.h
 	json_escape.cpp
 	json_escape.h
-	path.h
 	sha1.cpp
 	sha1.h
 	shell.cpp

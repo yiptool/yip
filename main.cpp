@@ -30,7 +30,7 @@
 #include "xcode/xcode_unique_id.h"
 #include "util/cxx-util/cxx-util/fmt.h"
 #include "util/shell.h"
-#include "util/path.h"
+#include "util/path-util/path-util.h"
 #include "config.h"
 #include <exception>
 #include <fstream>

@@ -23,7 +23,7 @@
 #include "generate_android.h"
 #include "../util/cxx-util/cxx-util/replace.h"
 #include "../util/xml.h"
-#include "../util/path.h"
+#include "../util/path-util/path-util.h"
 #include <map>
 #include <unordered_set>
 #include <sstream>

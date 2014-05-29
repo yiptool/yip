@@ -22,7 +22,7 @@
 //
 #include "file_type.h"
 #include "cxx-util/cxx-util/fmt.h"
-#include "path.h"
+#include "path-util/path-util.h"
 #include <unordered_map>
 
 static std::unordered_map<std::string, FileType> g_ExtMap;

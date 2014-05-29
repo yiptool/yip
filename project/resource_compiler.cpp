@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 //
 #include "resource_compiler.h"
-#include "../util/path.h"
+#include "../util/path-util/path-util.h"
 #include "../util/cxx_escape.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/sha1.h"

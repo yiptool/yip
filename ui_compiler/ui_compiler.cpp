@@ -25,7 +25,7 @@
 #include "../3rdparty/tinyxml/tinyxml.h"
 #include "../util/tinyxml-util/tinyxml-util.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
-#include "../util/path.h"
+#include "../util/path-util/path-util.h"
 #include "../util/sha1.h"
 #include <cassert>
 #include <stdexcept>

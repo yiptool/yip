@@ -24,7 +24,7 @@
 #include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/xml.h"
 #include "../util/sha1.h"
-#include "../util/path.h"
+#include "../util/path-util/path-util.h"
 #include <sstream>
 #include <unordered_set>
 #include <iostream>

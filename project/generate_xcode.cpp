@@ -24,7 +24,7 @@
 #include "../config.h"
 #include "../xcode/xcode_project.h"
 #include "../util/json_escape.h"
-#include "../util/path.h"
+#include "../util/path-util/path-util.h"
 #include "../util/file_type.h"
 #include "../util/xml.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
