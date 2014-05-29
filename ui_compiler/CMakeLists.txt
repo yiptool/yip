@@ -22,4 +22,4 @@ ADD_LIBRARY(ui_compiler STATIC
 	ui_widget.h
 )
 
-TARGET_LINK_LIBRARIES(ui_compiler tinyxml tinyxml-util)
+TARGET_LINK_LIBRARIES(ui_compiler tinyxml tinyxml-util util path-util)
