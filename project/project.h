@@ -28,6 +28,7 @@
 #include "define.h"
 #include "yip_directory.h"
 #include "../util/git.h"
+#include "../translation/translation_file.h"
 #include <vector>
 #include <map>
 #include <unordered_set>
@@ -118,6 +119,8 @@ public:
 
 	void addHeaderPath(const std::string & path, Platform::Type platform);
 	inline const std::map<std::string, HeaderPathPtr> & headerPaths() const { return m_HeaderPaths; }
+
+	void addTranslationFile(const std::string & language, const std::string & name, const std::string & path);
 
 	inline void addToDo(const std::string & file, int line, const std::string & message,
 			int year = -1, int month = -1, int day = -1)
@@ -242,6 +245,7 @@ private:
 	time_t m_ModificationTime;
 	bool m_HasModificationTime;
 	std::vector<ToDo> m_ToDo;
+	std::map<std::string, TranslationFilePtr> m_TranslationFiles;
 	std::map<std::string, HeaderPathPtr> m_HeaderPaths;
 	std::map<std::string, SourceFilePtr> m_SourceFiles;
 	std::map<std::string, SourceFilePtr> m_ResourceFiles;

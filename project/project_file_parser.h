@@ -90,6 +90,7 @@ private:
 	void parseAndroid();
 	void parseLicense();
 	void parseToDo();
+	void parseTranslationFile();
 
 	Platform::Type parsePlatformMask();
 	Platform::Type parsePlatformName();

@@ -106,6 +106,17 @@ void Project::addHeaderPath(const std::string & path, Platform::Type platform)
 	}
 }
 
+void Project::addTranslationFile(const std::string & language, const std::string & name, const std::string & path)
+{
+	auto it = m_TranslationFiles.find(language);
+	if (it != m_TranslationFiles.end())
+		throw std::runtime_error(fmt() << "multiple translation files for language '" << language << "'.");
+
+	TranslationFilePtr file = std::make_shared<TranslationFile>(this, language, name, path);
+	file->parse();
+	m_TranslationFiles.insert(std::make_pair(language, file));
+}
+
 void Project::winrtAddLibrary(const std::string & name)
 {
 	m_WinRTLibraries.insert(name);

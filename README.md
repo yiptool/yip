@@ -180,6 +180,21 @@ use the `ios:view_controller` directive:
 
 For more information see [User interface layout file format](README_UI.md).
 
+### Translations
+
+Yip is able to handle translations to multiple languages.
+
+There is a special directive `translation_file` which loads the specified
+translation file. The syntax is as follows:
+
+      translation_file ru russian.xml
+
+Translation file is an XML file. If the specified file does not exist,
+it will be created. Also, Yip will periodically update the file by adding
+new untranslated strings it will find in source files.
+
+For more information see [Translation file format](README_I18N.md).
+
 ### Application source files
 
 Source files specified in the `source` directive are compiled both when project

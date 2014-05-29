@@ -25,13 +25,16 @@
 #include "../util/path-util/path-util.h"
 #include "../util/tinyxml-util/tinyxml-util.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
+#include "../util/cxx-util/cxx-util/write_file.h"
 #include <sstream>
 #include <cassert>
 
-TranslationFile::TranslationFile(Project * project, const std::string & language, const std::string & path)
-	: m_Language(language),
+TranslationFile::TranslationFile(Project * prj, const std::string & lang, const std::string & name,
+		const std::string & path)
+	: m_Language(lang),
+	  m_Name(name),
 	  m_Path(pathMakeAbsolute(path)),
-	  m_Project(project),
+	  m_Project(prj),
 	  m_HasXML(false),
 	  m_HasNonTranslatedStrings(false)
 {
@@ -41,7 +44,19 @@ void TranslationFile::parse()
 {
 	try
 	{
-		std::cout << "parsing " << m_Path << std::endl;
+		if (pathIsFile(m_Path))
+			std::cout << "parsing " << m_Name << std::endl;
+		else
+		{
+			std::cout << "writing " << m_Name << std::endl;
+
+			std::stringstream ss;
+			ss << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+			ss << "<translations>\n";
+			ss << "</translations>\n";
+
+			writeFile(m_Path, ss.str());
+		}
 
 		m_HasXML = true;
 		if (!m_XML.LoadFile(m_Path))
@@ -76,6 +91,13 @@ void TranslationFile::parse()
 				throw std::runtime_error(xmlMissingAttribute(e, "f"));
 			if (!attrTo)
 				throw std::runtime_error(xmlMissingAttribute(e, "t"));
+
+			const TiXmlElement * child = e->FirstChildElement();
+			if (child)
+			{
+				throw std::runtime_error(xmlError(child,
+					fmt() << "unexpected element '" << child->ValueStr() << "'."));
+			}
 
 			const std::string & from = attrFrom->ValueStr();
 			std::string to = attrTo->ValueStr();

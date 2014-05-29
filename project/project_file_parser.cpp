@@ -116,6 +116,7 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const std::st
 	m_CommandHandlers.insert(std::make_pair("tizen", &ProjectFileParser::parseTizen));
 	m_CommandHandlers.insert(std::make_pair("license", &ProjectFileParser::parseLicense));
 	m_CommandHandlers.insert(std::make_pair("todo", &ProjectFileParser::parseToDo));
+	m_CommandHandlers.insert(std::make_pair("translation_file", &ProjectFileParser::parseTranslationFile));
 }
 
 ProjectFileParser::~ProjectFileParser()
@@ -1040,6 +1041,27 @@ void ProjectFileParser::parseToDo()
 			break;
 		else
 			{ reportError("expected '}'."); return; }
+	}
+}
+
+void ProjectFileParser::parseTranslationFile()
+{
+	if (getToken() != Token::Literal)
+		{ reportError("expected language name after 'translation_file'."); return; }
+	std::string language = m_TokenText;
+
+	if (getToken() != Token::Literal)
+		{ reportError("expected translation file name."); return; }
+	std::string file = m_TokenText;
+
+	try
+	{
+		std::string path = pathMakeAbsolute(file, m_ProjectPath);
+		m_Project->addTranslationFile(language, file, path);
+	}
+	catch (const std::exception & e)
+	{
+		reportError(e.what());
 	}
 }
 

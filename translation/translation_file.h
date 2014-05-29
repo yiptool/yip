@@ -33,7 +33,7 @@ class Project;
 class TranslationFile
 {
 public:
-	TranslationFile(Project * project, const std::string & language, const std::string & path);
+	TranslationFile(Project * prj, const std::string & lang, const std::string & name, const std::string & path);
 	inline ~TranslationFile() {}
 
 	void parse();
@@ -44,6 +44,7 @@ public:
 
 private:
 	std::string m_Language;
+	std::string m_Name;
 	std::string m_Path;
 	Project * m_Project;
 	mutable std::map<std::string, std::string> m_Strings;
