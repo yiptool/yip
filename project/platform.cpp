@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 //
 #include "platform.h"
-#include "../util/fmt.h"
+#include "../util/cxx-util/cxx-util/fmt.h"
 #include <unordered_map>
 
 static std::unordered_map<std::string, Platform::Type> g_PlatformMap;

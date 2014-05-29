@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 //
 #include "generate_tizen.h"
-#include "../util/fmt.h"
+#include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/xml.h"
 #include "../util/sha1.h"
 #include "../util/path.h"

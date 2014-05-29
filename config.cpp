@@ -22,7 +22,7 @@
 //
 #include "config.h"
 #include "util/path.h"
-#include "util/fmt.h"
+#include "util/cxx-util/cxx-util/fmt.h"
 #include "3rdparty/inih/ini.h"
 #include <cerrno>
 #include <cstring>

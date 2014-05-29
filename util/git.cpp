@@ -22,7 +22,7 @@
 //
 #include "git.h"
 #include "path.h"
-#include "fmt.h"
+#include "cxx-util/cxx-util/fmt.h"
 #include <cstring>
 #include <iostream>
 #include <iomanip>

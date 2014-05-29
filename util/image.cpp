@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 //
 #include "image.h"
-#include "fmt.h"
+#include "cxx-util/cxx-util/fmt.h"
 #include "../3rdparty/libpng/png.h"
 #include <new>
 #include <stdexcept>

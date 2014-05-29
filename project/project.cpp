@@ -22,7 +22,7 @@
 //
 #include "project.h"
 #include "../util/sha1.h"
-#include "../util/fmt.h"
+#include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/cxx_escape.h"
 
 Project::Project(const std::string & prjPath)

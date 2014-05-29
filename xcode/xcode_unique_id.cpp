@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 //
 #include "xcode_unique_id.h"
-#include "../util/fmt.h"
+#include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/sha1.h"
 #include <ctime>
 #include <cstring>

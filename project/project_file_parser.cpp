@@ -23,7 +23,7 @@
 #include "project_file_parser.h"
 #include "../config.h"
 #include "../util/image.h"
-#include "../util/fmt.h"
+#include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/path.h"
 #include <unordered_map>
 #include <cassert>

@@ -23,7 +23,7 @@
 #include "yip_directory.h"
 #include "project.h"
 #include "../util/cxx-util/cxx-util/write_file.h"
-#include "../util/fmt.h"
+#include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/path.h"
 #include "../util/sha1.h"
 #include <cassert>

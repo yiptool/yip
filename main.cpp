@@ -28,7 +28,7 @@
 #include "ui_compiler/ui_compiler.h"
 #include "3rdparty/libgit2/include/git2/threads.h"
 #include "xcode/xcode_unique_id.h"
-#include "util/fmt.h"
+#include "util/cxx-util/cxx-util/fmt.h"
 #include "util/shell.h"
 #include "util/path.h"
 #include "config.h"

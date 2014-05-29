@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 //
 #include "file_type.h"
-#include "fmt.h"
+#include "cxx-util/cxx-util/fmt.h"
 #include "path.h"
 #include <unordered_map>
 

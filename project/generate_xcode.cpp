@@ -27,7 +27,7 @@
 #include "../util/path.h"
 #include "../util/file_type.h"
 #include "../util/xml.h"
-#include "../util/fmt.h"
+#include "../util/cxx-util/cxx-util/fmt.h"
 #include <map>
 #include <sstream>
 #include <cassert>

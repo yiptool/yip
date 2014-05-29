@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 //
 #include "shell.h"
-#include "fmt.h"
+#include "cxx-util/cxx-util/fmt.h"
 #include <iostream>
 #include <sstream>
 

@@ -11,7 +11,6 @@ ADD_LIBRARY(util STATIC
 	cxx_escape.h
 	file_type.cpp
 	file_type.h
-	fmt.h
 	git.cpp
 	git.h
 	image.cpp

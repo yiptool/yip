@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 //
 #include "sqlite.h"
-#include "fmt.h"
+#include "cxx-util/cxx-util/fmt.h"
 #include <stdexcept>
 #include <iostream>
 
