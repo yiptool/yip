@@ -4,6 +4,8 @@ ADD_LIBRARY(ui_compiler STATIC
 	attributes/ui_alignment.h
 	attributes/ui_color.cpp
 	attributes/ui_color.h
+	attributes/ui_font.cpp
+	attributes/ui_font.h
 	attributes/ui_scale_mode.cpp
 	attributes/ui_scale_mode.h
 	widgets/ui_button.cpp
