@@ -113,9 +113,8 @@ public:
 		BuildType::Value buildTypes = BuildType::All);
 	inline const std::map<std::string, DefinePtr> & defines() const { return m_Defines; }
 
-	inline bool addImport(const std::string & name, const std::string & url)
-		{ return m_Imports.insert(std::make_pair(name, url)).second; }
-	inline const std::map<std::string, std::string> & imports() const { return m_Imports; }
+	inline bool addImport(const std::string & url) { return m_Imports.insert(url).second; }
+	inline const std::set<std::string> & imports() const { return m_Imports; }
 
 	void addHeaderPath(const std::string & path, Platform::Type platform);
 	inline const std::map<std::string, HeaderPathPtr> & headerPaths() const { return m_HeaderPaths; }
@@ -252,7 +251,7 @@ private:
 	std::map<std::string, SourceFilePtr> m_SourceFiles;
 	std::map<std::string, SourceFilePtr> m_ResourceFiles;
 	std::map<std::string, DefinePtr> m_Defines;
-	std::map<std::string, std::string> m_Imports;
+	std::set<std::string> m_Imports;
 	std::map<std::string, std::string> m_OSXFrameworks;
 	std::map<std::string, std::string> m_IOSFrameworks;
 	std::map<ImageSize, std::string> m_OSXIcons;

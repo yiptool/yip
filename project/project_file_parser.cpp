@@ -423,7 +423,7 @@ void ProjectFileParser::parseImport()
 	std::string url = (it != g_Config->repos.end() ? it->second : m_TokenText);
 	std::string name = (it != g_Config->repos.end() ? it->first : m_TokenText);
 
-	if (!m_Project->addImport(name, url))
+	if (!m_Project->addImport(url))
 		return;
 
 	if (!m_ResolveImports)

@@ -137,17 +137,21 @@ static ProjectPtr loadProject(Platform::Type platform = Platform::None)
 	if (ios || project->yipDirectory()->didBuildIOS())
 	{
 		std::string url = "https://github.com/yiptool/ios-util.git";
-		project->addImport(url, url);
-		ProjectFileParser::parseFromGit(project, url, Platform::iOS);
-		project->yipDirectory()->setDidBuildIOS();
+		if (project->addImport(url))
+		{
+			ProjectFileParser::parseFromGit(project, url, Platform::iOS);
+			project->yipDirectory()->setDidBuildIOS();
+		}
 	}
 
 	if (tizen || project->yipDirectory()->didBuildTizen())
 	{
 		std::string url = "https://github.com/oss-forks/libcxx.git";
-		project->addImport(url, url);
-		ProjectFileParser::parseFromGit(project, url, Platform::Tizen);
-		project->yipDirectory()->setDidBuildTizen();
+		if (project->addImport(url))
+		{
+			ProjectFileParser::parseFromGit(project, url, Platform::Tizen);
+			project->yipDirectory()->setDidBuildTizen();
+		}
 		std::string headerPath = pathConcat(project->yipDirectory()->getGitRepositoryPath(url), "include");
 		project->addHeaderPath(headerPath, Platform::Tizen);
 	}
@@ -164,9 +168,9 @@ static void updateProjectImports(const ProjectPtr & project)
 	}
 
 	GitProgressPrinter printer;
-	for (auto it : project->imports())
+	for (const std::string & url : project->imports())
 	{
-		GitRepositoryPtr repo = project->yipDirectory()->openGitRepository(it.second, &printer);
+		GitRepositoryPtr repo = project->yipDirectory()->openGitRepository(url, &printer);
 		repo->updateHeadToRemote("origin", &printer);
 	}
 }
