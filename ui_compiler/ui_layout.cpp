@@ -72,7 +72,7 @@ void UILayout::parse(const TiXmlDocument * doc)
 	}
 
 	if (!m_AllowPortrait && !m_AllowLandscape)
-		throw std::runtime_error(xmlError(element, "neither portrait, nor landscape orientation were allowed."));
+		throw std::runtime_error(xmlError(element, "neither portrait, nor landscape orientation were enabled."));
 
 	for (const TiXmlElement * child = element->FirstChildElement(); child; child = child->NextSiblingElement())
 	{
