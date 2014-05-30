@@ -26,11 +26,9 @@
 #include "ui_button.h"
 #include "ui_label.h"
 #include "ui_image.h"
+#include "parse_util.h"
 #include "../util/tinyxml-util/tinyxml-util.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
-#include "../util/cxx-util/cxx-util/explode.h"
-#include "../util/cxx-util/cxx-util/trim.h"
-#include "../util/strtod/strtod.h"
 #include <cassert>
 
 UIWidget::UIWidget(UILayout * layout, UIGroup * parentGroup, Kind kind)
@@ -76,115 +74,6 @@ UIWidgetPtr UIWidget::create(UILayout * layout, UIGroup * parentGroup, const std
 		return std::make_shared<UIImage>(layout, parentGroup);
 
 	throw std::runtime_error(fmt() << "invalid widget class '" << className << "'.");
-}
-
-void uiFloatPairFromAttr(const TiXmlAttribute * attr, float * outX, float * outY,
-	float * outLandscapeX, float * outLandscapeY)
-{
-	std::vector<std::string> lists = explode(attr->ValueStr(), '/');
-	if (lists.size() < 1 || lists.size() > 2)
-		throw std::runtime_error(xmlInvalidAttributeValue(attr));
-
-	std::vector<std::string> p = explode(lists[0], ',');
-	std::vector<std::string> l = explode(lists.size() > 1 ? lists[1] : lists[0], ',');
-	if (p.size() != 2 || l.size() != 2)
-		throw std::runtime_error(xmlInvalidAttributeValue(attr));
-
-	if (!strToFloat(trim(p[0]), *outX) || !strToFloat(trim(p[1]), *outY) ||
-			!strToFloat(trim(l[0]), *outLandscapeX) || !strToFloat(trim(l[1]), *outLandscapeY))
-		throw std::runtime_error(xmlInvalidAttributeValue(attr));
-}
-
-static void uiScaleModeFromAttr(const TiXmlAttribute * attr, UIScaleMode * outMode1, UIScaleMode * outMode2)
-{
-	std::vector<std::string> list = explode(attr->ValueStr(), '/');
-	if (list.size() < 1 || list.size() > 2)
-		throw std::runtime_error(xmlInvalidAttributeValue(attr));
-
-	try
-	{
-		*outMode1 = uiScaleModeFromString(list[0]);
-		*outMode2 = uiScaleModeFromString(list.size() > 1 ? list[1] : list[0]);
-	}
-	catch (const std::exception & e)
-	{
-		throw std::runtime_error(xmlError(attr, e.what()));
-	}
-}
-
-static void uiScaleModeFromAttr1(const TiXmlAttribute * attr, UIScaleMode * outMode1, UIScaleMode * outMode2,
-	bool * hasValue)
-{
-	if (*hasValue)
-		throw std::runtime_error(xmlError(attr, "multiple scale modes for the same attribute."));
-	uiScaleModeFromAttr(attr, outMode1, outMode2);
-	*hasValue = true;
-}
-
-static void uiScaleModeFromAttr2(const TiXmlAttribute * attr, UIScaleMode * outModeA1, UIScaleMode * outModeA2,
-	UIScaleMode * outModeB1, UIScaleMode * outModeB2, bool * hasValueA, bool * hasValueB)
-{
-	if (*hasValueA || *hasValueB)
-		throw std::runtime_error(xmlError(attr, "multiple scale modes for the same attribute."));
-
-	uiScaleModeFromAttr(attr, outModeA1, outModeA2);
-	*outModeB1 = *outModeA1;
-	*outModeB2 = *outModeA2;
-
-	*hasValueA = true;
-	*hasValueB = true;
-}
-
-static void uiScaleModeFromAttr4(const TiXmlAttribute * attr, UIScaleMode * outModeA1, UIScaleMode * outModeA2,
-	UIScaleMode * outModeB1, UIScaleMode * outModeB2, UIScaleMode * outModeC1, UIScaleMode * outModeC2,
-	UIScaleMode * outModeD1, UIScaleMode * outModeD2, bool * hasValueA, bool * hasValueB, bool * hasValueC,
-	bool * hasValueD)
-{
-	if (*hasValueA || *hasValueB || *hasValueC || *hasValueD)
-		throw std::runtime_error(xmlError(attr, "multiple scale modes for the same attribute."));
-
-	uiScaleModeFromAttr(attr, outModeA1, outModeA2);
-	*outModeB1 = *outModeA1;
-	*outModeB2 = *outModeA2;
-	*outModeC1 = *outModeA1;
-	*outModeC2 = *outModeA2;
-	*outModeD1 = *outModeA1;
-	*outModeD2 = *outModeA2;
-
-	*hasValueA = true;
-	*hasValueB = true;
-	*hasValueC = true;
-	*hasValueD = true;
-}
-
-#define uiScaleModeFromAttr1(ATTR, WHAT) \
-	uiScaleModeFromAttr1(ATTR, &m_##WHAT##ScaleMode, &m_Landscape##WHAT##ScaleMode, &has##WHAT##Scale)
-
-#define uiScaleModeFromAttr2(ATTR, WHAT1, WHAT2) \
-	uiScaleModeFromAttr2(ATTR, &m_##WHAT1##ScaleMode, &m_Landscape##WHAT1##ScaleMode, \
-		&m_##WHAT2##ScaleMode, &m_Landscape##WHAT2##ScaleMode, &has##WHAT1##Scale, &has##WHAT2##Scale)
-
-#define uiScaleModeFromAttr4(ATTR, WHAT1, WHAT2, WHAT3, WHAT4) \
-	uiScaleModeFromAttr4(ATTR, &m_##WHAT1##ScaleMode, &m_Landscape##WHAT1##ScaleMode, \
-		&m_##WHAT2##ScaleMode, &m_Landscape##WHAT2##ScaleMode, &m_##WHAT3##ScaleMode, \
-		&m_Landscape##WHAT3##ScaleMode, &m_##WHAT4##ScaleMode, &m_Landscape##WHAT4##ScaleMode, \
-		&has##WHAT1##Scale, &has##WHAT2##Scale, &has##WHAT3##Scale, &has##WHAT4##Scale)
-
-static void uiAlignmentFromAttr(const TiXmlAttribute * attr, UIAlignment * outAlign1, UIAlignment * outAlign2)
-{
-	std::vector<std::string> list = explode(attr->ValueStr(), '/');
-	if (list.size() < 1 || list.size() > 2)
-		throw std::runtime_error(xmlInvalidAttributeValue(attr));
-
-	try
-	{
-		*outAlign1 = uiAlignmentFromString(list[0]);
-		*outAlign2 = uiAlignmentFromString(list.size() > 1 ? list[1] : list[0]);
-	}
-	catch (const std::exception & e)
-	{
-		throw std::runtime_error(xmlError(attr, e.what()));
-	}
 }
 
 void UIWidget::parse(const TiXmlElement * element)

@@ -124,7 +124,4 @@ private:
 	UIWidget & operator=(const UIWidget &) = delete;
 };
 
-void uiFloatPairFromAttr(const TiXmlAttribute * attr, float * outX, float * outY,
-	float * outLandscapeX, float * outLandscapeY);
-
 #endif

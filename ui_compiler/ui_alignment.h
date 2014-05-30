@@ -47,6 +47,5 @@ enum UIAlignment
 };
 
 UIAlignment uiAlignmentFromString(const std::string & str);
-UIAlignment uiAlignmentFromAttr(const TiXmlAttribute * attr);
 
 #endif

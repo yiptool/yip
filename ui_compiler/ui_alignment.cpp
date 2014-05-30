@@ -62,15 +62,3 @@ UIAlignment uiAlignmentFromString(const std::string & str)
 
 	return align;
 }
-
-UIAlignment uiAlignmentFromAttr(const TiXmlAttribute * attr)
-{
-	try
-	{
-		return uiAlignmentFromString(attr->ValueStr());
-	}
-	catch (const std::exception & e)
-	{
-		throw std::runtime_error(xmlError(attr, e.what()));
-	}
-}

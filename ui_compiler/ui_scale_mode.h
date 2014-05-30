@@ -37,6 +37,5 @@ enum UIScaleMode
 };
 
 UIScaleMode uiScaleModeFromString(const std::string & str);
-UIScaleMode uiScaleModeFromAttr(const TiXmlAttribute * attr);
 
 #endif

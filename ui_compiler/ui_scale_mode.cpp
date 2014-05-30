@@ -42,11 +42,3 @@ UIScaleMode uiScaleModeFromString(const std::string & str)
 		throw std::runtime_error(fmt() << "invalid scale mode '" << str << "'.");
 	return it->second;
 }
-
-UIScaleMode uiScaleModeFromAttr(const TiXmlAttribute * attr)
-{
-	auto it = g_ScaleModeNames.find(attr->ValueStr());
-	if (it == g_ScaleModeNames.end())
-		throw std::runtime_error(xmlError(attr, fmt() << "invalid scale mode '" << attr->ValueStr() << "'."));
-	return it->second;
-}

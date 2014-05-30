@@ -1,5 +1,7 @@
 
 ADD_LIBRARY(ui_compiler STATIC
+	parse_util.cpp
+	parse_util.h
 	ui_alignment.cpp
 	ui_alignment.h
 	ui_button.cpp
