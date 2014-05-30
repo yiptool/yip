@@ -219,7 +219,7 @@ void UIButton::iosGenerateInitCode(const ProjectPtr & project, const std::string
 
 	if (!m_Image.empty())
 	{
-		ss << prefix << '[' << id() << " setImage:YIP::iosGetImage(@\"";
+		ss << prefix << '[' << id() << " setImage:iosImageFromResource(@\"";
 		cxxEscape(ss, m_Image);
 		ss << "\") forState:UIControlStateNormal];\n";
 	}
@@ -294,9 +294,6 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 
 		std::stringstream sh;
 		sh << "#import <UIKit/UIKit.h>\n";
-		sh << "#import <yip-imports/ios/i18n.h>\n";
-		sh << "#import <yip-imports/ios/resource.h>\n";
-		sh << "#import <yip-imports/ios/font.h>\n";
 		sh << '\n';
 		sh << "@interface " << cntrl.name << " : " << cntrl.parentClass << "\n";
 		for (auto it : widgetInfos)
@@ -311,7 +308,10 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 
 		std::stringstream sm;
 		sm << "#import \"" << targetName << ".h\"\n";
-		sm << "#import \"../yip_ios_layout.h\"\n";
+		sh << "#import <yip-imports/ios/i18n.h>\n";
+		sh << "#import <yip-imports/ios/resource.h>\n";
+		sh << "#import <yip-imports/ios/font.h>\n";
+		sm << '\n';
 		sm << "namespace YIP\n";
 		sm << "{\n";
 		sm << "\ttemplate <unsigned char ALIGN> CGRect iosLayoutRect(float x, float y, float w, float h,\n";
