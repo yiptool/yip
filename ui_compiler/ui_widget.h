@@ -86,6 +86,7 @@ public:
 
 	void parse(const TiXmlElement * element);
 
+	// In ios_generator.cpp
 	virtual const char * iosClassName() const = 0;
 	virtual void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss);
 	virtual void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss);

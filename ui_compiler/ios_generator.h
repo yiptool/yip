@@ -20,18 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "ui_label.h"
+#ifndef __2eb5a6e9c487b7a05350099e3a868d01__
+#define __2eb5a6e9c487b7a05350099e3a868d01__
 
-UILabel::UILabel(UILayout * layout, UIGroup * parentGroup)
-	: UIWidget(layout, parentGroup, UIWidget::Label)
-{
-}
+#include "../project/project.h"
+#include "parse_util.h"
+#include "ui_layout.h"
+#include "ui_scale_mode.h"
+#include <unordered_map>
+#include <string>
+#include <sstream>
 
-UILabel::~UILabel()
-{
-}
+class UIWidget;
 
-bool UILabel::parseAttribute(const TiXmlAttribute *)
-{
-	return false;
-}
+void iosChooseTranslation(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
+	const std::string & text);
+std::string iosScaleFunc(UIScaleMode mode, bool horz);
+void iosGenerateLayoutCode(const UIWidget * wd, const std::string & prefix, std::stringstream & ss, bool landscape);
+
+void uiGenerateIOSCommonCode(const ProjectPtr & project);
+void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & project,
+	const Project::IOSViewController & cntrl);
+
+#endif

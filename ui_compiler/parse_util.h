@@ -23,24 +23,32 @@
 #ifndef __4b98ede777219a9429cb75279ed170ba__
 #define __4b98ede777219a9429cb75279ed170ba__
 
+#include "ui_widget.h"
+#include "ui_layout.h"
 #include "ui_scale_mode.h"
 #include "ui_alignment.h"
 #include "../3rdparty/tinyxml/tinyxml.h"
 
+struct UIWidgetInfo
+{
+	UIWidget::Kind kind;
+	UIWidgetPtr ipad;
+	UIWidgetPtr iphone;
+};
+
+typedef std::unordered_map<std::string, UIWidgetInfo> UIWidgetInfos;
+typedef std::unordered_map<SourceFilePtr, UILayoutPtr> UILayoutMap;
+
 void uiFloatPairFromAttr(const TiXmlAttribute * attr, float * outX, float * outY,
 	float * outLandscapeX, float * outLandscapeY);
-
 void uiScaleModeFromAttr1(const TiXmlAttribute * attr, UIScaleMode * outMode1, UIScaleMode * outMode2,
 	bool * hasValue);
-
 void uiScaleModeFromAttr2(const TiXmlAttribute * attr, UIScaleMode * outModeA1, UIScaleMode * outModeA2,
 	UIScaleMode * outModeB1, UIScaleMode * outModeB2, bool * hasValueA, bool * hasValueB);
-
 void uiScaleModeFromAttr4(const TiXmlAttribute * attr, UIScaleMode * outModeA1, UIScaleMode * outModeA2,
 	UIScaleMode * outModeB1, UIScaleMode * outModeB2, UIScaleMode * outModeC1, UIScaleMode * outModeC2,
 	UIScaleMode * outModeD1, UIScaleMode * outModeD2, bool * hasValueA, bool * hasValueB, bool * hasValueC,
 	bool * hasValueD);
-
 void uiAlignmentFromAttr(const TiXmlAttribute * attr, UIAlignment * outAlign1, UIAlignment * outAlign2);
 
 #define uiScaleModeFromAttr1(ATTR, WHAT) \
@@ -55,5 +63,8 @@ void uiAlignmentFromAttr(const TiXmlAttribute * attr, UIAlignment * outAlign1, U
 		&m_##WHAT2##ScaleMode, &m_Landscape##WHAT2##ScaleMode, &m_##WHAT3##ScaleMode, \
 		&m_Landscape##WHAT3##ScaleMode, &m_##WHAT4##ScaleMode, &m_Landscape##WHAT4##ScaleMode, \
 		&has##WHAT1##Scale, &has##WHAT2##Scale, &has##WHAT3##Scale, &has##WHAT4##Scale)
+
+UILayoutPtr uiLoadLayout(UILayoutMap & layouts, const SourceFilePtr & sourceFile);
+UIWidgetInfos uiGetWidgetInfos(const std::initializer_list<UILayoutPtr> & layouts);
 
 #endif

@@ -126,3 +126,78 @@ void uiAlignmentFromAttr(const TiXmlAttribute * attr, UIAlignment * outAlign1, U
 		throw std::runtime_error(xmlError(attr, e.what()));
 	}
 }
+
+UILayoutPtr uiLoadLayout(UILayoutMap & layouts, const SourceFilePtr & sourceFile)
+{
+	if (!sourceFile.get())
+		return UILayoutPtr();
+
+	auto it = layouts.find(sourceFile);
+	if (it != layouts.end())
+		return it->second;
+
+	std::cout << "parsing " << sourceFile->name() << std::endl;
+
+	TiXmlDocument doc(sourceFile->path());
+	if (!doc.LoadFile())
+	{
+		std::stringstream ss;
+		ss << "error in '" << doc.ValueStr() << "' at row " << doc.ErrorRow() << ", column " << doc.ErrorCol()
+			<< ": " << doc.ErrorDesc();
+		throw std::runtime_error(ss.str());
+	}
+
+	UILayoutPtr layout = std::make_shared<UILayout>();
+	layout->parse(&doc);
+
+	layouts.insert(std::make_pair(sourceFile, layout));
+
+	return layout;
+}
+
+UIWidgetInfos uiGetWidgetInfos(const std::initializer_list<UILayoutPtr> & layouts)
+{
+	UIWidgetInfos infos;
+
+	size_t index = 0;
+	for (const UILayoutPtr & layout : layouts)
+	{
+		++index;
+		if (!layout)
+			continue;
+
+		for (auto it : layout->widgetMap())
+		{
+			const std::string & widgetID = it.first;
+			const UIWidgetPtr & widget = it.second;
+
+			UIWidgetInfo * infoPtr;
+
+			auto jt = infos.find(widgetID);
+			if (jt == infos.end())
+			{
+				UIWidgetInfo info;
+				info.kind = widget->kind();
+				infoPtr = &infos.insert(std::make_pair(widgetID, info)).first->second;
+			}
+			else
+			{
+				infoPtr = &jt->second;
+				if (jt->second.kind != widget->kind())
+				{
+					throw std::runtime_error(fmt() << "id '"
+						<< widgetID << "' corresponds to different widgets in different layout files.");
+				}
+			}
+
+			switch (index)
+			{
+			case 1: infoPtr->iphone = widget; break;
+			case 2: infoPtr->ipad = widget; break;
+			default: assert(false); throw std::runtime_error("internal error: invalid layout index.");
+			}
+		}
+	}
+
+	return infos;
+}

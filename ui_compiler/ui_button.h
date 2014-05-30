@@ -36,6 +36,7 @@ public:
 	inline const std::string & title() const { return m_Title; }
 	inline const std::string & image() const { return m_Image; }
 
+	// In ios_generator.cpp
 	const char * iosClassName() const override { return "UIButton"; }
 	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss) override;
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
@@ -50,8 +51,5 @@ private:
 	UIButton(const UIButton &) = delete;
 	UIButton & operator=(const UIButton &) = delete;
 };
-
-void iosChooseTranslation(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
-	const std::string & text);
 
 #endif

@@ -21,7 +21,6 @@
 // THE SOFTWARE.
 //
 #include "ui_button.h"
-#include "../util/cxx_escape.h"
 #include "../util/tinyxml-util/tinyxml-util.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 
@@ -32,56 +31,6 @@ UIButton::UIButton(UILayout * layout, UIGroup * parentGroup)
 
 UIButton::~UIButton()
 {
-}
-
-void iosChooseTranslation(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
-	const std::string & text)
-{
-	if (project->translationFiles().size() == 0)
-	{
-		ss << "@\"";
-		cxxEscape(ss, text);
-		ss << '"';
-		return;
-	}
-
-	ss << "YIP::iosChooseTranslation(@\"";
-	cxxEscape(ss, text);
-	ss << "\", @{\n";
-	for (auto it : project->translationFiles())
-	{
-		ss << prefix << "\t@\"";
-		cxxEscape(ss, it.first);
-		ss << "\" : @\"";
-		cxxEscape(ss, it.second->getTranslation(text));
-		ss << "\",\n";
-	}
-	ss << prefix << "})";
-}
-
-void UIButton::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
-{
-	ss << prefix << id() << " = [[UIButton buttonWithType:UIButtonTypeCustom] retain];\n";
-	UIWidget::iosGenerateInitCode(project, prefix, ss);
-
-	if (!m_Title.empty())
-	{
-		ss << prefix << '[' << id() << " setTitle:";
-		iosChooseTranslation(project, prefix, ss, m_Title);
-		ss << " forState:UIControlStateNormal];\n";
-	}
-
-	if (!m_Image.empty())
-	{
-		ss << prefix << '[' << id() << " setImage:[UIImage imageNamed:@\"";
-		cxxEscape(ss, m_Image);
-		ss << "\"] forState:UIControlStateNormal];\n";
-	}
-}
-
-void UIButton::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
-{
-	UIWidget::iosGenerateLayoutCode(prefix, ss);
 }
 
 bool UIButton::parseAttribute(const TiXmlAttribute * attr)

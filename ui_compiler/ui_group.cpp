@@ -22,7 +22,6 @@
 //
 #include "ui_group.h"
 #include "../util/tinyxml-util/tinyxml-util.h"
-#include "../util/cxx-util/cxx-util/fmt.h"
 
 UIGroup::UIGroup(UILayout * layout, UIGroup * parentGroup)
 	: UIWidget(layout, parentGroup, UIWidget::Group)
@@ -31,23 +30,6 @@ UIGroup::UIGroup(UILayout * layout, UIGroup * parentGroup)
 
 UIGroup::~UIGroup()
 {
-}
-
-void UIGroup::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
-{
-	ss << prefix << id() << " = [[UIView alloc] initWithFrame:CGRectZero];\n";
-	UIWidget::iosGenerateInitCode(project, prefix, ss);
-
-	for (const UIWidgetPtr & widget : m_Widgets)
-	{
-		widget->iosGenerateInitCode(project, prefix, ss);
-		ss << prefix << "[" << id() << " addSubview:" << widget->id() << "];\n";
-	}
-}
-
-void UIGroup::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
-{
-	UIWidget::iosGenerateLayoutCode(prefix, ss);
 }
 
 void UIGroup::afterParseAttributes(const TiXmlElement * element)

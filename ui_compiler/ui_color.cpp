@@ -44,7 +44,8 @@ const UIColor UIColor::orange(1.0f, 0.5f, 0.0f, 1.0f);
 const UIColor UIColor::purple(0.5f, 0.0f, 0.5f, 1.0f);
 const UIColor UIColor::brown(0.6f, 0.4f, 0.2f, 1.0f);
 
-static const std::unordered_map<std::string, UIColor> g_ColorNames = {
+const std::unordered_map<std::string, UIColor> UIColor::names =
+{
 	{ "clear", UIColor::clear },
 	{ "black", UIColor::black },
 	{ "darkgray", UIColor::darkGray },
@@ -62,25 +63,10 @@ static const std::unordered_map<std::string, UIColor> g_ColorNames = {
 	{ "brown", UIColor::brown },
 };
 
-std::string UIColor::iosValue() const
-{
-	for (auto it : g_ColorNames)
-	{
-		if (*this == it.second)
-			return fmt() << "[UIColor " << it.first << "Color]";
-	}
-
-	std::stringstream ss;
-	ss << "[UIColor colorWithRed:" << r / 255.0f << " green:" << g / 255.0f << " blue:" << b / 255.0f
-		<< " alpha:" << a << "]";
-
-	return ss.str();
-}
-
 UIColor UIColor::fromString(const std::string & str)
 {
-	auto it = g_ColorNames.find(str);
-	if (it != g_ColorNames.end())
+	auto it = names.find(str);
+	if (it != names.end())
 		return it->second;
 
 	if (str.length() > 0 && str[0] == '#')

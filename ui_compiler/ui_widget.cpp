@@ -130,55 +130,6 @@ void UIWidget::parse(const TiXmlElement * element)
 	afterParseAttributes(element);
 }
 
-void UIWidget::iosGenerateInitCode(const ProjectPtr &, const std::string & prefix, std::stringstream & ss)
-{
-	ss << prefix << m_ID << ".backgroundColor = " << m_BackgroundColor.iosValue() << ";\n";
-}
-
-static std::string iosScaleFunc(UIScaleMode mode, bool horz)
-{
-	switch (mode)
-	{
-	case UIScaleDefault: return (horz ? "horzScale" : "vertScale");
-	case UIScaleMin: return "MIN(horzScale, vertScale)";
-	case UIScaleMax: return "MAX(horzScale, vertScale)";
-	case UIScaleHorz: return "horzScale";
-	case UIScaleVert: return "vertScale";
-	case UIScaleAvg: return "((horzScale + vertScale) * 0.5f)";
-	}
-
-	assert(false);
-	throw std::runtime_error("invalid scale mode.");
-}
-
-static void iosGenerateLayoutCode(const UIWidget * wd, const std::string & prefix, std::stringstream & ss,
-	bool landscape)
-{
-	UIAlignment alignment = (!landscape ? wd->alignment() : wd->landscapeAlignment());
-
-	float x = (!landscape ? wd->x() : wd->landscapeX());
-	float y = (!landscape ? wd->y() : wd->landscapeY());
-	float w = (!landscape ? wd->width() : wd->landscapeWidth());
-	float h = (!landscape ? wd->height() : wd->landscapeHeight());
-
-	std::string xMode = iosScaleFunc(!landscape ? wd->xScaleMode() : wd->landscapeXScaleMode(), true);
-	std::string yMode = iosScaleFunc(!landscape ? wd->yScaleMode() : wd->landscapeYScaleMode(), false);
-	std::string wMode = iosScaleFunc(!landscape ? wd->widthScaleMode() : wd->landscapeWidthScaleMode(), true);
-	std::string hMode = iosScaleFunc(!landscape ? wd->heightScaleMode() : wd->landscapeHeightScaleMode(), false);
-
-	ss << prefix << wd->id() << ".frame = YIP::iosLayoutRect<" << alignment << ">(" << x << ", " << y << ", "
-		<< w << ", " << h << ", " << xMode << ", " << yMode << ", " << wMode << ", " << hMode
-		<< ", horzScale, vertScale);\n";
-}
-
-void UIWidget::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
-{
-	ss << prefix << "if (landscape)\n";
-	::iosGenerateLayoutCode(this, prefix + "\t", ss, true);
-	ss << prefix << "else\n";
-	::iosGenerateLayoutCode(this, prefix + "\t", ss, false);
-}
-
 void UIWidget::beforeParseAttributes(const TiXmlElement *)
 {
 }

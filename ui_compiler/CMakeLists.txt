@@ -1,5 +1,7 @@
 
 ADD_LIBRARY(ui_compiler STATIC
+	ios_generator.cpp
+	ios_generator.h
 	parse_util.cpp
 	parse_util.h
 	ui_alignment.cpp

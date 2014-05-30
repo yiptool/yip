@@ -25,6 +25,7 @@
 
 #include "../3rdparty/tinyxml/tinyxml.h"
 #include <string>
+#include <unordered_map>
 
 struct UIColor
 {
@@ -49,6 +50,8 @@ struct UIColor
 	static const UIColor purple;
 	static const UIColor brown;
 
+	static const std::unordered_map<std::string, UIColor> names;
+
 	inline UIColor(float R, float G, float B, float A) noexcept
 		: r(static_cast<unsigned char>(R * 255.0f)),
 		  g(static_cast<unsigned char>(G * 255.0f)),
@@ -57,6 +60,7 @@ struct UIColor
 	{
 	}
 
+	// In ios_generator.cpp
 	std::string iosValue() const;
 
 	inline bool operator==(const UIColor & c) const { return r == c.r && g == c.g && b == c.b && a == c.a; }
