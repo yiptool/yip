@@ -205,6 +205,8 @@ void UIButton::iosGenerateInitCode(const ProjectPtr & project, const std::string
 	ss << prefix << id() << " = [[UIButton buttonWithType:UIButtonTypeCustom] retain];\n";
 	UIWidget::iosGenerateInitCode(project, prefix, ss);
 
+	ss << prefix << id() << ".imageView.contentMode = UIViewContentModeScaleAspectFit;\n";
+
 	if (!text().empty())
 	{
 		ss << prefix << '[' << id() << " setTitle:";
@@ -243,6 +245,8 @@ void uiGenerateIOSCommonCode(const ProjectPtr & project)
 	std::stringstream ss;
 	ss << "#ifndef __fbaf7bcc319b33e8a39e16ddff3f11c7__\n";
 	ss << "#define __fbaf7bcc319b33e8a39e16ddff3f11c7__\n";
+	ss << '\n';
+	ss << "#import <UIKit/UIKit.h>\n";
 	ss << '\n';
 	ss << "namespace YIP\n";
 	ss << "{\n";
@@ -289,20 +293,24 @@ void uiGenerateIOSCommonCode(const ProjectPtr & project)
 	ss << "static NSMutableDictionary * g_Fonts;\n";
 	ss << "static std::unordered_map<std::string, UIImage *> g_Images;\n";
 	ss << '\n';
-	ss << "@interface UIImageWrapper : UIImage\n";
+	ss << "///////////////////////////////////////////////////////////////////////////////////////////////////\n";
+	ss << '\n';
+	ss << "@interface ImageWrapper_ : UIImage\n";
 	ss << "{\n";
 	ss << "\t@public\n";
 	ss << "\tstd::string dictionaryKey;\n";
 	ss << "}\n";
 	ss << "@end\n";
 	ss << '\n';
-	ss << "@implementation UIImageWrapper\n";
+	ss << "@implementation ImageWrapper_\n";
 	ss << "-(void)dealloc\n";
 	ss << "{\n";
 	ss << "\tg_Images.erase(dictionaryKey);\n";
 	ss << "\t[super dealloc];\n";
 	ss << "}\n";
 	ss << "@end\n";
+	ss << '\n';
+	ss << "///////////////////////////////////////////////////////////////////////////////////////////////////\n";
 	ss << '\n';
 	ss << "namespace YIP\n";
 	ss << "{\n";
@@ -316,7 +324,7 @@ void uiGenerateIOSCommonCode(const ProjectPtr & project)
 	ss << "\t\tNSString * file = [NSString stringWithFormat:@\"%@/%@\", [[NSBundle mainBundle] resourcePath], "
 		"name];\n";
 	ss << "\t\tNSData * data = [NSData dataWithContentsOfFile:file];\n";
-	ss << "\t\tUIImageWrapper * image = [[[UIImageWrapper alloc] initWithData:data scale:2.0f] autorelease];\n";
+	ss << "\t\tImageWrapper_ * image = [[[ImageWrapper_ alloc] initWithData:data scale:2.0f] autorelease];\n";
 	ss << "\t\timage->dictionaryKey = key;\n";
 	ss << "\t\tg_Images.insert(std::make_pair(key, image));\n";
 	ss << '\n';
