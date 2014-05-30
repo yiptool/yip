@@ -27,8 +27,6 @@
 
 void compileUI(const ProjectPtr & project)
 {
-	uiGenerateIOSCommonCode(project);
-
 	UILayoutMap layouts;
 	for (const Project::IOSViewController & cntrl : project->iosViewControllers())
 		uiGenerateIOSViewController(layouts, project, cntrl);

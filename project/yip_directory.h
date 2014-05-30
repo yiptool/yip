@@ -39,6 +39,9 @@ public:
 	inline const std::string & path() const { return m_Path; }
 	inline const Project * project() const { return m_Project; }
 
+	bool didBuildIOS() const;
+	void setDidBuildIOS();
+
 	bool didBuildTizen() const;
 	void setDidBuildTizen();
 

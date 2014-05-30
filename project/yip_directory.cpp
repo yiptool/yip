@@ -48,6 +48,16 @@ YipDirectory::~YipDirectory()
 {
 }
 
+bool YipDirectory::didBuildIOS() const
+{
+	return m_DB->queryInt("SELECT value FROM did_build_ios WHERE id = 1 LIMIT 1") != 0;
+}
+
+void YipDirectory::setDidBuildIOS()
+{
+	m_DB->exec(fmt() << "REPLACE INTO did_build_ios (id, value) VALUES (1, 1)");
+}
+
 bool YipDirectory::didBuildTizen() const
 {
 	return m_DB->queryInt("SELECT value FROM did_build_tizen WHERE id = 1 LIMIT 1") != 0;
@@ -212,6 +222,7 @@ void YipDirectory::initDB()
 {
 	// Create tables
 	m_DB->exec("CREATE TABLE IF NOT EXISTS version (id INTEGER PRIMARY KEY, value INTEGER);");
+	m_DB->exec("CREATE TABLE IF NOT EXISTS did_build_ios (id INTEGER PRIMARY KEY, value INTEGER);");
 	m_DB->exec("CREATE TABLE IF NOT EXISTS did_build_tizen (id INTEGER PRIMARY KEY, value INTEGER);");
 	m_DB->exec("CREATE TABLE IF NOT EXISTS project_dir (id INTEGER PRIMARY KEY, path TEXT);");
 	m_DB->exec("CREATE TABLE IF NOT EXISTS files (path TEXT PRIMARY KEY, size INTEGER, "

@@ -60,7 +60,7 @@ void iosChooseTranslation(const ProjectPtr & project, const std::string & prefix
 		return;
 	}
 
-	ss << "YIP::iosChooseTranslation(@\"";
+	ss << "iosChooseTranslation(@\"";
 	cxxEscape(ss, text);
 	ss << "\", @{\n";
 	for (auto it : project->translationFiles())
@@ -77,7 +77,7 @@ void iosChooseTranslation(const ProjectPtr & project, const std::string & prefix
 void iosGetFont(std::stringstream & ss, const UIFontPtr & font, UIScaleMode scaleMode,
 	UIScaleMode landscapeScaleMode)
 {
-	ss << "YIP::iosGetFont(@\"";
+	ss << "iosGetFont(@\"";
 	cxxEscape(ss, font->family);
 	ss << "\", (landscape ? " << font->landscapeSize << " * " << iosScaleFunc(landscapeScaleMode, false);
 	ss << " : " << font->size << " * " << iosScaleFunc(scaleMode, false) << "))";
@@ -240,147 +240,6 @@ void UIButton::iosGenerateLayoutCode(const std::string & prefix, std::stringstre
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void uiGenerateIOSCommonCode(const ProjectPtr & project)
-{
-	std::stringstream ss;
-	ss << "#ifndef __fbaf7bcc319b33e8a39e16ddff3f11c7__\n";
-	ss << "#define __fbaf7bcc319b33e8a39e16ddff3f11c7__\n";
-	ss << '\n';
-	ss << "#import <UIKit/UIKit.h>\n";
-	ss << '\n';
-	ss << "namespace YIP\n";
-	ss << "{\n";
-	ss << "\tUIImage * iosGetImage(NSString * name);\n";
-	ss << "\tUIFont * iosGetFont(NSString * name, float size);\n";
-	ss << "\tNSString * iosChooseTranslation(NSString * def, NSDictionary * strings);\n";
-	ss << '\n';
-	ss << "\ttemplate <unsigned char ALIGN> CGRect iosLayoutRect(float x, float y, float w, float h,\n";
-	ss << "\t\tfloat xScale, float yScale, float wScale, float hScale, float horzScale, float vertScale)\n";
-	ss << "\t{\n";
-	ss << "\t\tfloat widgetX = x * xScale;\n";
-	ss << "\t\tfloat widgetY = y * yScale;\n";
-	ss << "\t\tfloat widgetW = w * wScale;\n";
-	ss << "\t\tfloat widgetH = h * hScale;\n";
-	ss << "\t\n";
-	ss << "\t\tif ((ALIGN & " << UIAlignHorizontalMask << ") == " << UIAlignHCenter << ")\n";
-	ss << "\t\t\twidgetX += (w * horzScale - widgetW) * 0.5f;\n";
-	ss << "\t\telse if ((ALIGN & " << UIAlignHorizontalMask << ") == " << UIAlignRight << ")\n";
-	ss << "\t\t\twidgetX += w * horzScale - widgetW;\n";
-	ss << "\t\n";
-	ss << "\t\tif ((ALIGN & " << UIAlignVerticalMask << ") == " << UIAlignVCenter << ")\n";
-	ss << "\t\t\twidgetY += (h * vertScale - widgetH) * 0.5f;\n";
-	ss << "\t\telse if ((ALIGN & " << UIAlignVerticalMask << ") == " << UIAlignBottom << ")\n";
-	ss << "\t\t\twidgetY += h * vertScale - widgetH;\n";
-	ss << "\t\n";
-	ss << "\t\treturn CGRectMake(widgetX, widgetY, widgetW, widgetH);\n";
-	ss << "\t}\n";
-	ss << "}\n";
-	ss << '\n';
-	ss << "#endif\n";
-
-	std::string targetPath = ".yip-ios-view-controllers/yip_ios_layout.h";
-	std::string generatedPath = project->yipDirectory()->writeFile(targetPath, ss.str());
-
-	SourceFilePtr sourceFile = project->addSourceFile(targetPath, generatedPath);
-	sourceFile->setIsGenerated(true);
-	sourceFile->setPlatforms(Platform::iOS);
-
-	ss.str(std::string());
-	ss << "#import <UIKit/UIKit.h>\n";
-	ss << "#import <unordered_map>\n";
-	ss << "#import <string>\n";
-	ss << '\n';
-	ss << "static NSMutableDictionary * g_Fonts;\n";
-	ss << "static std::unordered_map<std::string, UIImage *> g_Images;\n";
-	ss << '\n';
-	ss << "///////////////////////////////////////////////////////////////////////////////////////////////////\n";
-	ss << '\n';
-	ss << "@interface ImageWrapper_ : UIImage\n";
-	ss << "{\n";
-	ss << "\t@public\n";
-	ss << "\tstd::string dictionaryKey;\n";
-	ss << "}\n";
-	ss << "@end\n";
-	ss << '\n';
-	ss << "@implementation ImageWrapper_\n";
-	ss << "-(void)dealloc\n";
-	ss << "{\n";
-	ss << "\tg_Images.erase(dictionaryKey);\n";
-	ss << "\t[super dealloc];\n";
-	ss << "}\n";
-	ss << "@end\n";
-	ss << '\n';
-	ss << "///////////////////////////////////////////////////////////////////////////////////////////////////\n";
-	ss << '\n';
-	ss << "namespace YIP\n";
-	ss << "{\n";
-	ss << "\tUIImage * iosGetImage(NSString * name)\n";
-	ss << "\t{\n";
-	ss << "\t\tstd::string key = [name UTF8String];\n";
-	ss << "\t\tauto it = g_Images.find(key);\n";
-	ss << "\t\tif (it != g_Images.end())\n";
-	ss << "\t\t\treturn [[it->second retain] autorelease];\n";
-	ss << '\n';
-	ss << "\t\tNSString * file = [NSString stringWithFormat:@\"%@/%@\", [[NSBundle mainBundle] resourcePath], "
-		"name];\n";
-	ss << "\t\tNSData * data = [NSData dataWithContentsOfFile:file];\n";
-	ss << "\t\tImageWrapper_ * image = [[[ImageWrapper_ alloc] initWithData:data scale:2.0f] autorelease];\n";
-	ss << "\t\timage->dictionaryKey = key;\n";
-	ss << "\t\tg_Images.insert(std::make_pair(key, image));\n";
-	ss << '\n';
-	ss << "\t\treturn image;\n";
-	ss << "\t}\n";
-	ss << '\n';
-	ss << "\tUIFont * iosGetFont(NSString * name, float size)\n";
-	ss << "\t{\n";
-	ss << "\t\tif (!g_Fonts)\n";
-	ss << "\t\t\tg_Fonts = [[NSMutableDictionary dictionaryWithCapacity:8] retain];\n";
-	ss << '\n';
-	ss << "\t\tNSMutableDictionary * sizes = [g_Fonts objectForKey:name];\n";
-	ss << "\t\tif (!sizes)\n";
-	ss << "\t\t{\n";
-	ss << "\t\t\tsizes = [NSMutableDictionary dictionaryWithCapacity:16];\n";
-	ss << "\t\t\t[g_Fonts setObject:sizes forKey:name];\n";
-	ss << "\t\t}\n";
-	ss << '\n';
-	ss << "\t\tNSNumber * fontSize = [NSNumber numberWithFloat:size];\n";
-	ss << "\t\tUIFont * font = [sizes objectForKey:fontSize];\n";
-	ss << "\t\tif (font)\n";
-	ss << "\t\t\treturn font;\n";
-	ss << '\n';
-	ss << "\t\tfont = [UIFont fontWithName:name size:size];\n";
-	ss << "\t\t[sizes setObject:font forKey:fontSize];\n";
-	ss << '\n';
-	ss << "\t\treturn font;\n";
-	ss << "\t}\n";
-	ss << '\n';
-	ss << "\tNSString * iosChooseTranslation(NSString * def, NSDictionary * strings)\n";
-	ss << "\t{\n";
-	ss << "\t\tNSArray * languages = [NSLocale preferredLanguages];\n";
-	ss << "\t\tfor (NSString * language : languages)\n";
-	ss << "\t\t{\n";
-	ss << "\t\t\tNSString * message = [strings objectForKey:language];\n";
-	ss << "\t\t\tif (message)\n";
-	ss << "\t\t\t\treturn message;\n";
-	ss << "\t\t}\n";
-	ss << "\t\tfor (NSString * language : languages)\n";
-	ss << "\t\t{\n";
-	ss << "\t\t\tNSString * message = [strings objectForKey:[language substringToIndex:2]];\n";
-	ss << "\t\t\tif (message)\n";
-	ss << "\t\t\t\treturn message;\n";
-	ss << "\t\t}\n";
-	ss << "\t\treturn def;\n";
-	ss << "\t}\n";
-	ss << "}\n";
-
-	targetPath = ".yip-ios-view-controllers/ios_layout.mm";
-	generatedPath = project->yipDirectory()->writeFile(targetPath, ss.str());
-
-	sourceFile = project->addSourceFile(targetPath, generatedPath);
-	sourceFile->setIsGenerated(true);
-	sourceFile->setPlatforms(Platform::iOS);
-}
-
 void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & project,
 	const Project::IOSViewController & cntrl)
 {
@@ -435,6 +294,9 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 
 		std::stringstream sh;
 		sh << "#import <UIKit/UIKit.h>\n";
+		sh << "#import <yip-imports/ios/i18n.h>\n";
+		sh << "#import <yip-imports/ios/resource.h>\n";
+		sh << "#import <yip-imports/ios/font.h>\n";
 		sh << '\n';
 		sh << "@interface " << cntrl.name << " : " << cntrl.parentClass << "\n";
 		for (auto it : widgetInfos)
@@ -450,6 +312,29 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		std::stringstream sm;
 		sm << "#import \"" << targetName << ".h\"\n";
 		sm << "#import \"../yip_ios_layout.h\"\n";
+		sm << "namespace YIP\n";
+		sm << "{\n";
+		sm << "\ttemplate <unsigned char ALIGN> CGRect iosLayoutRect(float x, float y, float w, float h,\n";
+		sm << "\t\tfloat xScale, float yScale, float wScale, float hScale, float horzScale, float vertScale)\n";
+		sm << "\t{\n";
+		sm << "\t\tfloat widgetX = x * xScale;\n";
+		sm << "\t\tfloat widgetY = y * yScale;\n";
+		sm << "\t\tfloat widgetW = w * wScale;\n";
+		sm << "\t\tfloat widgetH = h * hScale;\n";
+		sm << "\t\n";
+		sm << "\t\tif ((ALIGN & " << UIAlignHorizontalMask << ") == " << UIAlignHCenter << ")\n";
+		sm << "\t\t\twidgetX += (w * horzScale - widgetW) * 0.5f;\n";
+		sm << "\t\telse if ((ALIGN & " << UIAlignHorizontalMask << ") == " << UIAlignRight << ")\n";
+		sm << "\t\t\twidgetX += w * horzScale - widgetW;\n";
+		sm << "\t\n";
+		sm << "\t\tif ((ALIGN & " << UIAlignVerticalMask << ") == " << UIAlignVCenter << ")\n";
+		sm << "\t\t\twidgetY += (h * vertScale - widgetH) * 0.5f;\n";
+		sm << "\t\telse if ((ALIGN & " << UIAlignVerticalMask << ") == " << UIAlignBottom << ")\n";
+		sm << "\t\t\twidgetY += h * vertScale - widgetH;\n";
+		sm << "\t\n";
+		sm << "\t\treturn CGRectMake(widgetX, widgetY, widgetW, widgetH);\n";
+		sm << "\t}\n";
+		sm << "}\n";
 		sm << '\n';
 		sm << "@implementation " << cntrl.name << '\n';
 		sm << '\n';

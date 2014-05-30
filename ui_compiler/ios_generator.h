@@ -41,7 +41,6 @@ void iosGetFont(std::stringstream & ss, const UIFontPtr & font, UIScaleMode scal
 	UIScaleMode landscapeScaleMode);
 void iosGenerateLayoutCode(const UIWidget * wd, const std::string & prefix, std::stringstream & ss, bool landscape);
 
-void uiGenerateIOSCommonCode(const ProjectPtr & project);
 void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & project,
 	const Project::IOSViewController & cntrl);
 

@@ -123,13 +123,24 @@ static void usage()
 	    << std::endl;
 }
 
-static ProjectPtr loadProject(bool tizen = false)
+static ProjectPtr loadProject(Platform::Type platform = Platform::None)
 {
+	bool ios = (platform & Platform::iOS) != 0;
+	bool tizen = (platform & Platform::Tizen) != 0;
+
 	std::string projectPath = pathGetDirectory(pathMakeAbsolute(g_Config->projectFileName));
 	XCodeUniqueID::setSeed(projectPath);
 
 	ProjectPtr project = std::make_shared<Project>(projectPath);
 	ProjectFileParser::parseFromCurrentDirectory(project, true);
+
+	if (ios || project->yipDirectory()->didBuildIOS())
+	{
+		std::string url = "https://github.com/yiptool/ios-util.git";
+		project->addImport(url, url);
+		ProjectFileParser::parseFromGit(project, url, Platform::iOS);
+		project->yipDirectory()->setDidBuildIOS();
+	}
 
 	if (tizen || project->yipDirectory()->didBuildTizen())
 	{
@@ -296,11 +307,11 @@ static int build(int argc, char ** argv)
 
 	if (update)
 	{
-		ProjectPtr project = loadProject();
+		ProjectPtr project = loadProject(platform);
 		updateProjectImports(project);
 	}
 
-	ProjectPtr project = loadProject((platform & Platform::Tizen) != 0);
+	ProjectPtr project = loadProject(platform);
 	if (!project->isValid())
 		return 1;
 
@@ -397,11 +408,11 @@ static int generate(int argc, char ** argv)
 
 	if (update)
 	{
-		ProjectPtr project = loadProject();
+		ProjectPtr project = loadProject(platform);
 		updateProjectImports(project);
 	}
 
-	ProjectPtr project = loadProject((platform & Platform::Tizen) != 0);
+	ProjectPtr project = loadProject(platform);
 	if (!project->isValid())
 		return 1;
 
@@ -504,7 +515,7 @@ static int xcodePrebuild(int argc, char ** argv)
 	else
 		throw std::runtime_error("invalid command-line arguments.");
 
-	ProjectPtr project = loadProject();
+	ProjectPtr project = loadProject(iOS ? Platform::iOS : Platform::OSX);
 	if (!project->isValid())
 		return 1;
 
