@@ -21,14 +21,14 @@
 // THE SOFTWARE.
 //
 #include "ui_widget.h"
-#include "ui_layout.h"
+#include "../ui_layout.h"
 #include "ui_group.h"
 #include "ui_button.h"
 #include "ui_label.h"
 #include "ui_image.h"
-#include "parse_util.h"
-#include "../util/tinyxml-util/tinyxml-util.h"
-#include "../util/cxx-util/cxx-util/fmt.h"
+#include "../parse_util.h"
+#include "../../util/tinyxml-util/tinyxml-util.h"
+#include "../../util/cxx-util/cxx-util/fmt.h"
 #include <cassert>
 
 UIWidget::UIWidget(UILayout * layout, UIGroup * parentGroup, Kind kind)

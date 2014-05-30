@@ -23,11 +23,11 @@
 #ifndef __413ca771bbacd3af2f2cf3f63a13fff1__
 #define __413ca771bbacd3af2f2cf3f63a13fff1__
 
-#include "ui_scale_mode.h"
-#include "ui_color.h"
-#include "ui_alignment.h"
-#include "../project/project.h"
-#include "../3rdparty/tinyxml/tinyxml.h"
+#include "../attributes/ui_scale_mode.h"
+#include "../attributes/ui_color.h"
+#include "../attributes/ui_alignment.h"
+#include "../../project/project.h"
+#include "../../3rdparty/tinyxml/tinyxml.h"
 #include <string>
 #include <memory>
 

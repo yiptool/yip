@@ -23,7 +23,7 @@
 #ifndef __b869d7cae57c81e0e905d6c065d80352__
 #define __b869d7cae57c81e0e905d6c065d80352__
 
-#include "ui_widget.h"
+#include "widgets/ui_widget.h"
 #include <string>
 #include <vector>
 #include <memory>

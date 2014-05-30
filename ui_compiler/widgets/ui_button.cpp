@@ -20,32 +20,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __93225bb9bf181ba8e83876676b936577__
-#define __93225bb9bf181ba8e83876676b936577__
+#include "ui_button.h"
 
-#include "../3rdparty/tinyxml/tinyxml.h"
-#include <string>
-
-enum UIAlignment
+UIButton::UIButton(UILayout * layout, UIGroup * parentGroup)
+	: UIWidget(layout, parentGroup, UIWidget::Button)
 {
-	UIAlignUnspecified = 0,
-	UIAlignLeft = 0x01,
-	UIAlignRight = 0x02,
-	UIAlignHCenter = 0x03,
-	UIAlignTop = 0x10,
-	UIAlignBottom = 0x20,
-	UIAlignVCenter = 0x30,
+}
 
-	UIAlignTopLeft = UIAlignTop | UIAlignLeft,
-	UIAlignTopRight = UIAlignTop | UIAlignRight,
-	UIAlignBottomLeft = UIAlignBottom | UIAlignLeft,
-	UIAlignBottomRight = UIAlignBottom | UIAlignRight,
-	UIAlignCenter = UIAlignHCenter | UIAlignVCenter,
+UIButton::~UIButton()
+{
+}
 
-	UIAlignHorizontalMask = 0x03,
-	UIAlignVerticalMask = 0x30,
-};
+bool UIButton::parseAttribute(const TiXmlAttribute * attr)
+{
+	if (attr->NameTStr() == "title")
+	{
+		m_Title = attr->ValueStr();
+		return true;
+	}
+	else if (attr->NameTStr() == "image")
+	{
+		m_Image = attr->ValueStr();
+		return true;
+	}
 
-UIAlignment uiAlignmentFromString(const std::string & str);
-
-#endif
+	return false;
+}

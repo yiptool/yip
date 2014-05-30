@@ -21,12 +21,12 @@
 // THE SOFTWARE.
 //
 #include "ios_generator.h"
-#include "ui_widget.h"
-#include "ui_group.h"
-#include "ui_button.h"
-#include "ui_label.h"
-#include "ui_image.h"
 #include "parse_util.h"
+#include "widgets/ui_widget.h"
+#include "widgets/ui_group.h"
+#include "widgets/ui_button.h"
+#include "widgets/ui_label.h"
+#include "widgets/ui_image.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/path-util/path-util.h"
 #include "../util/cxx_escape.h"

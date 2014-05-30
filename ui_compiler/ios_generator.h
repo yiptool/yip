@@ -24,9 +24,9 @@
 #define __2eb5a6e9c487b7a05350099e3a868d01__
 
 #include "../project/project.h"
+#include "attributes/ui_scale_mode.h"
 #include "parse_util.h"
 #include "ui_layout.h"
-#include "ui_scale_mode.h"
 #include <unordered_map>
 #include <string>
 #include <sstream>

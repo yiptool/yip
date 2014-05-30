@@ -20,30 +20,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "ui_group.h"
-#include "../util/tinyxml-util/tinyxml-util.h"
+#ifndef __93225bb9bf181ba8e83876676b936577__
+#define __93225bb9bf181ba8e83876676b936577__
 
-UIGroup::UIGroup(UILayout * layout, UIGroup * parentGroup)
-	: UIWidget(layout, parentGroup, UIWidget::Group)
+#include "../../3rdparty/tinyxml/tinyxml.h"
+#include <string>
+
+enum UIAlignment
 {
-}
+	UIAlignUnspecified = 0,
+	UIAlignLeft = 0x01,
+	UIAlignRight = 0x02,
+	UIAlignHCenter = 0x03,
+	UIAlignTop = 0x10,
+	UIAlignBottom = 0x20,
+	UIAlignVCenter = 0x30,
 
-UIGroup::~UIGroup()
-{
-}
+	UIAlignTopLeft = UIAlignTop | UIAlignLeft,
+	UIAlignTopRight = UIAlignTop | UIAlignRight,
+	UIAlignBottomLeft = UIAlignBottom | UIAlignLeft,
+	UIAlignBottomRight = UIAlignBottom | UIAlignRight,
+	UIAlignCenter = UIAlignHCenter | UIAlignVCenter,
 
-void UIGroup::afterParseAttributes(const TiXmlElement * element)
-{
-	for (const TiXmlElement * child = element->FirstChildElement(); child; child = child->NextSiblingElement())
-	{
-		UIWidgetPtr widget;
-		try {
-			widget = UIWidget::create(layout(), this, child->ValueStr());
-		} catch (const std::exception & e) {
-			throw std::runtime_error(xmlError(child, e.what()));
-		}
+	UIAlignHorizontalMask = 0x03,
+	UIAlignVerticalMask = 0x30,
+};
 
-		widget->parse(child);
-		m_Widgets.push_back(widget);
-	}
-}
+UIAlignment uiAlignmentFromString(const std::string & str);
+
+#endif

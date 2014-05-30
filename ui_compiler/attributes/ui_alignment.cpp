@@ -21,8 +21,8 @@
 // THE SOFTWARE.
 //
 #include "ui_alignment.h"
-#include "../util/tinyxml-util/tinyxml-util.h"
-#include "../util/cxx-util/cxx-util/fmt.h"
+#include "../../util/tinyxml-util/tinyxml-util.h"
+#include "../../util/cxx-util/cxx-util/fmt.h"
 #include <stdexcept>
 #include <unordered_map>
 

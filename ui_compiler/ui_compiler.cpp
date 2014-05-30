@@ -22,8 +22,8 @@
 //
 #include "ui_compiler.h"
 #include "ui_layout.h"
-#include "parse_util.h"
 #include "ios_generator.h"
+#include "parse_util.h"
 
 void compileUI(const ProjectPtr & project)
 {

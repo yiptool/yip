@@ -20,31 +20,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "ui_button.h"
-#include "../util/tinyxml-util/tinyxml-util.h"
-#include "../util/cxx-util/cxx-util/fmt.h"
+#include "ui_group.h"
+#include "../../util/tinyxml-util/tinyxml-util.h"
 
-UIButton::UIButton(UILayout * layout, UIGroup * parentGroup)
-	: UIWidget(layout, parentGroup, UIWidget::Button)
+UIGroup::UIGroup(UILayout * layout, UIGroup * parentGroup)
+	: UIWidget(layout, parentGroup, UIWidget::Group)
 {
 }
 
-UIButton::~UIButton()
+UIGroup::~UIGroup()
 {
 }
 
-bool UIButton::parseAttribute(const TiXmlAttribute * attr)
+void UIGroup::afterParseAttributes(const TiXmlElement * element)
 {
-	if (attr->NameTStr() == "title")
+	for (const TiXmlElement * child = element->FirstChildElement(); child; child = child->NextSiblingElement())
 	{
-		m_Title = attr->ValueStr();
-		return true;
-	}
-	else if (attr->NameTStr() == "image")
-	{
-		m_Image = attr->ValueStr();
-		return true;
-	}
+		UIWidgetPtr widget;
+		try {
+			widget = UIWidget::create(layout(), this, child->ValueStr());
+		} catch (const std::exception & e) {
+			throw std::runtime_error(xmlError(child, e.what()));
+		}
 
-	return false;
+		widget->parse(child);
+		m_Widgets.push_back(widget);
+	}
 }

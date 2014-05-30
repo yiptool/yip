@@ -21,9 +21,9 @@
 // THE SOFTWARE.
 //
 #include "ui_color.h"
-#include "../util/tinyxml-util/tinyxml-util.h"
-#include "../util/cxx-util/cxx-util/fmt.h"
-#include "../util/cxx-util/cxx-util/unhex.h"
+#include "../../util/tinyxml-util/tinyxml-util.h"
+#include "../../util/cxx-util/cxx-util/fmt.h"
+#include "../../util/cxx-util/cxx-util/unhex.h"
 #include <stdexcept>
 #include <unordered_map>
 #include <sstream>
@@ -44,8 +44,7 @@ const UIColor UIColor::orange(1.0f, 0.5f, 0.0f, 1.0f);
 const UIColor UIColor::purple(0.5f, 0.0f, 0.5f, 1.0f);
 const UIColor UIColor::brown(0.6f, 0.4f, 0.2f, 1.0f);
 
-const std::unordered_map<std::string, UIColor> UIColor::names =
-{
+const std::unordered_map<std::string, UIColor> UIColor::names = {
 	{ "clear", UIColor::clear },
 	{ "black", UIColor::black },
 	{ "darkgray", UIColor::darkGray },

@@ -20,22 +20,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __fddfe6193bfcb40bf475eb914daf5f6d__
-#define __fddfe6193bfcb40bf475eb914daf5f6d__
+#include "ui_scale_mode.h"
+#include "../../util/tinyxml-util/tinyxml-util.h"
+#include "../../util/cxx-util/cxx-util/fmt.h"
+#include <stdexcept>
+#include <unordered_map>
 
-#include "../3rdparty/tinyxml/tinyxml.h"
-#include <string>
-
-enum UIScaleMode
-{
-	UIScaleDefault = 0,
-	UIScaleMin,
-	UIScaleMax,
-	UIScaleHorz,
-	UIScaleVert,
-	UIScaleAvg,
+static const std::unordered_map<std::string, UIScaleMode> g_ScaleModeNames = {
+	{ "default", UIScaleDefault },
+	{ "min", UIScaleMin },
+	{ "max", UIScaleMax },
+	{ "horz", UIScaleHorz },
+	{ "vert", UIScaleVert },
+	{ "avg", UIScaleAvg },
 };
 
-UIScaleMode uiScaleModeFromString(const std::string & str);
-
-#endif
+UIScaleMode uiScaleModeFromString(const std::string & str)
+{
+	auto it = g_ScaleModeNames.find(str);
+	if (it == g_ScaleModeNames.end())
+		throw std::runtime_error(fmt() << "invalid scale mode '" << str << "'.");
+	return it->second;
+}

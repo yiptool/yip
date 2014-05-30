@@ -23,10 +23,10 @@
 #ifndef __4b98ede777219a9429cb75279ed170ba__
 #define __4b98ede777219a9429cb75279ed170ba__
 
-#include "ui_widget.h"
+#include "widgets/ui_widget.h"
+#include "attributes/ui_scale_mode.h"
+#include "attributes/ui_alignment.h"
 #include "ui_layout.h"
-#include "ui_scale_mode.h"
-#include "ui_alignment.h"
 #include "../3rdparty/tinyxml/tinyxml.h"
 
 struct UIWidgetInfo
