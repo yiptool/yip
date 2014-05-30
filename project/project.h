@@ -121,6 +121,8 @@ public:
 	inline const std::map<std::string, HeaderPathPtr> & headerPaths() const { return m_HeaderPaths; }
 
 	void addTranslationFile(const std::string & language, const std::string & name, const std::string & path);
+	inline const std::map<std::string, TranslationFilePtr> & translationFiles() const { return m_TranslationFiles; }
+	void saveTranslationFiles() const;
 
 	inline void addToDo(const std::string & file, int line, const std::string & message,
 			int year = -1, int month = -1, int day = -1)

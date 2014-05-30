@@ -162,6 +162,37 @@ static void generateIOSCommonCode(const ProjectPtr & project)
 	SourceFilePtr sourceFile = project->addSourceFile(targetPath, generatedPath);
 	sourceFile->setIsGenerated(true);
 	sourceFile->setPlatforms(Platform::iOS);
+
+	ss.str(std::string());
+	ss << "#import <UIKit/UIKit.h>\n";
+	ss << '\n';
+	ss << "namespace YIP\n";
+	ss << "{\n";
+	ss << "\tNSString * iosChooseTranslation(NSString * def, NSDictionary * strings)\n";
+	ss << "\t{\n";
+	ss << "\t\tNSArray * languages = [NSLocale preferredLanguages];\n";
+	ss << "\t\tfor (NSString * language : languages)\n";
+	ss << "\t\t{\n";
+	ss << "\t\t\tNSString * message = [strings objectForKey:language];\n";
+	ss << "\t\t\tif (message)\n";
+	ss << "\t\t\t\treturn message;\n";
+	ss << "\t\t}\n";
+	ss << "\t\tfor (NSString * language : languages)\n";
+	ss << "\t\t{\n";
+	ss << "\t\t\tNSString * message = [strings objectForKey:[language substringToIndex:2]];\n";
+	ss << "\t\t\tif (message)\n";
+	ss << "\t\t\t\treturn message;\n";
+	ss << "\t\t}\n";
+	ss << "\t\treturn def;\n";
+	ss << "\t}\n";
+	ss << "}\n";
+
+	targetPath = ".yip-ios-view-controllers/ios_lang.mm";
+	generatedPath = project->yipDirectory()->writeFile(targetPath, ss.str());
+
+	sourceFile = project->addSourceFile(targetPath, generatedPath);
+	sourceFile->setIsGenerated(true);
+	sourceFile->setPlatforms(Platform::iOS);
 }
 
 static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & project,
@@ -177,12 +208,26 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 	std::string targetPathM = pathConcat(".yip-ios-view-controllers/yip-ios", targetName) + ".mm";
 
 	bool shouldProcessFile =
-		(cntrl.iphone.get() &&
-			project->yipDirectory()->shouldProcessFile(targetPathH, cntrl.iphone->path(), true) &&
-			project->yipDirectory()->shouldProcessFile(targetPathM, cntrl.iphone->path(), true)) ||
-		(cntrl.ipad.get() &&
-			project->yipDirectory()->shouldProcessFile(targetPathH, cntrl.ipad->path(), true) &&
-			project->yipDirectory()->shouldProcessFile(targetPathM, cntrl.ipad->path(), true));
+		(cntrl.iphone.get() && (
+			project->yipDirectory()->shouldProcessFile(targetPathH, cntrl.iphone->path(), true) ||
+			project->yipDirectory()->shouldProcessFile(targetPathM, cntrl.iphone->path(), true))) ||
+		(cntrl.ipad.get() && (
+			project->yipDirectory()->shouldProcessFile(targetPathH, cntrl.ipad->path(), true) ||
+			project->yipDirectory()->shouldProcessFile(targetPathM, cntrl.ipad->path(), true)));
+
+	if (!shouldProcessFile)
+	{
+		for (auto it : project->translationFiles())
+		{
+			if (project->yipDirectory()->shouldProcessFile(targetPathH, it.second->path(), false) ||
+				project->yipDirectory()->shouldProcessFile(targetPathM, it.second->path(), false))
+			{
+				shouldProcessFile = true;
+				break;
+			}
+		}
+	}
+
 	if (!shouldProcessFile)
 	{
 		sourceFileH = project->addSourceFile(targetPathH, pathConcat(yipDir, targetPathH));
@@ -220,6 +265,10 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 		sm << "#import \"" << targetName << ".h\"\n";
 		sm << "#import \"../ios_layout.h\"\n";
 		sm << '\n';
+		sm << "namespace YIP {\n";
+		sm << "\tNSString * iosChooseTranslation(NSString * def, NSDictionary * strings);\n";
+		sm << "}\n";
+		sm << '\n';
 		sm << "@implementation " << cntrl.name << '\n';
 		sm << '\n';
 		for (auto it : widgetInfos)
@@ -236,7 +285,7 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 			sm << "\t\t{\n";
 			for (const UIWidgetPtr & widget : iphoneLayout->widgets())
 			{
-				widget->iosGenerateInitCode("\t\t\t", sm);
+				widget->iosGenerateInitCode(project, "\t\t\t", sm);
 				sm << "\t\t\t[self.view addSubview:" << widget->id() << "];\n";
 			}
 			sm << "\t\t}\n";
@@ -247,7 +296,7 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 			sm << "\t\t{\n";
 			for (const UIWidgetPtr & widget : ipadLayout->widgets())
 			{
-				widget->iosGenerateInitCode("\t\t\t", sm);
+				widget->iosGenerateInitCode(project, "\t\t\t", sm);
 				sm << "\t\t\t[self.view addSubview:" << widget->id() << "];\n";
 			}
 			sm << "\t\t}\n";
@@ -341,9 +390,9 @@ static void generateIOSViewController(LayoutMap & layouts, const ProjectPtr & pr
 		{
 			sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)\n";
 			sm << "\t\treturn 0";
-			if (iphoneLayout->allowPortrait())
+			if (ipadLayout->allowPortrait())
 				sm << " | UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown";
-			if (iphoneLayout->allowLandscape())
+			if (ipadLayout->allowLandscape())
 				sm << " | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight";
 			sm << ";\n";
 		}

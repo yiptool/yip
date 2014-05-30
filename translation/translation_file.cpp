@@ -36,12 +36,15 @@ TranslationFile::TranslationFile(Project * prj, const std::string & lang, const 
 	  m_Path(pathMakeAbsolute(path)),
 	  m_Project(prj),
 	  m_HasXML(false),
-	  m_HasNonTranslatedStrings(false)
+	  m_HasNonTranslatedStrings(false),
+	  m_WasModified(false)
 {
 }
 
 void TranslationFile::parse()
 {
+	m_WasModified = false;
+
 	try
 	{
 		if (pathIsFile(m_Path))
@@ -130,8 +133,9 @@ void TranslationFile::save() const
 {
 	if (m_HasXML)
 	{
+		std::cout << "writing " << m_Name << std::endl;
 		m_XML.SaveFile(m_Path);
-		m_HasNonTranslatedStrings = false;
+		m_WasModified = false;
 	}
 }
 
@@ -154,7 +158,8 @@ std::string TranslationFile::getTranslation(const std::string & string) const
 	newElement->SetAttribute("t", "TBT");
 	rootElement->LinkEndChild(newElement);
 
-	m_Strings.insert(std::make_pair(string, "TBT"));
+	m_Strings.insert(std::make_pair(string, string));
+	m_WasModified = true;
 	m_HasNonTranslatedStrings = true;
 
 	return string;

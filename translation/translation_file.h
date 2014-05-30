@@ -36,10 +36,14 @@ public:
 	TranslationFile(Project * prj, const std::string & lang, const std::string & name, const std::string & path);
 	inline ~TranslationFile() {}
 
+	inline const std::string & path() const { return m_Path; }
+
 	void parse();
 	void save() const;
 
 	inline bool hasNonTranslatedStrings() const { return m_HasNonTranslatedStrings; }
+	inline bool wasModified() const { return m_WasModified; }
+
 	std::string getTranslation(const std::string & string) const;
 
 private:
@@ -50,6 +54,7 @@ private:
 	mutable std::map<std::string, std::string> m_Strings;
 	mutable bool m_HasXML;
 	mutable bool m_HasNonTranslatedStrings;
+	mutable bool m_WasModified;
 	mutable TiXmlDocument m_XML;
 
 	TranslationFile(const TranslationFile &) = delete;

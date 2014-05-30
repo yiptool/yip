@@ -305,9 +305,10 @@ static int build(int argc, char ** argv)
 		return 1;
 
 	project->generateLicenseData();
-	project->generateToDo();
 	compileUI(project);
 	compileResources(project);
+	project->saveTranslationFiles();
+	project->generateToDo();
 
 	if (platform & Platform::OSX)
 	{
@@ -405,9 +406,10 @@ static int generate(int argc, char ** argv)
 		return 1;
 
 	project->generateLicenseData();
-	project->generateToDo();
 	compileUI(project);
 	compileResources(project);
+	project->saveTranslationFiles();
+	project->generateToDo();
 
 	size_t numPlatforms = 0;
 	for (size_t i = 1; i <= 0x8000; i <<= 1)
@@ -507,9 +509,10 @@ static int xcodePrebuild(int argc, char ** argv)
 		return 1;
 
 	project->generateLicenseData();
-	project->generateToDo();
 	compileUI(project);
 	compileResources(project);
+	project->saveTranslationFiles();
+	project->generateToDo();
 
 	bool changed = false;
 	generateXCode(project, iOS, &changed);

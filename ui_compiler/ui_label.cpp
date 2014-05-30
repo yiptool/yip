@@ -33,10 +33,10 @@ UILabel::~UILabel()
 {
 }
 
-void UILabel::iosGenerateInitCode(const std::string & prefix, std::stringstream & ss)
+void UILabel::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
 {
 	ss << prefix << id() << " = [[UILabel alloc] initWithFrame:CGRectZero];\n";
-	UIWidget::iosGenerateInitCode(prefix, ss);
+	UIWidget::iosGenerateInitCode(project, prefix, ss);
 }
 
 void UILabel::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)

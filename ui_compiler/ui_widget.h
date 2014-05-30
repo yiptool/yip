@@ -26,6 +26,7 @@
 #include "ui_scale_mode.h"
 #include "ui_color.h"
 #include "ui_alignment.h"
+#include "../project/project.h"
 #include "../3rdparty/tinyxml/tinyxml.h"
 #include <string>
 #include <memory>
@@ -86,7 +87,7 @@ public:
 	void parse(const TiXmlElement * element);
 
 	virtual const char * iosClassName() const = 0;
-	virtual void iosGenerateInitCode(const std::string & prefix, std::stringstream & ss);
+	virtual void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss);
 	virtual void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss);
 
 protected:

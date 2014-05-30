@@ -25,6 +25,7 @@
 
 #include "ui_widget.h"
 #include <vector>
+#include <sstream>
 
 class UIButton : public UIWidget
 {
@@ -36,7 +37,7 @@ public:
 	inline const std::string & image() const { return m_Image; }
 
 	const char * iosClassName() const override { return "UIButton"; }
-	void iosGenerateInitCode(const std::string & prefix, std::stringstream & ss) override;
+	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss) override;
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 protected:
@@ -49,5 +50,8 @@ private:
 	UIButton(const UIButton &) = delete;
 	UIButton & operator=(const UIButton &) = delete;
 };
+
+void iosChooseTranslation(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
+	const std::string & text);
 
 #endif

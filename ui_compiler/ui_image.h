@@ -33,7 +33,7 @@ public:
 	~UIImage();
 
 	const char * iosClassName() const override { return "UIImageView"; }
-	void iosGenerateInitCode(const std::string & prefix, std::stringstream & ss) override;
+	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss) override;
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 protected:

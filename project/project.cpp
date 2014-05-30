@@ -117,6 +117,15 @@ void Project::addTranslationFile(const std::string & language, const std::string
 	m_TranslationFiles.insert(std::make_pair(language, file));
 }
 
+void Project::saveTranslationFiles() const
+{
+	for (auto it : m_TranslationFiles)
+	{
+		if (it.second->wasModified())
+			it.second->save();
+	}
+}
+
 void Project::winrtAddLibrary(const std::string & name)
 {
 	m_WinRTLibraries.insert(name);

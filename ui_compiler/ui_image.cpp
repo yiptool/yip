@@ -33,10 +33,10 @@ UIImage::~UIImage()
 {
 }
 
-void UIImage::iosGenerateInitCode(const std::string & prefix, std::stringstream & ss)
+void UIImage::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
 {
 	ss << prefix << id() << " = [[UIImageView alloc] initWithImage:nil];\n";
-	UIWidget::iosGenerateInitCode(prefix, ss);
+	UIWidget::iosGenerateInitCode(project, prefix, ss);
 }
 
 void UIImage::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)

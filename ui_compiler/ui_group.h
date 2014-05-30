@@ -33,7 +33,7 @@ public:
 	~UIGroup();
 
 	const char * iosClassName() const override { return "UIView"; }
-	void iosGenerateInitCode(const std::string & prefix, std::stringstream & ss) override;
+	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss) override;
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 protected:

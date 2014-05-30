@@ -241,7 +241,7 @@ void UIWidget::parse(const TiXmlElement * element)
 	afterParseAttributes(element);
 }
 
-void UIWidget::iosGenerateInitCode(const std::string & prefix, std::stringstream & ss)
+void UIWidget::iosGenerateInitCode(const ProjectPtr &, const std::string & prefix, std::stringstream & ss)
 {
 	ss << prefix << m_ID << ".backgroundColor = " << m_BackgroundColor.iosValue() << ";\n";
 }
