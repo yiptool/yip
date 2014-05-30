@@ -138,9 +138,24 @@ Also the following shortcuts are available:
 You may specify two alignments, separated with a slash (`/`) - one for the portrait orientation and one for
 the landscape orientation.
 
+### Font
+
+Some widgets allow to specify a font to use to display a text. The font string consists of a font name,
+followed by a comma (`,`) and by a font size in points. You can optionally specify two font sizes separated
+with a slash (`/`) - one for the portrait orientation and one for the landscape orientation.
+
+Here are some examples of font specifications:
+
+  * `Arial,16`
+  * `OpenSans,16/20`
+
 ## Button
 
 For a button you may additionaly specify the following attributes:
 
-  * `title`: text to display on the button.
   * `image`: icon to display on the button.
+  * `text`: text to display on the button.
+  * `textColor`: color of the button text.
+  * `font`: font for the button text.
+  * `fontScale`: scale mode for the button text font. You may specify two scale modes, separated with a
+  slash (`/`) - one for the portrait orientation and one for the landscape orientation.

@@ -205,6 +205,9 @@ void UIButton::iosGenerateInitCode(const ProjectPtr & project, const std::string
 		ss << " forState:UIControlStateNormal];\n";
 	}
 
+	ss << prefix << '[' << id() << " setTitleColor:" << textColor().iosValue()
+		<< " forState:UIControlStateNormal];\n";
+
 	if (!m_Image.empty())
 	{
 		ss << prefix << '[' << id() << " setImage:[UIImage imageNamed:@\"";

@@ -41,6 +41,7 @@ typedef std::unordered_map<SourceFilePtr, UILayoutPtr> UILayoutMap;
 
 void uiFloatPairFromAttr(const TiXmlAttribute * attr, float * outX, float * outY,
 	float * outLandscapeX, float * outLandscapeY);
+void uiScaleModeFromAttr(const TiXmlAttribute * attr, UIScaleMode * outMode1, UIScaleMode * outMode2);
 void uiScaleModeFromAttr1(const TiXmlAttribute * attr, UIScaleMode * outMode1, UIScaleMode * outMode2,
 	bool * hasValue);
 void uiScaleModeFromAttr2(const TiXmlAttribute * attr, UIScaleMode * outModeA1, UIScaleMode * outModeA2,

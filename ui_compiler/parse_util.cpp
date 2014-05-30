@@ -48,7 +48,7 @@ void uiFloatPairFromAttr(const TiXmlAttribute * attr, float * outX, float * outY
 		throw std::runtime_error(xmlInvalidAttributeValue(attr));
 }
 
-static void uiScaleModeFromAttr(const TiXmlAttribute * attr, UIScaleMode * outMode1, UIScaleMode * outMode2)
+void uiScaleModeFromAttr(const TiXmlAttribute * attr, UIScaleMode * outMode1, UIScaleMode * outMode2)
 {
 	std::vector<std::string> list = explode(attr->ValueStr(), '/');
 	if (list.size() < 1 || list.size() > 2)

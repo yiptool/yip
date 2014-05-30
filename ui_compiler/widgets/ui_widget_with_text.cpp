@@ -22,9 +22,11 @@
 //
 #include "ui_widget_with_text.h"
 #include "../../util/tinyxml-util/tinyxml-util.h"
+#include "../parse_util.h"
 
 UIWidgetWithText::UIWidgetWithText(UILayout * layout, UIGroup * parentGroup, Kind kind)
 	: UIWidget(layout, parentGroup, kind),
+	  m_TextColor(UIColor::white),
 	  m_FontScaleMode(UIScaleDefault),
 	  m_LandscapeFontScaleMode(UIScaleDefault),
 	  m_HasFontScaleMode(false)
@@ -42,9 +44,20 @@ bool UIWidgetWithText::parseAttribute(const TiXmlAttribute * attr)
 		m_Text = attr->ValueStr();
 		return true;
 	}
+	else if (attr->NameTStr() == "textColor")
+	{
+		m_TextColor = UIColor::fromAttr(attr);
+		return true;
+	}
 	else if (attr->NameTStr() == "font")
 	{
 		m_Font = UIFont::fromAttr(attr);
+		return true;
+	}
+	else if (attr->NameTStr() == "fontScale")
+	{
+		uiScaleModeFromAttr(attr, &m_FontScaleMode, &m_LandscapeFontScaleMode);
+		m_HasFontScaleMode = true;
 		return true;
 	}
 

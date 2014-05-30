@@ -33,6 +33,7 @@ public:
 	~UIWidgetWithText();
 
 	inline const std::string & text() const { return m_Text; }
+	inline const UIColor & textColor() const { return m_TextColor; }
 
 	inline const UIFontPtr & font() const { return m_Font; }
 
@@ -45,6 +46,7 @@ protected:
 
 private:
 	std::string m_Text;
+	UIColor m_TextColor;
 	UIFontPtr m_Font;
 	UIScaleMode m_FontScaleMode;
 	UIScaleMode m_LandscapeFontScaleMode;
