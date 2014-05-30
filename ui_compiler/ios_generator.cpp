@@ -111,7 +111,14 @@ std::string UIColor::iosValue() const
 	for (auto it : UIColor::names)
 	{
 		if (*this == it.second)
-			return fmt() << "[UIColor " << it.first << "Color]";
+		{
+			if (it.first.length() == 8 && it.first == "darkgray")
+				return fmt() << "[UIColor darkGrayColor]";
+			else if (it.first.length() == 9 && it.first == "lightgray")
+				return fmt() << "[UIColor lightGrayColor]";
+			else
+				return fmt() << "[UIColor " << it.first << "Color]";
+		}
 	}
 
 	std::stringstream ss;
