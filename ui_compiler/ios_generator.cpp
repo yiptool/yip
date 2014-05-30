@@ -447,7 +447,7 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sm << "{\n";
 		sm << "\t[super viewWillLayoutSubviews];\n";
 		sm << '\n';
-		sm << "\tCGRect frame = self.view.frame;\n";
+		sm << "\tCGRect frame = self.view.bounds;\n";
 		sm << "\tBOOL landscape = UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation);\n";
 		sm << '\n';
 		sm << "\t(void)frame;\n";
