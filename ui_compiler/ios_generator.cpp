@@ -210,9 +210,9 @@ void UIButton::iosGenerateInitCode(const ProjectPtr & project, const std::string
 
 	if (!m_Image.empty())
 	{
-		ss << prefix << '[' << id() << " setImage:[UIImage imageNamed:@\"";
+		ss << prefix << '[' << id() << " setImage:YIP::iosGetImage(@\"";
 		cxxEscape(ss, m_Image);
-		ss << "\"] forState:UIControlStateNormal];\n";
+		ss << "\") forState:UIControlStateNormal];\n";
 	}
 }
 
@@ -239,6 +239,7 @@ void uiGenerateIOSCommonCode(const ProjectPtr & project)
 	ss << '\n';
 	ss << "namespace YIP\n";
 	ss << "{\n";
+	ss << "\tUIImage * iosGetImage(NSString * name);\n";
 	ss << "\tUIFont * iosGetFont(NSString * name, float size);\n";
 	ss << "\tNSString * iosChooseTranslation(NSString * def, NSDictionary * strings);\n";
 	ss << '\n';
@@ -275,10 +276,45 @@ void uiGenerateIOSCommonCode(const ProjectPtr & project)
 
 	ss.str(std::string());
 	ss << "#import <UIKit/UIKit.h>\n";
+	ss << "#import <unordered_map>\n";
+	ss << "#import <string>\n";
+	ss << '\n';
+	ss << "static NSMutableDictionary * g_Fonts;\n";
+	ss << "static std::unordered_map<std::string, UIImage *> g_Images;\n";
+	ss << '\n';
+	ss << "@interface UIImageWrapper : UIImage\n";
+	ss << "{\n";
+	ss << "\t@public\n";
+	ss << "\tstd::string dictionaryKey;\n";
+	ss << "}\n";
+	ss << "@end\n";
+	ss << '\n';
+	ss << "@implementation UIImageWrapper\n";
+	ss << "-(void)dealloc\n";
+	ss << "{\n";
+	ss << "\tg_Images.erase(dictionaryKey);\n";
+	ss << "\t[super dealloc];\n";
+	ss << "}\n";
+	ss << "@end\n";
 	ss << '\n';
 	ss << "namespace YIP\n";
 	ss << "{\n";
-	ss << "\tstatic NSMutableDictionary * g_Fonts;\n";
+	ss << "\tUIImage * iosGetImage(NSString * name)\n";
+	ss << "\t{\n";
+	ss << "\t\tstd::string key = [name UTF8String];\n";
+	ss << "\t\tauto it = g_Images.find(key);\n";
+	ss << "\t\tif (it != g_Images.end())\n";
+	ss << "\t\t\treturn [[it->second retain] autorelease];\n";
+	ss << '\n';
+	ss << "\t\tNSString * file = [NSString stringWithFormat:@\"%@/%@\", [[NSBundle mainBundle] resourcePath], "
+		"name];\n";
+	ss << "\t\tNSData * data = [NSData dataWithContentsOfFile:file];\n";
+	ss << "\t\tUIImageWrapper * image = [[[UIImageWrapper alloc] initWithData:data scale:2.0f] autorelease];\n";
+	ss << "\t\timage->dictionaryKey = key;\n";
+	ss << "\t\tg_Images.insert(std::make_pair(key, image));\n";
+	ss << '\n';
+	ss << "\t\treturn image;\n";
+	ss << "\t}\n";
 	ss << '\n';
 	ss << "\tUIFont * iosGetFont(NSString * name, float size)\n";
 	ss << "\t{\n";
