@@ -74,6 +74,15 @@ void iosChooseTranslation(const ProjectPtr & project, const std::string & prefix
 	ss << prefix << "})";
 }
 
+void iosGetFont(std::stringstream & ss, const UIFontPtr & font, UIScaleMode scaleMode,
+	UIScaleMode landscapeScaleMode)
+{
+	ss << "YIP::iosGetFont(@\"";
+	cxxEscape(ss, font->family);
+	ss << "\", (landscape ? " << font->landscapeSize << " * " << iosScaleFunc(landscapeScaleMode, false);
+	ss << " : " << font->size << " * " << iosScaleFunc(scaleMode, false) << "))";
+}
+
 void iosGenerateLayoutCode(const UIWidget * wd, const std::string & prefix, std::stringstream & ss, bool landscape)
 {
 	UIAlignment alignment = (!landscape ? wd->alignment() : wd->landscapeAlignment());
@@ -189,10 +198,10 @@ void UIButton::iosGenerateInitCode(const ProjectPtr & project, const std::string
 	ss << prefix << id() << " = [[UIButton buttonWithType:UIButtonTypeCustom] retain];\n";
 	UIWidget::iosGenerateInitCode(project, prefix, ss);
 
-	if (!m_Title.empty())
+	if (!text().empty())
 	{
 		ss << prefix << '[' << id() << " setTitle:";
-		iosChooseTranslation(project, prefix, ss, m_Title);
+		iosChooseTranslation(project, prefix, ss, text());
 		ss << " forState:UIControlStateNormal];\n";
 	}
 
@@ -207,6 +216,13 @@ void UIButton::iosGenerateInitCode(const ProjectPtr & project, const std::string
 void UIButton::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
 {
 	UIWidget::iosGenerateLayoutCode(prefix, ss);
+
+	if (font().get())
+	{
+		ss << prefix << id() << ".titleLabel.font = ";
+		iosGetFont(ss, font(), fontScaleMode(), landscapeFontScaleMode());
+		ss << ";\n";
+	}
 }
 
 
@@ -220,6 +236,9 @@ void uiGenerateIOSCommonCode(const ProjectPtr & project)
 	ss << '\n';
 	ss << "namespace YIP\n";
 	ss << "{\n";
+	ss << "\tUIFont * iosGetFont(NSString * name, float size);\n";
+	ss << "\tNSString * iosChooseTranslation(NSString * def, NSDictionary * strings);\n";
+	ss << '\n';
 	ss << "\ttemplate <unsigned char ALIGN> CGRect iosLayoutRect(float x, float y, float w, float h,\n";
 	ss << "\t\tfloat xScale, float yScale, float wScale, float hScale, float horzScale, float vertScale)\n";
 	ss << "\t{\n";
@@ -244,7 +263,7 @@ void uiGenerateIOSCommonCode(const ProjectPtr & project)
 	ss << '\n';
 	ss << "#endif\n";
 
-	std::string targetPath = ".yip-ios-view-controllers/ios_layout.h";
+	std::string targetPath = ".yip-ios-view-controllers/yip_ios_layout.h";
 	std::string generatedPath = project->yipDirectory()->writeFile(targetPath, ss.str());
 
 	SourceFilePtr sourceFile = project->addSourceFile(targetPath, generatedPath);
@@ -256,6 +275,31 @@ void uiGenerateIOSCommonCode(const ProjectPtr & project)
 	ss << '\n';
 	ss << "namespace YIP\n";
 	ss << "{\n";
+	ss << "\tstatic NSMutableDictionary * g_Fonts;\n";
+	ss << '\n';
+	ss << "\tUIFont * iosGetFont(NSString * name, float size)\n";
+	ss << "\t{\n";
+	ss << "\t\tif (!g_Fonts)\n";
+	ss << "\t\t\tg_Fonts = [[NSMutableDictionary dictionaryWithCapacity:8] retain];\n";
+	ss << '\n';
+	ss << "\t\tNSMutableDictionary * sizes = [g_Fonts objectForKey:name];\n";
+	ss << "\t\tif (!sizes)\n";
+	ss << "\t\t{\n";
+	ss << "\t\t\tsizes = [NSMutableDictionary dictionaryWithCapacity:16];\n";
+	ss << "\t\t\t[g_Fonts setObject:sizes forKey:name];\n";
+	ss << "\t\t}\n";
+	ss << '\n';
+	ss << "\t\tNSNumber * fontSize = [NSNumber numberWithFloat:size];\n";
+	ss << "\t\tUIFont * font = [sizes objectForKey:fontSize];\n";
+	ss << "\t\tif (font)\n";
+	ss << "\t\t\treturn font;\n";
+	ss << '\n';
+	ss << "\t\tfont = [UIFont fontWithName:name size:size];\n";
+	ss << "\t\t[sizes setObject:font forKey:fontSize];\n";
+	ss << '\n';
+	ss << "\t\treturn font;\n";
+	ss << "\t}\n";
+	ss << '\n';
 	ss << "\tNSString * iosChooseTranslation(NSString * def, NSDictionary * strings)\n";
 	ss << "\t{\n";
 	ss << "\t\tNSArray * languages = [NSLocale preferredLanguages];\n";
@@ -275,7 +319,7 @@ void uiGenerateIOSCommonCode(const ProjectPtr & project)
 	ss << "\t}\n";
 	ss << "}\n";
 
-	targetPath = ".yip-ios-view-controllers/ios_lang.mm";
+	targetPath = ".yip-ios-view-controllers/ios_layout.mm";
 	generatedPath = project->yipDirectory()->writeFile(targetPath, ss.str());
 
 	sourceFile = project->addSourceFile(targetPath, generatedPath);
@@ -351,11 +395,7 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 
 		std::stringstream sm;
 		sm << "#import \"" << targetName << ".h\"\n";
-		sm << "#import \"../ios_layout.h\"\n";
-		sm << '\n';
-		sm << "namespace YIP {\n";
-		sm << "\tNSString * iosChooseTranslation(NSString * def, NSDictionary * strings);\n";
-		sm << "}\n";
+		sm << "#import \"../yip_ios_layout.h\"\n";
 		sm << '\n';
 		sm << "@implementation " << cntrl.name << '\n';
 		sm << '\n';

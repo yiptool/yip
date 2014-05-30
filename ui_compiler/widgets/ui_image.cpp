@@ -31,7 +31,7 @@ UIImage::~UIImage()
 {
 }
 
-bool UIImage::parseAttribute(const TiXmlAttribute *)
+bool UIImage::parseAttribute(const TiXmlAttribute * attr)
 {
-	return false;
+	return UIWidget::parseAttribute(attr);
 }

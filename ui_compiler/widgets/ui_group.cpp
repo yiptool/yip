@@ -46,4 +46,6 @@ void UIGroup::afterParseAttributes(const TiXmlElement * element)
 		widget->parse(child);
 		m_Widgets.push_back(widget);
 	}
+
+	UIWidget::afterParseAttributes(element);
 }

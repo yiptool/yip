@@ -23,10 +23,10 @@
 #ifndef __6087b759cedff1106a48081845d2ee36__
 #define __6087b759cedff1106a48081845d2ee36__
 
-#include "ui_widget.h"
+#include "ui_widget_with_text.h"
 #include <vector>
 
-class UILabel : public UIWidget
+class UILabel : public UIWidgetWithText
 {
 public:
 	UILabel(UILayout * layout, UIGroup * parentGroup);

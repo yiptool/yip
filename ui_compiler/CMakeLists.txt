@@ -18,6 +18,8 @@ ADD_LIBRARY(ui_compiler STATIC
 	widgets/ui_label.h
 	widgets/ui_widget.cpp
 	widgets/ui_widget.h
+	widgets/ui_widget_with_text.cpp
+	widgets/ui_widget_with_text.h
 	ios_generator.cpp
 	ios_generator.h
 	parse_util.cpp

@@ -23,17 +23,16 @@
 #ifndef __f7c700c34a2d02ea09d0d3a63e537db2__
 #define __f7c700c34a2d02ea09d0d3a63e537db2__
 
-#include "ui_widget.h"
+#include "ui_widget_with_text.h"
 #include <vector>
 #include <sstream>
 
-class UIButton : public UIWidget
+class UIButton : public UIWidgetWithText
 {
 public:
 	UIButton(UILayout * layout, UIGroup * parentGroup);
 	~UIButton();
 
-	inline const std::string & title() const { return m_Title; }
 	inline const std::string & image() const { return m_Image; }
 
 	// In ios_generator.cpp
@@ -45,7 +44,6 @@ protected:
 	virtual bool parseAttribute(const TiXmlAttribute * attr);
 
 private:
-	std::string m_Title;
 	std::string m_Image;
 
 	UIButton(const UIButton &) = delete;

@@ -23,7 +23,7 @@
 #include "ui_button.h"
 
 UIButton::UIButton(UILayout * layout, UIGroup * parentGroup)
-	: UIWidget(layout, parentGroup, UIWidget::Button)
+	: UIWidgetWithText(layout, parentGroup, UIWidget::Button)
 {
 }
 
@@ -33,16 +33,11 @@ UIButton::~UIButton()
 
 bool UIButton::parseAttribute(const TiXmlAttribute * attr)
 {
-	if (attr->NameTStr() == "title")
-	{
-		m_Title = attr->ValueStr();
-		return true;
-	}
-	else if (attr->NameTStr() == "image")
+	if (attr->NameTStr() == "image")
 	{
 		m_Image = attr->ValueStr();
 		return true;
 	}
 
-	return false;
+	return UIWidgetWithText::parseAttribute(attr);
 }

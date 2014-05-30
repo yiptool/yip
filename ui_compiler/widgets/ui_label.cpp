@@ -23,7 +23,7 @@
 #include "ui_label.h"
 
 UILabel::UILabel(UILayout * layout, UIGroup * parentGroup)
-	: UIWidget(layout, parentGroup, UIWidget::Label)
+	: UIWidgetWithText(layout, parentGroup, UIWidget::Label)
 {
 }
 
@@ -31,7 +31,7 @@ UILabel::~UILabel()
 {
 }
 
-bool UILabel::parseAttribute(const TiXmlAttribute *)
+bool UILabel::parseAttribute(const TiXmlAttribute * attr)
 {
-	return false;
+	return UIWidgetWithText::parseAttribute(attr);
 }

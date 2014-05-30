@@ -24,6 +24,7 @@
 #define __2eb5a6e9c487b7a05350099e3a868d01__
 
 #include "../project/project.h"
+#include "attributes/ui_font.h"
 #include "attributes/ui_scale_mode.h"
 #include "parse_util.h"
 #include "ui_layout.h"
@@ -33,9 +34,11 @@
 
 class UIWidget;
 
+std::string iosScaleFunc(UIScaleMode mode, bool horz);
 void iosChooseTranslation(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
 	const std::string & text);
-std::string iosScaleFunc(UIScaleMode mode, bool horz);
+void iosGetFont(std::stringstream & ss, const UIFontPtr & font, UIScaleMode scaleMode,
+	UIScaleMode landscapeScaleMode);
 void iosGenerateLayoutCode(const UIWidget * wd, const std::string & prefix, std::stringstream & ss, bool landscape);
 
 void uiGenerateIOSCommonCode(const ProjectPtr & project);

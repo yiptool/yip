@@ -49,3 +49,15 @@ UIFontPtr UIFont::fromString(const std::string & str)
 
 	return std::make_shared<UIFont>(family, size, landscapeSize);
 }
+
+UIFontPtr UIFont::fromAttr(const TiXmlAttribute * attr)
+{
+	try
+	{
+		return fromString(attr->ValueStr());
+	}
+	catch (const std::exception & e)
+	{
+		throw std::runtime_error(xmlError(attr, e.what()));
+	}
+}

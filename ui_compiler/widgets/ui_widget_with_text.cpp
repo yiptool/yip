@@ -20,27 +20,41 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __538c2b09160c3dd1fbf7f07e863a6990__
-#define __538c2b09160c3dd1fbf7f07e863a6990__
+#include "ui_widget_with_text.h"
+#include "../../util/tinyxml-util/tinyxml-util.h"
 
-#include "../../3rdparty/tinyxml/tinyxml.h"
-#include <string>
-#include <memory>
-
-struct UIFont;
-typedef std::shared_ptr<UIFont> UIFontPtr;
-
-struct UIFont
+UIWidgetWithText::UIWidgetWithText(UILayout * layout, UIGroup * parentGroup, Kind kind)
+	: UIWidget(layout, parentGroup, kind),
+	  m_FontScaleMode(UIScaleDefault),
+	  m_LandscapeFontScaleMode(UIScaleDefault),
+	  m_HasFontScaleMode(false)
 {
-	std::string family;
-	float size;
-	float landscapeSize;
+}
 
-	inline UIFont(const std::string & f, float s) : family(f), size(s), landscapeSize(s) {}
-	inline UIFont(const std::string & f, float s, float ls) : family(f), size(s), landscapeSize(ls) {}
+UIWidgetWithText::~UIWidgetWithText()
+{
+}
 
-	static UIFontPtr fromString(const std::string & str);
-	static UIFontPtr fromAttr(const TiXmlAttribute * attr);
-};
+bool UIWidgetWithText::parseAttribute(const TiXmlAttribute * attr)
+{
+	if (attr->NameTStr() == "text")
+	{
+		m_Text = attr->ValueStr();
+		return true;
+	}
+	else if (attr->NameTStr() == "font")
+	{
+		m_Font = UIFont::fromAttr(attr);
+		return true;
+	}
 
-#endif
+	return UIWidget::parseAttribute(attr);
+}
+
+void UIWidgetWithText::afterParseAttributes(const TiXmlElement * element)
+{
+	if (!m_Font && m_HasFontScaleMode)
+		throw std::runtime_error(xmlError(element, "font scale mode is useless without specifying a font."));
+
+	UIWidget::afterParseAttributes(element);
+}

@@ -20,27 +20,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __538c2b09160c3dd1fbf7f07e863a6990__
-#define __538c2b09160c3dd1fbf7f07e863a6990__
+#ifndef __c48137b06c14ea264a9986b4dfea3afd__
+#define __c48137b06c14ea264a9986b4dfea3afd__
 
-#include "../../3rdparty/tinyxml/tinyxml.h"
-#include <string>
-#include <memory>
+#include "ui_widget.h"
+#include "../attributes/ui_font.h"
 
-struct UIFont;
-typedef std::shared_ptr<UIFont> UIFontPtr;
-
-struct UIFont
+class UIWidgetWithText : public UIWidget
 {
-	std::string family;
-	float size;
-	float landscapeSize;
+public:
+	UIWidgetWithText(UILayout * layout, UIGroup * parentGroup, Kind kind);
+	~UIWidgetWithText();
 
-	inline UIFont(const std::string & f, float s) : family(f), size(s), landscapeSize(s) {}
-	inline UIFont(const std::string & f, float s, float ls) : family(f), size(s), landscapeSize(ls) {}
+	inline const std::string & text() const { return m_Text; }
 
-	static UIFontPtr fromString(const std::string & str);
-	static UIFontPtr fromAttr(const TiXmlAttribute * attr);
+	inline const UIFontPtr & font() const { return m_Font; }
+
+	inline UIScaleMode fontScaleMode() const { return m_FontScaleMode; }
+	inline UIScaleMode landscapeFontScaleMode() const { return m_LandscapeFontScaleMode; }
+
+protected:
+	bool parseAttribute(const TiXmlAttribute * attr) override;
+	void afterParseAttributes(const TiXmlElement * element) override;
+
+private:
+	std::string m_Text;
+	UIFontPtr m_Font;
+	UIScaleMode m_FontScaleMode;
+	UIScaleMode m_LandscapeFontScaleMode;
+	bool m_HasFontScaleMode;
+
+	UIWidgetWithText(const UIWidgetWithText &) = delete;
+	UIWidgetWithText & operator=(const UIWidgetWithText &) = delete;
 };
 
 #endif
