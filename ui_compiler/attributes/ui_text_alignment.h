@@ -20,34 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __6087b759cedff1106a48081845d2ee36__
-#define __6087b759cedff1106a48081845d2ee36__
+#ifndef __920880e1e0579344617aa8cb49bad109__
+#define __920880e1e0579344617aa8cb49bad109__
 
-#include "ui_widget_with_text.h"
-#include "../attributes/ui_text_alignment.h"
-#include <vector>
+#include "../../3rdparty/tinyxml/tinyxml.h"
+#include <string>
 
-class UILabel : public UIWidgetWithText
+enum UITextAlignment
 {
-public:
-	UILabel(UILayout * layout, UIGroup * parentGroup);
-	~UILabel();
-
-	inline UITextAlignment textAlignment() const { return m_TextAlignment; }
-
-	// In ios_generator.cpp
-	const char * iosClassName() const override { return "UILabel"; }
-	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss) override;
-	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
-
-protected:
-	virtual bool parseAttribute(const TiXmlAttribute * attr);
-
-private:
-	UITextAlignment m_TextAlignment;
-
-	UILabel(const UILabel &) = delete;
-	UILabel & operator=(const UILabel &) = delete;
+	UITextAlignUnspecified = 0,
+	UITextAlignLeft = 1,
+	UITextAlignRight = 2,
+	UITextAlignCenter = 3
 };
+
+UITextAlignment uiTextAlignmentFromString(const std::string & str);
+UITextAlignment uiTextAlignmentFromAttr(const TiXmlAttribute * attr);
 
 #endif

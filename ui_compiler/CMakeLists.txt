@@ -8,6 +8,8 @@ ADD_LIBRARY(ui_compiler STATIC
 	attributes/ui_font.h
 	attributes/ui_scale_mode.cpp
 	attributes/ui_scale_mode.h
+	attributes/ui_text_alignment.cpp
+	attributes/ui_text_alignment.h
 	widgets/ui_button.cpp
 	widgets/ui_button.h
 	widgets/ui_group.cpp

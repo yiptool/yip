@@ -20,34 +20,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __6087b759cedff1106a48081845d2ee36__
-#define __6087b759cedff1106a48081845d2ee36__
+#include "ui_text_alignment.h"
+#include "../../util/tinyxml-util/tinyxml-util.h"
+#include "../../util/cxx-util/cxx-util/fmt.h"
+#include <stdexcept>
+#include <unordered_map>
 
-#include "ui_widget_with_text.h"
-#include "../attributes/ui_text_alignment.h"
-#include <vector>
-
-class UILabel : public UIWidgetWithText
-{
-public:
-	UILabel(UILayout * layout, UIGroup * parentGroup);
-	~UILabel();
-
-	inline UITextAlignment textAlignment() const { return m_TextAlignment; }
-
-	// In ios_generator.cpp
-	const char * iosClassName() const override { return "UILabel"; }
-	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss) override;
-	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
-
-protected:
-	virtual bool parseAttribute(const TiXmlAttribute * attr);
-
-private:
-	UITextAlignment m_TextAlignment;
-
-	UILabel(const UILabel &) = delete;
-	UILabel & operator=(const UILabel &) = delete;
+static const std::unordered_map<std::string, UITextAlignment> g_TextAlignmentNames = {
+	{ "left", UITextAlignLeft },
+	{ "right", UITextAlignRight },
+	{ "center", UITextAlignCenter }
 };
 
-#endif
+UITextAlignment uiTextAlignmentFromString(const std::string & str)
+{
+	auto it = g_TextAlignmentNames.find(str);
+	if (it == g_TextAlignmentNames.end())
+		throw std::runtime_error(fmt() << "invalid text alignment '" << str << "'.");
+	return it->second;
+}
+
+UITextAlignment uiTextAlignmentFromAttr(const TiXmlAttribute * attr)
+{
+	try
+	{
+		return uiTextAlignmentFromString(attr->ValueStr());
+	}
+	catch (const std::exception & e)
+	{
+		throw std::runtime_error(xmlError(attr, e.what()));
+	}
+}

@@ -23,7 +23,8 @@
 #include "ui_label.h"
 
 UILabel::UILabel(UILayout * layout, UIGroup * parentGroup)
-	: UIWidgetWithText(layout, parentGroup, UIWidget::Label)
+	: UIWidgetWithText(layout, parentGroup, UIWidget::Label),
+	  m_TextAlignment(UITextAlignUnspecified)
 {
 }
 
@@ -33,5 +34,11 @@ UILabel::~UILabel()
 
 bool UILabel::parseAttribute(const TiXmlAttribute * attr)
 {
+	if (attr->NameTStr() == "textAlign")
+	{
+		m_TextAlignment = uiTextAlignmentFromAttr(attr);
+		return true;
+	}
+
 	return UIWidgetWithText::parseAttribute(attr);
 }

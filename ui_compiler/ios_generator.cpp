@@ -50,6 +50,20 @@ std::string iosScaleFunc(UIScaleMode mode, bool horz)
 	throw std::runtime_error("invalid scale mode.");
 }
 
+std::string iosTextAlignment(UITextAlignment align)
+{
+	switch (align)
+	{
+	case UITextAlignUnspecified: return "NSTextAlignmentLeft";
+	case UITextAlignLeft: return "NSTextAlignmentLeft";
+	case UITextAlignRight: return "NSTextAlignmentRight";
+	case UITextAlignCenter: return "NSTextAlignmentCenter";
+	}
+
+	assert(false);
+	throw std::runtime_error("invalid text alignment.");
+}
+
 void iosChooseTranslation(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
 	const std::string & text)
 {
@@ -196,6 +210,8 @@ void UILabel::iosGenerateLayoutCode(const std::string & prefix, std::stringstrea
 		iosGetFont(ss, font(), fontScaleMode(), landscapeFontScaleMode());
 		ss << ";\n";
 	}
+
+	ss << prefix << id() << ".textAlignment = " << iosTextAlignment(m_TextAlignment) << ";\n";
 }
 
 

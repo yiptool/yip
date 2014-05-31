@@ -160,3 +160,20 @@ For a button you may additionaly specify the following attributes:
   * `font`: font for the button text.
   * `fontScale`: scale mode for the button text font. You may specify two scale modes, separated with a
   slash (`/`) - one for the portrait orientation and one for the landscape orientation.
+
+## Label
+
+For a label you may additionaly specify the following attributes:
+
+  * `text`: text to display on the label.
+  * `textColor`: color of the label text.
+  * `font`: font for the label text.
+  * `fontScale`: scale mode for the label text font. You may specify two scale modes, separated with a
+  slash (`/`) - one for the portrait orientation and one for the landscape orientation.
+  * `textAlign`: alignment of the text, one of `left`, `right` or `center`.
+
+## Image
+
+For an image you may additionaly specify the following attributes:
+
+  * `image`: path to the image resource.
