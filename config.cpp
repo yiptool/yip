@@ -61,6 +61,7 @@ Config::Config()
 	repos.insert(std::make_pair("ios-keyboard-avoiding", "https://github.com/oss-forks/ios-keyboard-avoiding.git"));
 	repos.insert(std::make_pair("ios-star-rating-view", "https://github.com/oss-forks/ios-star-rating-view.git"));
 	repos.insert(std::make_pair("kissfft", "https://github.com/oss-forks/kissfft.git"));
+	repos.insert(std::make_pair("libogg", "https://github.com/oss-forks/libogg.git"));
 	repos.insert(std::make_pair("libpng", "https://github.com/oss-forks/libpng.git"));
 	repos.insert(std::make_pair("lua", "https://github.com/oss-forks/lua.git"));
 	repos.insert(std::make_pair("dhpoware-modelobj", "https://github.com/oss-forks/dhpoware-modelobj.git"));
@@ -74,6 +75,7 @@ Config::Config()
 	repos.insert(std::make_pair("strtod", "https://github.com/oss-forks/strtod.git"));
 	repos.insert(std::make_pair("tinyobjloader", "https://github.com/oss-forks/tinyobjloader.git"));
 	repos.insert(std::make_pair("tinyxml", "https://github.com/oss-forks/tinyxml.git"));
+	repos.insert(std::make_pair("tremor", "https://github.com/oss-forks/tremor.git"));
 	repos.insert(std::make_pair("vk-ios-sdk", "https://github.com/oss-forks/vk-ios-sdk.git"));
 	repos.insert(std::make_pair("zlib", "https://github.com/oss-forks/zlib.git"));
 
