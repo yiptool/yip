@@ -27,6 +27,7 @@
 #include "widgets/ui_button.h"
 #include "widgets/ui_label.h"
 #include "widgets/ui_image.h"
+#include "widgets/ui_webview.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/path-util/path-util.h"
 #include "../util/cxx_escape.h"
@@ -235,6 +236,22 @@ void UIButton::iosGenerateLayoutCode(const std::string & prefix, std::stringstre
 		iosGetFont(ss, font(), fontScaleMode(), landscapeFontScaleMode());
 		ss << ";\n";
 	}
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UIWebView
+
+void UIWebView::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
+{
+	ss << prefix << id() << " = [[UIWebView alloc] init];\n";
+	UIWidget::iosGenerateInitCode(project, prefix, ss);
+
+}
+
+void UIWebView::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIWidget::iosGenerateLayoutCode(prefix, ss);
 }
 
 

@@ -16,6 +16,8 @@ ADD_LIBRARY(ui_compiler STATIC
 	widgets/ui_image.h
 	widgets/ui_label.cpp
 	widgets/ui_label.h
+	widgets/ui_webview.cpp
+	widgets/ui_webview.h
 	widgets/ui_widget.cpp
 	widgets/ui_widget.h
 	widgets/ui_widget_with_text.cpp

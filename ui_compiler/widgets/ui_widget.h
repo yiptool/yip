@@ -45,7 +45,8 @@ public:
 		Group = 0,
 		Label,
 		Image,
-		Button
+		Button,
+		WebView,
 	};
 
 	UIWidget(UILayout * layout, UIGroup * parentGroup, Kind kind);

@@ -28,6 +28,7 @@ The following widgets are available:
   * `label`: a block of text.
   * `image`: a static image.
   * `button`: a clickable element with a background, optional icon and/or optional title.
+  * `webview`: a browser view.
 
 The following attributes are available for all widgets and groups:
 

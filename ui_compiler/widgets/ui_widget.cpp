@@ -26,6 +26,7 @@
 #include "ui_button.h"
 #include "ui_label.h"
 #include "ui_image.h"
+#include "ui_webview.h"
 #include "../parse_util.h"
 #include "../../util/tinyxml-util/tinyxml-util.h"
 #include "../../util/cxx-util/cxx-util/fmt.h"
@@ -72,6 +73,8 @@ UIWidgetPtr UIWidget::create(UILayout * layout, UIGroup * parentGroup, const std
 		return std::make_shared<UILabel>(layout, parentGroup);
 	else if (className == "image")
 		return std::make_shared<UIImage>(layout, parentGroup);
+	else if (className == "webview")
+		return std::make_shared<UIWebView>(layout, parentGroup);
 
 	throw std::runtime_error(fmt() << "invalid widget class '" << className << "'.");
 }
