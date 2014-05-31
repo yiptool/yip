@@ -175,11 +175,27 @@ void UILabel::iosGenerateInitCode(const ProjectPtr & project, const std::string 
 {
 	ss << prefix << id() << " = [[UILabel alloc] initWithFrame:CGRectZero];\n";
 	UIWidget::iosGenerateInitCode(project, prefix, ss);
+
+	if (!text().empty())
+	{
+		ss << prefix << id() << ".text = ";
+		iosChooseTranslation(project, prefix, ss, text());
+		ss << ";\n";
+	}
+
+	ss << prefix << id() << ".textColor = " << textColor().iosValue() << ";\n";
 }
 
 void UILabel::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
 {
 	UIWidget::iosGenerateLayoutCode(prefix, ss);
+
+	if (font().get())
+	{
+		ss << prefix << id() << ".font = ";
+		iosGetFont(ss, font(), fontScaleMode(), landscapeFontScaleMode());
+		ss << ";\n";
+	}
 }
 
 
