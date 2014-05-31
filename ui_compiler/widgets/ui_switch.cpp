@@ -20,29 +20,58 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __8e3344a5e83271c06f118b16e6f90ca2__
-#define __8e3344a5e83271c06f118b16e6f90ca2__
+#include "ui_switch.h"
+#include "../../util/tinyxml-util/tinyxml-util.h"
 
-#include "ui_widget.h"
-#include <vector>
-
-class UIWebView : public UIWidget
+UISwitch::UISwitch(UILayout * layout, UIGroup * parentGroup)
+	: UIWidget(layout, parentGroup, UIWidget::Switch)
 {
-public:
-	UIWebView(UILayout * layout, UIGroup * parentGroup);
-	~UIWebView();
+}
 
-	// In ios_generator.cpp
-	const char * iosClassName() const override { return "UIWebView"; }
-	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss) override;
-	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
+UISwitch::~UISwitch()
+{
+}
 
-protected:
-	bool parseAttribute(const TiXmlAttribute * attr) override;
+bool UISwitch::isCustom() const
+{
+	size_t len1 = m_KnobImage.length();
+	size_t len2 = m_OnImage.length();
+	size_t len3 = m_OffImage.length();
+	return (len1 && len2 && len3);
+}
 
-private:
-	UIWebView(const UIWebView &) = delete;
-	UIWebView & operator=(const UIWebView &) = delete;
-};
+bool UISwitch::parseAttribute(const TiXmlAttribute * attr)
+{
+	if (attr->NameTStr() == "onImage")
+	{
+		m_OnImage = attr->ValueStr();
+		return true;
+	}
+	else if (attr->NameTStr() == "offImage")
+	{
+		m_OffImage = attr->ValueStr();
+		return true;
+	}
+	else if (attr->NameTStr() == "knobImage")
+	{
+		m_KnobImage = attr->ValueStr();
+		return true;
+	}
 
-#endif
+	return UIWidget::parseAttribute(attr);
+}
+
+void UISwitch::afterParseAttributes(const TiXmlElement * element)
+{
+	size_t len1 = m_KnobImage.length();
+	size_t len2 = m_OnImage.length();
+	size_t len3 = m_OffImage.length();
+
+	if (len1 || len2 || len3)
+	{
+		if (!len1 || !len2 || !len3)
+			throw std::runtime_error(xmlError(element, "not all images were specified for the switch."));
+	}
+
+	UIWidget::afterParseAttributes(element);
+}

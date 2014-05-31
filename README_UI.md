@@ -27,6 +27,7 @@ The following widgets are available:
   * `group`: a group of widgets.
   * `label`: a block of text.
   * `image`: a static image.
+  * `switch`: a clickable switch with two possible values (usually "ON" and "OFF").
   * `button`: a clickable element with a background, optional icon and/or optional title.
   * `webview`: a browser view.
 
@@ -149,6 +150,17 @@ Here are some examples of font specifications:
 
   * `Arial,16`
   * `OpenSans,16/20`
+
+## Switch
+
+For a switch you may specify custom images for the "on" state, "off" state and for the moving "knob".
+You should either specify all three images or do not specify any of them.
+
+To specify custom images for the switch, use the following attributes:
+
+  * `knobImage`: name of the resource containing image for the moving "knob".
+  * `onImage`: name of the resource containing image for the "on" state.
+  * `offImage`: name of the resource containing image for the "off" state.
 
 ## Button
 

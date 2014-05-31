@@ -20,29 +20,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __8e3344a5e83271c06f118b16e6f90ca2__
-#define __8e3344a5e83271c06f118b16e6f90ca2__
+#ifndef __854a5b920b3b3fa177f36ee0e5938aff__
+#define __854a5b920b3b3fa177f36ee0e5938aff__
 
 #include "ui_widget.h"
 #include <vector>
 
-class UIWebView : public UIWidget
+class UISwitch : public UIWidget
 {
 public:
-	UIWebView(UILayout * layout, UIGroup * parentGroup);
-	~UIWebView();
+	UISwitch(UILayout * layout, UIGroup * parentGroup);
+	~UISwitch();
+
+	bool isCustom() const;
 
 	// In ios_generator.cpp
-	const char * iosClassName() const override { return "UIWebView"; }
+	const char * iosClassName() const override { return isCustom() ? "NZSwitchControl" : "UISwitch"; }
 	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss) override;
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 protected:
 	bool parseAttribute(const TiXmlAttribute * attr) override;
+	void afterParseAttributes(const TiXmlElement * element) override;
 
 private:
-	UIWebView(const UIWebView &) = delete;
-	UIWebView & operator=(const UIWebView &) = delete;
+	std::string m_KnobImage;
+	std::string m_OnImage;
+	std::string m_OffImage;
+
+	UISwitch(const UISwitch &) = delete;
+	UISwitch & operator=(const UISwitch &) = delete;
 };
 
 #endif

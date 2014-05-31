@@ -28,6 +28,7 @@
 #include "widgets/ui_label.h"
 #include "widgets/ui_image.h"
 #include "widgets/ui_webview.h"
+#include "widgets/ui_switch.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/path-util/path-util.h"
 #include "../util/cxx_escape.h"
@@ -238,6 +239,39 @@ void UIImage::iosGenerateLayoutCode(const std::string & prefix, std::stringstrea
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UISwitch
+
+void UISwitch::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
+{
+	if (!isCustom())
+		ss << prefix << id() << " = [[UISwitch alloc] initWithFrame:CGRectZero];\n";
+	else
+	{
+		ss << prefix << id() << " = [[NZSwitchControl alloc] init];\n";
+
+		ss << prefix << id() << ".knob.image = iosImageFromResource(@\"";
+		cxxEscape(ss, m_KnobImage);
+		ss << "\");\n";
+
+		ss << prefix << id() << ".turnedOn.image = iosImageFromResource(@\"";
+		cxxEscape(ss, m_OnImage);
+		ss << "\");\n";
+
+		ss << prefix << id() << ".turnedOff.image = iosImageFromResource(@\"";
+		cxxEscape(ss, m_OffImage);
+		ss << "\");\n";
+	}
+
+	UIWidget::iosGenerateInitCode(project, prefix, ss);
+}
+
+void UISwitch::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIWidget::iosGenerateLayoutCode(prefix, ss);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // UIButton
 
 void UIButton::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
@@ -350,6 +384,7 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 
 		std::stringstream sh;
 		sh << "#import <UIKit/UIKit.h>\n";
+		sh << "#import <yip-imports/ios/NZSwitchControl.h>\n";
 		sh << '\n';
 		sh << "@interface " << cntrl.name << " : " << cntrl.parentClass << "\n";
 		for (auto it : widgetInfos)

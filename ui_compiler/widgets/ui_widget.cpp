@@ -27,6 +27,7 @@
 #include "ui_label.h"
 #include "ui_image.h"
 #include "ui_webview.h"
+#include "ui_switch.h"
 #include "../parse_util.h"
 #include "../../util/tinyxml-util/tinyxml-util.h"
 #include "../../util/cxx-util/cxx-util/fmt.h"
@@ -71,6 +72,8 @@ UIWidgetPtr UIWidget::create(UILayout * layout, UIGroup * parentGroup, const std
 		return std::make_shared<UIButton>(layout, parentGroup);
 	else if (className == "label")
 		return std::make_shared<UILabel>(layout, parentGroup);
+	else if (className == "switch")
+		return std::make_shared<UISwitch>(layout, parentGroup);
 	else if (className == "image")
 		return std::make_shared<UIImage>(layout, parentGroup);
 	else if (className == "webview")

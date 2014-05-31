@@ -45,6 +45,7 @@ public:
 		Group = 0,
 		Label,
 		Image,
+		Switch,
 		Button,
 		WebView,
 	};

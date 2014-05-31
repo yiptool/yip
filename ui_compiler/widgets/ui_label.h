@@ -41,7 +41,7 @@ public:
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 protected:
-	virtual bool parseAttribute(const TiXmlAttribute * attr);
+	bool parseAttribute(const TiXmlAttribute * attr) override;
 
 private:
 	UITextAlignment m_TextAlignment;
