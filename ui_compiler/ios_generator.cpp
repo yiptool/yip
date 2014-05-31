@@ -190,6 +190,13 @@ void UIImage::iosGenerateInitCode(const ProjectPtr & project, const std::string 
 {
 	ss << prefix << id() << " = [[UIImageView alloc] initWithImage:nil];\n";
 	UIWidget::iosGenerateInitCode(project, prefix, ss);
+
+	if (!m_Image.empty())
+	{
+		ss << prefix << id() << ".image = iosImageFromResource(@\"";
+		cxxEscape(ss, m_Image);
+		ss << "\");\n";
+	}
 }
 
 void UIImage::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)

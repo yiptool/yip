@@ -41,6 +41,8 @@ protected:
 	virtual bool parseAttribute(const TiXmlAttribute * attr);
 
 private:
+	std::string m_Image;
+
 	UIImage(const UIImage &) = delete;
 	UIImage & operator=(const UIImage &) = delete;
 };

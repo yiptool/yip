@@ -33,5 +33,11 @@ UIImage::~UIImage()
 
 bool UIImage::parseAttribute(const TiXmlAttribute * attr)
 {
+	if (attr->NameTStr() == "image")
+	{
+		m_Image = attr->ValueStr();
+		return true;
+	}
+
 	return UIWidget::parseAttribute(attr);
 }
