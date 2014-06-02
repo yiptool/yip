@@ -134,7 +134,7 @@ static ProjectPtr loadProject(Platform::Type platform = Platform::None)
 	ProjectPtr project = std::make_shared<Project>(projectPath);
 	ProjectFileParser::parseFromCurrentDirectory(project, true);
 
-	if (ios || project->yipDirectory()->didBuildIOS())
+	if ((ios || project->yipDirectory()->didBuildIOS()) && project->shouldImportIOSUtil())
 	{
 		std::string url = "https://github.com/yiptool/ios-util.git";
 		if (project->addImport(url))

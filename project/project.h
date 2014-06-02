@@ -116,6 +116,9 @@ public:
 	inline bool addImport(const std::string & url) { return m_Imports.insert(url).second; }
 	inline const std::set<std::string> & imports() const { return m_Imports; }
 
+	inline bool shouldImportIOSUtil() const { return m_ShouldImportIOSUtil; }
+	inline void setShouldImportIOSUtil() { m_ShouldImportIOSUtil = true; }
+
 	void addHeaderPath(const std::string & path, Platform::Type platform);
 	inline const std::map<std::string, HeaderPathPtr> & headerPaths() const { return m_HeaderPaths; }
 
@@ -283,6 +286,7 @@ private:
 	int m_AndroidTargetSdkVersion;
 	std::vector<std::string> m_AndroidActivities;
 	mutable YipDirectoryPtr m_YipDirectory;
+	bool m_ShouldImportIOSUtil;
 	bool m_IOSAllowIPad;
 	bool m_IOSAllowIPhone;
 	bool m_Valid;

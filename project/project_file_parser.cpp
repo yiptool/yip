@@ -871,6 +871,7 @@ void ProjectFileParser::parseIOSorOSX()
 
 		try {
 			m_Project->iosAddViewController(cntrl);
+			m_Project->setShouldImportIOSUtil();
 		} catch (const Error &) {
 			throw;
 		} catch (const std::exception & e) {
