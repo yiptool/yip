@@ -35,7 +35,7 @@ bool UIImageView::parseAttribute(const TiXmlAttribute * attr)
 {
 	if (attr->NameTStr() == "image")
 	{
-		m_Image = attr->ValueStr();
+		m_Image = UIImage::fromAttr(attr);
 		return true;
 	}
 

@@ -24,6 +24,7 @@
 #define __f7c700c34a2d02ea09d0d3a63e537db2__
 
 #include "ui_widget_with_text.h"
+#include "../attributes/ui_image.h"
 #include <vector>
 #include <sstream>
 
@@ -33,7 +34,7 @@ public:
 	UIButton(UILayout * layout, UIGroup * parentGroup);
 	~UIButton();
 
-	inline const std::string & image() const { return m_Image; }
+	inline const UIImagePtr & image() const { return m_Image; }
 
 	// In ios_generator.cpp
 	const char * iosClassName() const override { return "UIButton"; }
@@ -44,7 +45,7 @@ protected:
 	bool parseAttribute(const TiXmlAttribute * attr) override;
 
 private:
-	std::string m_Image;
+	UIImagePtr m_Image;
 
 	UIButton(const UIButton &) = delete;
 	UIButton & operator=(const UIButton &) = delete;

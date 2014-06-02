@@ -99,6 +99,34 @@ void iosGetFont(std::stringstream & ss, const UIFontPtr & font, UIScaleMode scal
 	ss << " : " << font->size << " * " << iosScaleFunc(scaleMode, false) << "))";
 }
 
+void iosGetImage(std::stringstream & ss, const UIImagePtr & image)
+{
+	ss << "iosImageFromResource(@\"";
+	cxxEscape(ss, image->name);
+	ss << "\")";
+}
+
+void iosGetScaledImage(const UIWidget * wd, std::stringstream & ss, const UIImagePtr & image,
+	const std::string & imageObject)
+{
+	std::string wMode1 = iosScaleFunc(wd->widthScaleMode(), true);
+	std::string hMode1 = iosScaleFunc(wd->heightScaleMode(), false);
+
+	std::string wMode2 = iosScaleFunc(wd->landscapeWidthScaleMode(), true);
+	std::string hMode2 = iosScaleFunc(wd->landscapeHeightScaleMode(), false);
+
+	std::string wMode = fmt() << "(landscape ? " << wMode2 << " : " << wMode1 << ')';
+	std::string hMode = fmt() << "(landscape ? " << hMode2 << " : " << hMode1 << ')';
+
+	if (!image->isNinePatch)
+		ss << "iosScaledImage(" << imageObject << ", " << wMode << ", " << hMode << ')';
+	else
+	{
+		ss << "iosScaledImageWithCapInsets(" << imageObject << ", " << wMode << ", " << hMode << ", "
+			<< image->left << ", " << image->top << ", " << image->right << ", " << image->bottom << ')';
+	}
+}
+
 void iosGenerateLayoutCode(const UIWidget * wd, const std::string & prefix, std::stringstream & ss, bool landscape)
 {
 	UIAlignment alignment = (!landscape ? wd->alignment() : wd->landscapeAlignment());
@@ -225,17 +253,24 @@ void UIImageView::iosGenerateInitCode(const ProjectPtr & project, const std::str
 	ss << prefix << id() << " = [[UIImageView alloc] initWithImage:nil];\n";
 	UIWidget::iosGenerateInitCode(project, prefix, ss);
 
-	if (!m_Image.empty())
+	if (m_Image.get())
 	{
-		ss << prefix << id() << ".image = iosImageFromResource(@\"";
-		cxxEscape(ss, m_Image);
-		ss << "\");\n";
+		ss << prefix << "objc_setAssociatedObject(" << id() << ", &YIP::KEY_IMAGE, ";
+		iosGetImage(ss, m_Image);
+		ss << ", OBJC_ASSOCIATION_RETAIN_NONATOMIC);\n";
 	}
 }
 
 void UIImageView::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
 {
 	UIWidget::iosGenerateLayoutCode(prefix, ss);
+
+	if (m_Image.get())
+	{
+		ss << prefix << id() << ".image = ";
+		iosGetScaledImage(this, ss, m_Image, fmt() << "objc_getAssociatedObject(" << id() << ", &YIP::KEY_IMAGE)");
+		ss << ";\n";
+	}
 }
 
 
@@ -292,11 +327,11 @@ void UIButton::iosGenerateInitCode(const ProjectPtr & project, const std::string
 	ss << prefix << '[' << id() << " setTitleColor:" << textColor().iosValue()
 		<< " forState:UIControlStateNormal];\n";
 
-	if (!m_Image.empty())
+	if (m_Image.get())
 	{
-		ss << prefix << '[' << id() << " setImage:iosImageFromResource(@\"";
-		cxxEscape(ss, m_Image);
-		ss << "\") forState:UIControlStateNormal];\n";
+		ss << prefix << "objc_setAssociatedObject(" << id() << ", &YIP::KEY_IMAGE, ";
+		iosGetImage(ss, m_Image);
+		ss << ", OBJC_ASSOCIATION_RETAIN_NONATOMIC);\n";
 	}
 }
 
@@ -309,6 +344,13 @@ void UIButton::iosGenerateLayoutCode(const std::string & prefix, std::stringstre
 		ss << prefix << id() << ".titleLabel.font = ";
 		iosGetFont(ss, font(), fontScaleMode(), landscapeFontScaleMode());
 		ss << ";\n";
+	}
+
+	if (m_Image.get())
+	{
+		ss << prefix << '[' << id() << " setImage:";
+		iosGetScaledImage(this, ss, m_Image, fmt() << "objc_getAssociatedObject(" << id() << ", &YIP::KEY_IMAGE)");
+		ss << " forState:UIControlStateNormal];\n";
 	}
 }
 
@@ -386,6 +428,8 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		std::stringstream sh;
 		sh << "#import <UIKit/UIKit.h>\n";
 		sh << "#import <yip-imports/ios/NZSwitchControl.h>\n";
+		sh << "#import <yip-imports/ios/image.h>\n";
+		sh << "#import <objc/runtime.h>\n";
 		sh << '\n';
 		sh << "@interface " << cntrl.name << " : " << cntrl.parentClass << "\n";
 		for (auto it : widgetInfos)
@@ -406,24 +450,28 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sm << '\n';
 		sm << "namespace YIP\n";
 		sm << "{\n";
+		sm << "\tstatic char KEY_IMAGE;\n";
+		sm << '\n';
 		sm << "\ttemplate <unsigned char ALIGN> CGRect iosLayoutRect(float x, float y, float w, float h,\n";
 		sm << "\t\tfloat xScale, float yScale, float wScale, float hScale, float horzScale, float vertScale)\n";
 		sm << "\t{\n";
+		sm << "\t\t(void)KEY_IMAGE; /* Prevent compiler warning. */\n";
+		sm << '\n';
 		sm << "\t\tfloat widgetX = x * xScale;\n";
 		sm << "\t\tfloat widgetY = y * yScale;\n";
 		sm << "\t\tfloat widgetW = w * wScale;\n";
 		sm << "\t\tfloat widgetH = h * hScale;\n";
-		sm << "\t\n";
+		sm << '\n';
 		sm << "\t\tif ((ALIGN & " << UIAlignHorizontalMask << ") == " << UIAlignHCenter << ")\n";
 		sm << "\t\t\twidgetX += (w * horzScale - widgetW) * 0.5f;\n";
 		sm << "\t\telse if ((ALIGN & " << UIAlignHorizontalMask << ") == " << UIAlignRight << ")\n";
 		sm << "\t\t\twidgetX += w * horzScale - widgetW;\n";
-		sm << "\t\n";
+		sm << '\n';
 		sm << "\t\tif ((ALIGN & " << UIAlignVerticalMask << ") == " << UIAlignVCenter << ")\n";
 		sm << "\t\t\twidgetY += (h * vertScale - widgetH) * 0.5f;\n";
 		sm << "\t\telse if ((ALIGN & " << UIAlignVerticalMask << ") == " << UIAlignBottom << ")\n";
 		sm << "\t\t\twidgetY += h * vertScale - widgetH;\n";
-		sm << "\t\n";
+		sm << '\n';
 		sm << "\t\treturn CGRectMake(widgetX, widgetY, widgetW, widgetH);\n";
 		sm << "\t}\n";
 		sm << "}\n";

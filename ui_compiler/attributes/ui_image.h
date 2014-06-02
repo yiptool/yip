@@ -20,32 +20,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __1fdb8fbaf09b434fa06907aca8f82372__
-#define __1fdb8fbaf09b434fa06907aca8f82372__
+#ifndef __09d9ee56b7fd8830078b6731c6f8660f__
+#define __09d9ee56b7fd8830078b6731c6f8660f__
 
-#include "ui_widget.h"
-#include "../attributes/ui_image.h"
-#include <vector>
+#include "../../3rdparty/tinyxml/tinyxml.h"
+#include <string>
+#include <memory>
 
-class UIImageView : public UIWidget
+struct UIImage;
+typedef std::shared_ptr<UIImage> UIImagePtr;
+
+struct UIImage
 {
-public:
-	UIImageView(UILayout * layout, UIGroup * parentGroup);
-	~UIImageView();
+	std::string name;
+	bool isNinePatch;
+	float left;
+	float top;
+	float right;
+	float bottom;
 
-	// In ios_generator.cpp
-	const char * iosClassName() const override { return "UIImageView"; }
-	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss) override;
-	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
+	inline UIImage(const std::string & n) : name(n), isNinePatch(false), left(0), top(0), right(0), bottom(0) {}
 
-protected:
-	bool parseAttribute(const TiXmlAttribute * attr) override;
-
-private:
-	UIImagePtr m_Image;
-
-	UIImageView(const UIImageView &) = delete;
-	UIImageView & operator=(const UIImageView &) = delete;
+	static UIImagePtr fromString(const std::string & str);
+	static UIImagePtr fromAttr(const TiXmlAttribute * attr);
 };
 
 #endif
