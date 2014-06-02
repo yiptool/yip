@@ -89,8 +89,9 @@ Config::Config()
 	repos.insert(std::make_pair("game-main", "https://github.com/yiptool/game-main.git"));
 	repos.insert(std::make_pair("gles2", "https://github.com/yiptool/gles2.git"));
 	repos.insert(std::make_pair("gles2-util", "https://github.com/yiptool/gles2-util.git"));
-	repos.insert(std::make_pair("jni-util", "https://github.com/yiptool/jni-util.git"));
+	repos.insert(std::make_pair("ios-action-sheet", "https://github.com/yiptool/ios-action-sheet.git"));
 	repos.insert(std::make_pair("ios-util", "https://github.com/yiptool/ios-util.git"));
+	repos.insert(std::make_pair("jni-util", "https://github.com/yiptool/jni-util.git"));
 	repos.insert(std::make_pair("math", "https://github.com/yiptool/math.git"));
 	repos.insert(std::make_pair("parse-com", "https://github.com/yiptool/parse-com.git"));
 	repos.insert(std::make_pair("resources", "https://github.com/yiptool/resources.git"));
