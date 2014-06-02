@@ -14,8 +14,8 @@ ADD_LIBRARY(ui_compiler STATIC
 	widgets/ui_button.h
 	widgets/ui_group.cpp
 	widgets/ui_group.h
-	widgets/ui_image.cpp
-	widgets/ui_image.h
+	widgets/ui_image_view.cpp
+	widgets/ui_image_view.h
 	widgets/ui_label.cpp
 	widgets/ui_label.h
 	widgets/ui_switch.cpp

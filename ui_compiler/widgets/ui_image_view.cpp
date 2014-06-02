@@ -20,18 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "ui_image.h"
+#include "ui_image_view.h"
 
-UIImage::UIImage(UILayout * layout, UIGroup * parentGroup)
+UIImageView::UIImageView(UILayout * layout, UIGroup * parentGroup)
 	: UIWidget(layout, parentGroup, UIWidget::Image)
 {
 }
 
-UIImage::~UIImage()
+UIImageView::~UIImageView()
 {
 }
 
-bool UIImage::parseAttribute(const TiXmlAttribute * attr)
+bool UIImageView::parseAttribute(const TiXmlAttribute * attr)
 {
 	if (attr->NameTStr() == "image")
 	{

@@ -25,7 +25,7 @@
 #include "ui_group.h"
 #include "ui_button.h"
 #include "ui_label.h"
-#include "ui_image.h"
+#include "ui_image_view.h"
 #include "ui_webview.h"
 #include "ui_switch.h"
 #include "../parse_util.h"
@@ -75,7 +75,7 @@ UIWidgetPtr UIWidget::create(UILayout * layout, UIGroup * parentGroup, const std
 	else if (className == "switch")
 		return std::make_shared<UISwitch>(layout, parentGroup);
 	else if (className == "image")
-		return std::make_shared<UIImage>(layout, parentGroup);
+		return std::make_shared<UIImageView>(layout, parentGroup);
 	else if (className == "webview")
 		return std::make_shared<UIWebView>(layout, parentGroup);
 

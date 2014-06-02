@@ -26,7 +26,7 @@
 #include "widgets/ui_group.h"
 #include "widgets/ui_button.h"
 #include "widgets/ui_label.h"
-#include "widgets/ui_image.h"
+#include "widgets/ui_image_view.h"
 #include "widgets/ui_webview.h"
 #include "widgets/ui_switch.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
@@ -217,9 +217,10 @@ void UILabel::iosGenerateLayoutCode(const std::string & prefix, std::stringstrea
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// UIImage
+// UIImageView
 
-void UIImage::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
+void UIImageView::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+	std::stringstream & ss)
 {
 	ss << prefix << id() << " = [[UIImageView alloc] initWithImage:nil];\n";
 	UIWidget::iosGenerateInitCode(project, prefix, ss);
@@ -232,7 +233,7 @@ void UIImage::iosGenerateInitCode(const ProjectPtr & project, const std::string 
 	}
 }
 
-void UIImage::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+void UIImageView::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
 {
 	UIWidget::iosGenerateLayoutCode(prefix, ss);
 }

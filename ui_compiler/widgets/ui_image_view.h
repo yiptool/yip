@@ -26,11 +26,11 @@
 #include "ui_widget.h"
 #include <vector>
 
-class UIImage : public UIWidget
+class UIImageView : public UIWidget
 {
 public:
-	UIImage(UILayout * layout, UIGroup * parentGroup);
-	~UIImage();
+	UIImageView(UILayout * layout, UIGroup * parentGroup);
+	~UIImageView();
 
 	// In ios_generator.cpp
 	const char * iosClassName() const override { return "UIImageView"; }
@@ -43,8 +43,8 @@ protected:
 private:
 	std::string m_Image;
 
-	UIImage(const UIImage &) = delete;
-	UIImage & operator=(const UIImage &) = delete;
+	UIImageView(const UIImageView &) = delete;
+	UIImageView & operator=(const UIImageView &) = delete;
 };
 
 #endif
