@@ -597,9 +597,9 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		{
 			sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)\n";
 			sm << "\t\treturn 0";
-			if (ipadLayout->allowPortrait())
+			if (ipadLayout->allowPortraitTablet())
 				sm << " | UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown";
-			if (ipadLayout->allowLandscape())
+			if (ipadLayout->allowLandscapeTablet())
 				sm << " | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight";
 			sm << ";\n";
 		}

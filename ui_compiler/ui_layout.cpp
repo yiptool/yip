@@ -32,7 +32,9 @@ UILayout::UILayout()
 	  m_LandscapeWidth(0.0f),
 	  m_LandscapeHeight(0.0f),
 	  m_AllowPortrait(false),
-	  m_AllowLandscape(false)
+	  m_AllowLandscape(false),
+	  m_AllowPortraitTablet(false),
+	  m_AllowLandscapeTablet(false)
 {
 }
 
@@ -58,21 +60,21 @@ void UILayout::parse(const TiXmlDocument * doc)
 		if (name == "size")
 			uiFloatPairFromAttr(attr, &m_Width, &m_Height, &m_LandscapeWidth, &m_LandscapeHeight);
 		else if (name == "portrait")
-		{
-			if (!xmlAttrToBool(attr, m_AllowPortrait))
-				throw std::runtime_error(xmlInvalidAttributeValue(attr));
-		}
+			uiBoolPairFromAttr(attr, &m_AllowPortrait, &m_AllowPortraitTablet);
 		else if (name == "landscape")
-		{
-			if (!xmlAttrToBool(attr, m_AllowLandscape))
-				throw std::runtime_error(xmlInvalidAttributeValue(attr));
-		}
+			uiBoolPairFromAttr(attr, &m_AllowLandscape, &m_AllowLandscapeTablet);
 		else
 			throw std::runtime_error(xmlError(attr, fmt() << "unknown attribute '" << name << "'."));
 	}
 
 	if (!m_AllowPortrait && !m_AllowLandscape)
 		throw std::runtime_error(xmlError(element, "neither portrait, nor landscape orientation were enabled."));
+
+	if (!m_AllowPortraitTablet && !m_AllowLandscapeTablet)
+	{
+		throw std::runtime_error(xmlError(element,
+			"neither portrait, nor landscape orientation were enabled for tablets."));
+	}
 
 	for (const TiXmlElement * child = element->FirstChildElement(); child; child = child->NextSiblingElement())
 	{

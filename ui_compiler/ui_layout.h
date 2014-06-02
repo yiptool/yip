@@ -38,6 +38,9 @@ public:
 	inline bool allowPortrait() const { return m_AllowPortrait; }
 	inline bool allowLandscape() const { return m_AllowLandscape; }
 
+	inline bool allowPortraitTablet() const { return m_AllowPortraitTablet; }
+	inline bool allowLandscapeTablet() const { return m_AllowLandscapeTablet; }
+
 	inline float width() const { return m_Width; }
 	inline float height() const { return m_Height; }
 
@@ -60,6 +63,8 @@ private:
 	float m_LandscapeHeight;
 	bool m_AllowPortrait;
 	bool m_AllowLandscape;
+	bool m_AllowPortraitTablet;
+	bool m_AllowLandscapeTablet;
 
 	UILayout(const UILayout &) = delete;
 	UILayout & operator=(const UILayout &) = delete;

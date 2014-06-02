@@ -31,6 +31,35 @@
 #undef uiScaleModeFromAttr2
 #undef uiScaleModeFromAttr4
 
+static bool strToBool(const std::string & str, bool * out)
+{
+	if (str == "true" || str == "yes")
+	{
+		*out = true;
+		return true;
+	}
+	else if (str == "false" || str == "no")
+	{
+		*out = false;
+		return true;
+	}
+	return false;
+}
+
+void uiBoolPairFromAttr(const TiXmlAttribute * attr, bool * out1, bool * out2)
+{
+	std::vector<std::string> values = explode(attr->ValueStr(), '/');
+
+	if (values.size() < 1 || values.size() > 2)
+		throw std::runtime_error(xmlInvalidAttributeValue(attr));
+
+	if (!strToBool(values[0], out1))
+		throw std::runtime_error(xmlInvalidAttributeValue(attr));
+
+	if (!strToBool(values.size() > 1 ? values[1] : values[0], out2))
+		throw std::runtime_error(xmlInvalidAttributeValue(attr));
+}
+
 void uiFloatPairFromAttr(const TiXmlAttribute * attr, float * outX, float * outY,
 	float * outLandscapeX, float * outLandscapeY)
 {
