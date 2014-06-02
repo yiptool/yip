@@ -537,7 +537,7 @@ void Gen::writeAndroidManifest()
 	ss << "\t<application\n";
 	ss << "\t\t\tandroid:label=\"@string/app_title\">\n";
 
-	for (const std::string & activity : project->androidActivities())
+	for (const std::string & activity : project->androidManifestActivities())
 		ss << activity << '\n';
 
 	ss << "\t</application>\n";

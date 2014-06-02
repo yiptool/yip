@@ -395,9 +395,9 @@ the `android:gles_version` command:
 
 ### Android activities
 
-To add an activity to the Android manifest file, use the `android:activity` command:
+To add an activity to the Android manifest file, use the `android:manifest_activity` command:
 
-      android:activity '
+      android:manifest_activity '
         <activity
             android:name="MainActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
@@ -410,7 +410,7 @@ To add an activity to the Android manifest file, use the `android:activity` comm
         </activity>
       '
 
-You can have as many `android:activity` commands as you like. All of them will be
+You can have as many `android:manifest_activity` commands as you like. All of them will be
 added to the manifest file.
 
 Yip is also capable to generate a tiny class in the application package (value of the
@@ -421,7 +421,7 @@ if you have specified `android:package` to be `com.mysuperapp`, then the followi
       android:make_activity TestActivity => com.test.Activity
 
 will create class `com.mysuperapp.TestActivity` inherited from `com.test.Activity`. You can
-then specify the `.TestActivity` name in the `android:name` attribute of the `android:activity`
+then specify the `.TestActivity` name in the `android:name` attribute of the `android:manifest_activity`
 command, and applications using the library will not conflict for the public name of activity.
 
 ### Privileges on the Samsung Tizen platform

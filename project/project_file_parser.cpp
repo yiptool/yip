@@ -944,11 +944,11 @@ void ProjectFileParser::parseAndroid()
 		m_Project->androidSetTargetSdkVersion(int(value));
 		return;
 	}
-	else if (m_TokenText == "activity")
+	else if (m_TokenText == "manifest_activity")
 	{
 		if (getToken() != Token::Literal)
 			{ reportError(fmt() << "expected activity XML after '" << prefix << ":activity'."); return; }
-		m_Project->androidAddActivity(m_TokenText);
+		m_Project->androidAddManifestActivity(m_TokenText);
 		return;
 	}
 	else if (m_TokenText == "java_srcdir")

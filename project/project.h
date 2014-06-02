@@ -218,8 +218,10 @@ public:
 		{ m_AndroidTargetSdkVersion = std::max(m_AndroidTargetSdkVersion, ver); }
 	inline int androidTargetSdkVersion() const { return m_AndroidTargetSdkVersion; }
 
-	inline void androidAddActivity(const std::string & activity) { m_AndroidActivities.push_back(activity); }
-	inline const std::vector<std::string> & androidActivities() const { return m_AndroidActivities; }
+	inline void androidAddManifestActivity(const std::string & activity)
+		{ m_AndroidManifestActivities.push_back(activity); }
+	inline const std::vector<std::string> & androidManifestActivities() const
+		{ return m_AndroidManifestActivities; }
 
 	inline bool androidAddMakeActivity(const std::string & name, const std::string & parent)
 		{ return m_AndroidMakeActivities.insert(std::make_pair(name, parent)).second; }
@@ -284,7 +286,7 @@ private:
 	std::set<std::string> m_AndroidJavaSourceDirs;
 	int m_AndroidMinSdkVersion;
 	int m_AndroidTargetSdkVersion;
-	std::vector<std::string> m_AndroidActivities;
+	std::vector<std::string> m_AndroidManifestActivities;
 	mutable YipDirectoryPtr m_YipDirectory;
 	bool m_ShouldImportIOSUtil;
 	bool m_IOSAllowIPad;
