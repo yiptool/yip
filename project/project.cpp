@@ -127,6 +127,20 @@ void Project::saveTranslationFiles() const
 	}
 }
 
+SourceFilePtr Project::addUILayoutFile(const std::string & name, const std::string & path, Platform::Type platform)
+{
+	auto it = m_UILayoutFiles.find(path);
+	if (it != m_UILayoutFiles.end())
+		return it->second;
+
+	SourceFilePtr sourceFile = addSourceFile(name, path);
+	sourceFile->setPlatforms(platform);
+	sourceFile->setFileType(FILE_TEXT_XML);
+	m_UILayoutFiles.insert(std::make_pair(path, sourceFile));
+
+	return sourceFile;
+}
+
 void Project::winrtAddLibrary(const std::string & name)
 {
 	m_WinRTLibraries.insert(name);
@@ -165,6 +179,18 @@ void Project::iosAddViewController(const IOSViewController & cntrl)
 	if (!m_IOSViewControllerNames.insert(cntrl.name).second)
 		throw std::runtime_error(fmt() << "duplicate iOS view controller '" << cntrl.name << "'.");
 	m_IOSViewControllers.push_back(cntrl);
+}
+
+bool Project::androidAddMakeActivity(const std::string & name, const std::string & parent)
+{
+	return m_AndroidMakeActivities.insert(std::make_pair(name, parent)).second;
+}
+
+void Project::androidAddView(const AndroidView & view)
+{
+	if (!m_AndroidViewNames.insert(view.name).second)
+		throw std::runtime_error(fmt() << "duplicate Android view '" << view.name << "'.");
+	m_AndroidViews.push_back(view);
 }
 
 void Project::tizenAddPrivilege(const std::string & url)

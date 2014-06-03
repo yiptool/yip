@@ -801,7 +801,6 @@ void ProjectFileParser::parseIOSorOSX()
 	}
 	else if (m_TokenText == "view_controller" && iOS)
 	{
-		std::unordered_map<std::string, SourceFilePtr> sourceFiles;
 		Project::IOSViewController cntrl;
 
 		if (getToken() != Token::Literal)
@@ -839,21 +838,12 @@ void ProjectFileParser::parseIOSorOSX()
 			std::string name = m_TokenText;
 			std::string path = pathMakeAbsolute(name, m_ProjectPath);
 
-			auto it = sourceFiles.find(path);
-			if (it != sourceFiles.end())
-				*target = it->second;
-			else
-			{
-				try {
-					*target = m_Project->addSourceFile(name, path);
-					(*target)->setPlatforms(Platform::iOS);
-					(*target)->setFileType(FILE_TEXT_XML);
-				} catch (const Error &) {
-					throw;
-				} catch (const std::exception & e) {
-					reportWarning(e.what());
-				}
-				sourceFiles.insert(std::make_pair(path, *target));
+			try {
+				*target = m_Project->addUILayoutFile(name, path, Platform::iOS);
+			} catch (const Error &) {
+				throw;
+			} catch (const std::exception & e) {
+				reportWarning(e.what());
 			}
 
 			switch (getToken())
@@ -947,7 +937,7 @@ void ProjectFileParser::parseAndroid()
 	else if (m_TokenText == "manifest_activity")
 	{
 		if (getToken() != Token::Literal)
-			{ reportError(fmt() << "expected activity XML after '" << prefix << ":activity'."); return; }
+			{ reportError(fmt() << "expected activity XML after '" << prefix << ":manifest_activity'."); return; }
 		m_Project->androidAddManifestActivity(m_TokenText);
 		return;
 	}
@@ -970,6 +960,74 @@ void ProjectFileParser::parseAndroid()
 		std::string parentClass = m_TokenText;
 		if (!m_Project->androidAddMakeActivity(name, parentClass))
 			reportWarning(fmt() << "duplicate 'make_activity' for class '" << name << "'.");
+		return;
+	}
+	else if (m_TokenText == "view")
+	{
+		Project::AndroidView view;
+
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected view name after '" << prefix << ":view'."); return; }
+		view.name = m_TokenText;
+
+		if (getToken() != Token::LCurly)
+			{ reportError("expected '{'."); return; }
+		for (;;)
+		{
+			if (getToken() != Token::Literal)
+				{ reportError("expected device family/orientation name."); return; }
+
+			SourceFilePtr * target = nullptr;
+			if (m_TokenText == "phone")
+				target = &view.phone;
+			else if (m_TokenText == "tablet7")
+				target = &view.tablet7;
+			else if (m_TokenText == "tablet10")
+				target = &view.tablet10;
+			else
+				{ reportError(fmt() << "invalid device family/orientation name '" << m_TokenText << "'."); }
+
+			if (target->get() != nullptr)
+				{ reportError(fmt() << "duplicate family/orientation '" << m_TokenText << "'."); }
+
+			if (getToken() != Token::Arrow)
+				{ reportError("expected '=>'."); return; }
+
+			if (getToken() != Token::Literal)
+				{ reportError("expected XML file name."); return; }
+
+			std::string name = m_TokenText;
+			std::string path = pathMakeAbsolute(name, m_ProjectPath);
+
+			try {
+				*target = m_Project->addUILayoutFile(name, path, Platform::Android);
+			} catch (const Error &) {
+				throw;
+			} catch (const std::exception & e) {
+				reportWarning(e.what());
+			}
+
+			switch (getToken())
+			{
+			case Token::RCurly:
+				break;
+			case Token::Comma:
+				continue;
+			default:
+				reportError("expected '}'.");
+				return;
+			}
+			break;
+		}
+
+		try {
+			m_Project->androidAddView(view);
+		} catch (const Error &) {
+			throw;
+		} catch (const std::exception & e) {
+			reportWarning(e.what());
+		}
+
 		return;
 	}
 

@@ -413,6 +413,7 @@ void Gen::writeLogCxx()
 void Gen::writeStringsXml()
 {
 	std::stringstream ss;
+	ss << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 	ss << "<resources>\n";
 	ss << "\t<string name=\"app_title\">" << xmlEscape(project->androidDisplayName()) << "</string>\n";
 	ss << "</resources>\n";

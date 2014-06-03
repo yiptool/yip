@@ -20,23 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "ui_compiler.h"
+#ifndef __f0d6feb531055a0354584723fb1e5ce1__
+#define __f0d6feb531055a0354584723fb1e5ce1__
+
+#include "../project/project.h"
 #include "ui_layout.h"
-#include "ios_generator.h"
-#include "android_generator.h"
 #include "parse_util.h"
 
-void compileUI(const ProjectPtr & project)
-{
-	UILayoutMap layouts;
+void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project, const Project::AndroidView & view);
+void uiGenerateAndroidCommon(const ProjectPtr & project);
 
-	for (const Project::IOSViewController & cntrl : project->iosViewControllers())
-		uiGenerateIOSViewController(layouts, project, cntrl);
-
-	if (!project->androidViews().empty())
-	{
-		for (const Project::AndroidView & view : project->androidViews())
-			uiGenerateAndroidView(layouts, project, view);
-		uiGenerateAndroidCommon(project);
-	}
-}
+#endif

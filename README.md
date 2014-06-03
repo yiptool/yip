@@ -169,13 +169,23 @@ for resource loading.
 Yip is able to generate source code for user interface on various platforms.
 User interface layout is described in XML files.
 
-To generate a descendant of `UIViewController` for iOS from the given XML file,
+To generate a descendant of `UIViewController` for iOS from given XML files,
 use the `ios:view_controller` directive:
 
       ios:view_controller MyViewController UIViewController
       {
          iphone => ui/iphone.xml,
          ipad => ui/ipad.xml
+      }
+
+To generate a view group for Android from given XML files, use the
+`android:view` directive:
+
+      android:view com.mysuperapp.MyActivity
+      {
+        phone => ui/phone.xml,
+        tablet7 => ui/tablet_7inch.xml,
+        tablet10 => ui/tablet_10inch.xml
       }
 
 For more information see [User interface layout file format](README_UI.md).

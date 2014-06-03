@@ -28,6 +28,8 @@ ADD_LIBRARY(ui_compiler STATIC
 	widgets/ui_widget.h
 	widgets/ui_widget_with_text.cpp
 	widgets/ui_widget_with_text.h
+	android_generator.cpp
+	android_generator.h
 	ios_generator.cpp
 	ios_generator.h
 	parse_util.cpp

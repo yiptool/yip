@@ -32,6 +32,7 @@
 #include <vector>
 #include <map>
 #include <unordered_set>
+#include <unordered_map>
 #include <set>
 #include <algorithm>
 #include <ctime>
@@ -87,6 +88,14 @@ public:
 		SourceFilePtr iphone;
 	};
 
+	struct AndroidView
+	{
+		std::string name;
+		SourceFilePtr phone;
+		SourceFilePtr tablet7;
+		SourceFilePtr tablet10;
+	};
+
 	Project(const std::string & prjPath);
 	~Project();
 
@@ -130,6 +139,8 @@ public:
 			int year = -1, int month = -1, int day = -1)
 		{ m_ToDo.push_back(ToDo(file, line, message, year, month, day)); }
 	inline const std::vector<ToDo> & toDo() const { return m_ToDo; }
+
+	SourceFilePtr addUILayoutFile(const std::string & name, const std::string & path, Platform::Type platform);
 
 	// WinRT
 
@@ -223,13 +234,15 @@ public:
 	inline const std::vector<std::string> & androidManifestActivities() const
 		{ return m_AndroidManifestActivities; }
 
-	inline bool androidAddMakeActivity(const std::string & name, const std::string & parent)
-		{ return m_AndroidMakeActivities.insert(std::make_pair(name, parent)).second; }
+	bool androidAddMakeActivity(const std::string & name, const std::string & parent);
 	inline const std::map<std::string, std::string> & androidMakeActivities() const
 		{ return m_AndroidMakeActivities; }
 
 	inline void androidAddJavaSourceDir(const std::string & dir) { m_AndroidJavaSourceDirs.insert(dir); }
 	inline const std::set<std::string> & androidJavaSourceDirs() const { return m_AndroidJavaSourceDirs; }
+
+	void androidAddView(const AndroidView & view);
+	inline const std::vector<AndroidView> & androidViews() const { return m_AndroidViews; }
 
 	// Tizen
 
@@ -251,6 +264,7 @@ private:
 	time_t m_ModificationTime;
 	bool m_HasModificationTime;
 	std::vector<ToDo> m_ToDo;
+	std::unordered_map<std::string, SourceFilePtr> m_UILayoutFiles;
 	std::map<std::string, TranslationFilePtr> m_TranslationFiles;
 	std::map<std::string, HeaderPathPtr> m_HeaderPaths;
 	std::map<std::string, SourceFilePtr> m_SourceFiles;
@@ -284,6 +298,8 @@ private:
 	std::string m_AndroidGlEsVersion;
 	std::map<std::string, std::string> m_AndroidMakeActivities;
 	std::set<std::string> m_AndroidJavaSourceDirs;
+	std::vector<AndroidView> m_AndroidViews;
+	std::unordered_set<std::string> m_AndroidViewNames;
 	int m_AndroidMinSdkVersion;
 	int m_AndroidTargetSdkVersion;
 	std::vector<std::string> m_AndroidManifestActivities;
