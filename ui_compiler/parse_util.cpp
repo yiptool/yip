@@ -184,7 +184,7 @@ UILayoutPtr uiLoadLayout(UILayoutMap & layouts, const SourceFilePtr & sourceFile
 	return layout;
 }
 
-UIWidgetInfos uiGetWidgetInfos(const std::initializer_list<UILayoutPtr> & layouts)
+UIWidgetInfos uiGetWidgetInfos(const std::initializer_list<UILayoutPtr> & layouts, bool android)
 {
 	UIWidgetInfos infos;
 
@@ -221,8 +221,9 @@ UIWidgetInfos uiGetWidgetInfos(const std::initializer_list<UILayoutPtr> & layout
 
 			switch (index)
 			{
-			case 1: infoPtr->iphone = widget; break;
-			case 2: infoPtr->ipad = widget; break;
+			case 1: (android ? infoPtr->iphone = widget : infoPtr->phone = widget); break;
+			case 2: (android ? infoPtr->ipad = widget : infoPtr->tablet7 = widget); break;
+			case 3: infoPtr->tablet10 = widget; break;
 			default: assert(false); throw std::runtime_error("internal error: invalid layout index.");
 			}
 		}

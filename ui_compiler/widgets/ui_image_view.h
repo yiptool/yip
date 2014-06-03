@@ -38,6 +38,9 @@ public:
 	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss) override;
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
+	// In android_generator.cpp
+	const char * androidClassName() const override { return "ImageView"; }
+
 protected:
 	bool parseAttribute(const TiXmlAttribute * attr) override;
 

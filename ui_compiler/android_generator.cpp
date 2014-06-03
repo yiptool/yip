@@ -72,6 +72,13 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 	UILayoutPtr tablet7Layout = uiLoadLayout(layouts, view.tablet7);
 	UILayoutPtr tablet10Layout = uiLoadLayout(layouts, view.tablet10);
 
+	UIWidgetInfos widgetInfos = uiGetWidgetInfos({
+		// Don't change order of this items: it's important
+		phoneLayout,
+		tablet7Layout,
+		tablet10Layout
+	}, true);
+
 	bool hasPhone = phoneLayout.get() != nullptr;
 	bool hasTablet7 = tablet7Layout.get() != nullptr;
 	bool hasTablet10 = tablet10Layout.get() != nullptr;
@@ -106,6 +113,13 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 	ss << '\n';
 	ss << "public class " << className << " extends ViewGroup\n";
 	ss << "{\n";
+	for (auto it : widgetInfos)
+	{
+		const UIWidgetPtr & widget = (it.second.phone.get() ? it.second.iphone :
+			(it.second.tablet7.get() ? it.second.tablet7 : it.second.tablet10));
+		ss << "public final " << widget->androidClassName() << ' ' << it.first << ";\n";
+	}
+	ss << '\n';
 	ss << "\tpublic " << className << "(Context context)\n";
 	ss << "\t{\n";
 	ss << "\t\tsuper(context);\n";

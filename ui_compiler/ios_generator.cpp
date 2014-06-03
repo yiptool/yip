@@ -420,7 +420,7 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 			// Don't change order of this items: it's important
 			iphoneLayout,
 			ipadLayout,
-		});
+		}, false);
 
 		bool hasIPhone = iphoneLayout.get() != nullptr;
 		bool hasIPad = ipadLayout.get() != nullptr;

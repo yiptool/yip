@@ -93,6 +93,9 @@ public:
 	virtual void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss);
 	virtual void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss);
 
+	// In android_generator.cpp
+	virtual const char * androidClassName() const = 0;
+
 protected:
 	virtual void beforeParseAttributes(const TiXmlElement * element);
 	virtual bool parseAttribute(const TiXmlAttribute * attr);

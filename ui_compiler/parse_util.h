@@ -34,6 +34,9 @@ struct UIWidgetInfo
 	UIWidget::Kind kind;
 	UIWidgetPtr ipad;
 	UIWidgetPtr iphone;
+	UIWidgetPtr phone;
+	UIWidgetPtr tablet7;
+	UIWidgetPtr tablet10;
 };
 
 typedef std::unordered_map<std::string, UIWidgetInfo> UIWidgetInfos;
@@ -67,6 +70,6 @@ void uiAlignmentFromAttr(const TiXmlAttribute * attr, UIAlignment * outAlign1, U
 		&has##WHAT1##Scale, &has##WHAT2##Scale, &has##WHAT3##Scale, &has##WHAT4##Scale)
 
 UILayoutPtr uiLoadLayout(UILayoutMap & layouts, const SourceFilePtr & sourceFile);
-UIWidgetInfos uiGetWidgetInfos(const std::initializer_list<UILayoutPtr> & layouts);
+UIWidgetInfos uiGetWidgetInfos(const std::initializer_list<UILayoutPtr> & layouts, bool android);
 
 #endif

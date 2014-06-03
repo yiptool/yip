@@ -26,17 +26,26 @@
 #include "android_generator.h"
 #include "parse_util.h"
 
-void compileUI(const ProjectPtr & project)
+static void uiCompileIOS(const ProjectPtr & project)
 {
 	UILayoutMap layouts;
-
 	for (const Project::IOSViewController & cntrl : project->iosViewControllers())
 		uiGenerateIOSViewController(layouts, project, cntrl);
+}
 
+static void uiCompileAndroid(const ProjectPtr & project)
+{
+	UILayoutMap layouts;
 	if (!project->androidViews().empty())
 	{
 		for (const Project::AndroidView & view : project->androidViews())
 			uiGenerateAndroidView(layouts, project, view);
 		uiGenerateAndroidCommon(project);
 	}
+}
+
+void compileUI(const ProjectPtr & project)
+{
+	uiCompileIOS(project);
+	uiCompileAndroid(project);
 }
