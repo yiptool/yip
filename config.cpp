@@ -93,6 +93,7 @@ Config::Config()
 	repos.insert(std::make_pair("ios-util", "https://github.com/yiptool/ios-util.git"));
 	repos.insert(std::make_pair("jni-util", "https://github.com/yiptool/jni-util.git"));
 	repos.insert(std::make_pair("math", "https://github.com/yiptool/math.git"));
+	repos.insert(std::make_pair("ogg-vorbis-stream", "https://github.com/yiptool/ogg-vorbis-stream.git"));
 	repos.insert(std::make_pair("parse-com", "https://github.com/yiptool/parse-com.git"));
 	repos.insert(std::make_pair("resources", "https://github.com/yiptool/resources.git"));
 	repos.insert(std::make_pair("scenegraph", "https://github.com/yiptool/scenegraph.git"));
