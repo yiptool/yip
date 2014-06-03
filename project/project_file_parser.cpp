@@ -912,6 +912,13 @@ void ProjectFileParser::parseAndroid()
 		m_Project->androidSetGlEsVersion(m_TokenText);
 		return;
 	}
+	else if (m_TokenText == "nativelib")
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected library name after '" << prefix << ":nativelib'."); return; }
+		m_Project->androidAddNativeLib(m_TokenText);
+		return;
+	}
 	else if (m_TokenText == "min_sdk_version")
 	{
 		if (getToken() != Token::Literal)

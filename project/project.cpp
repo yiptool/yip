@@ -48,6 +48,8 @@ Project::Project(const std::string & prjPath)
 	  m_Valid(true)
 {
 	addDefine("__YIP__");
+	androidAddNativeLib("android");
+	androidAddNativeLib("log");
 }
 
 Project::~Project()

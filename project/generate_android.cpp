@@ -474,7 +474,11 @@ void Gen::writeAndroidMk()
 	}
 	ss << '\n';
 
-	ss << "LOCAL_LDLIBS := -llog -lGLESv2 -landroid\n";
+	ss << "LOCAL_LDLIBS :=";
+	for (const std::string & lib : project->androidNativeLibs())
+		ss << " -l" << lib;
+	ss << '\n';
+
 	ss << "include $(BUILD_SHARED_LIBRARY)\n";
 	project->yipDirectory()->writeFile("android/jni/Android.mk", ss.str());
 }

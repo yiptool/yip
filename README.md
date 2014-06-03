@@ -403,6 +403,12 @@ the `android:gles_version` command:
 
       android:gles_version "0x00020000"
 
+### Android native libraries
+
+To link with additional native libraries use the `android:nativelib` command:
+
+      android:nativelib GLESv2
+
 ### Android activities
 
 To add an activity to the Android manifest file, use the `android:manifest_activity` command:

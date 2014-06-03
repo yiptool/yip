@@ -244,6 +244,9 @@ public:
 	void androidAddView(const AndroidView & view);
 	inline const std::vector<AndroidView> & androidViews() const { return m_AndroidViews; }
 
+	void androidAddNativeLib(const std::string & name) { m_AndroidNativeLibs.insert(name); }
+	inline const std::set<std::string> & androidNativeLibs() const { return m_AndroidNativeLibs; }
+
 	// Tizen
 
 	void tizenAddPrivilege(const std::string & url);
@@ -300,6 +303,7 @@ private:
 	std::set<std::string> m_AndroidJavaSourceDirs;
 	std::vector<AndroidView> m_AndroidViews;
 	std::unordered_set<std::string> m_AndroidViewNames;
+	std::set<std::string> m_AndroidNativeLibs;
 	int m_AndroidMinSdkVersion;
 	int m_AndroidTargetSdkVersion;
 	std::vector<std::string> m_AndroidManifestActivities;
