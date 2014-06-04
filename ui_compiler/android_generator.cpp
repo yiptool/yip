@@ -115,7 +115,7 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 	ss << "{\n";
 	for (auto it : widgetInfos)
 	{
-		const UIWidgetPtr & widget = (it.second.phone.get() ? it.second.iphone :
+		const UIWidgetPtr & widget = (it.second.phone.get() ? it.second.phone :
 			(it.second.tablet7.get() ? it.second.tablet7 : it.second.tablet10));
 		ss << "public final " << widget->androidClassName() << ' ' << it.first << ";\n";
 	}
