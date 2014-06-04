@@ -61,6 +61,7 @@ Config::Config()
 	repos.insert(std::make_pair("ios-form-sheet-controller", "https://github.com/oss-forks/ios-form-sheet-controller.git"));
 	repos.insert(std::make_pair("ios-keyboard-avoiding", "https://github.com/oss-forks/ios-keyboard-avoiding.git"));
 	repos.insert(std::make_pair("ios-star-rating-view", "https://github.com/oss-forks/ios-star-rating-view.git"));
+	repos.insert(std::make_pair("ios-vk-sdk", "https://github.com/oss-forks/ios-vk-sdk.git"));
 	repos.insert(std::make_pair("kissfft", "https://github.com/oss-forks/kissfft.git"));
 	repos.insert(std::make_pair("libogg", "https://github.com/oss-forks/libogg.git"));
 	repos.insert(std::make_pair("libpng", "https://github.com/oss-forks/libpng.git"));
@@ -77,7 +78,6 @@ Config::Config()
 	repos.insert(std::make_pair("tinyobjloader", "https://github.com/oss-forks/tinyobjloader.git"));
 	repos.insert(std::make_pair("tinyxml", "https://github.com/oss-forks/tinyxml.git"));
 	repos.insert(std::make_pair("tremor", "https://github.com/oss-forks/tremor.git"));
-	repos.insert(std::make_pair("vk-ios-sdk", "https://github.com/oss-forks/vk-ios-sdk.git"));
 	repos.insert(std::make_pair("zlib", "https://github.com/oss-forks/zlib.git"));
 
 	repos.insert(std::make_pair("amazon-aws-runtime", "https://github.com/yiptool/amazon-aws-runtime.git"));
