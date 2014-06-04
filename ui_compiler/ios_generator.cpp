@@ -488,6 +488,7 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sm << "\t{\n";
 		if (hasIPhone)
 		{
+			sm << '\n';
 			sm << "\t\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)\n";
 			sm << "\t\t{\n";
 			for (const UIWidgetPtr & widget : iphoneLayout->widgets())
@@ -499,6 +500,7 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		}
 		if (hasIPad)
 		{
+			sm << '\n';
 			sm << "\t\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)\n";
 			sm << "\t\t{\n";
 			for (const UIWidgetPtr & widget : ipadLayout->widgets())
@@ -520,6 +522,18 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 			sm << "\t" << it.first << " = nil;\n";
 		}
 		sm << "\t[super dealloc];\n";
+		sm << "}\n";
+		sm << '\n';
+		sm << "-(void)viewWillAppear:(BOOL)animated\n";
+		sm << "{\n";
+		sm << "\t[super viewWillAppear:animated];\n";
+		sm << "\tif ([self respondsToSelector:@selector(prefersStatusBarHidden)])\n";
+		sm << "\t{\n";
+		sm << "\t\t[[UIApplication sharedApplication] setStatusBarHidden:[self prefersStatusBarHidden]\n";
+		sm << "\t\t\twithAnimation:[self preferredStatusBarUpdateAnimation]];\n";
+		sm << "\t\tif ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)])\n";
+		sm << "\t\t\t[self setNeedsStatusBarAppearanceUpdate];\n";
+		sm << "\t}\n";
 		sm << "}\n";
 		sm << '\n';
 		sm << "-(void)viewWillLayoutSubviews\n";
