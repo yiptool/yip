@@ -396,6 +396,16 @@ use the `android:target_sdk_version` command:
 This command corresponds to the `targetSdkVersion` attribute of the `uses-sdk` element in the
 Android.
 
+### Application icons on Android
+
+Icons for applications on Android could be specified using the `android:icon` command:
+
+      android:icon icons/48.png
+      android:icon icons/72.png
+
+Note that this commands accepts only PNG images. Other image formats are
+not accepted.
+
 ### Android OpenGL version requirement
 
 To add the `uses-feature` element for OpenGL ES into the Android manifest file, use
