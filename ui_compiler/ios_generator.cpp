@@ -362,7 +362,6 @@ void UIWebView::iosGenerateInitCode(const ProjectPtr & project, const std::strin
 {
 	ss << prefix << id() << " = [[UIWebView alloc] init];\n";
 	UIWidget::iosGenerateInitCode(project, prefix, ss);
-
 }
 
 void UIWebView::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)

@@ -20,38 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __1fdb8fbaf09b434fa06907aca8f82372__
-#define __1fdb8fbaf09b434fa06907aca8f82372__
+#ifndef __8e33ab198a0202bcd648dba00e0b0ffc__
+#define __8e33ab198a0202bcd648dba00e0b0ffc__
 
-#include "ui_widget.h"
-#include "../attributes/ui_image.h"
-#include <vector>
+#include <sstream>
+#include <string>
 
-class UIImageView : public UIWidget
-{
-public:
-	UIImageView(UILayout * layout, UIGroup * parentGroup);
-	~UIImageView();
-
-	// In ios_generator.cpp
-	const char * iosClassName() const override { return "UIImageView"; }
-	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss) override;
-	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
-
-	// In android_generator.cpp
-	const char * androidClassName() const override { return "android.widget.ImageView"; }
-	void androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
-		std::stringstream & ss, std::map<std::string, std::string> & translations) override;
-	void androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
-
-protected:
-	bool parseAttribute(const TiXmlAttribute * attr) override;
-
-private:
-	UIImagePtr m_Image;
-
-	UIImageView(const UIImageView &) = delete;
-	UIImageView & operator=(const UIImageView &) = delete;
-};
+void javaEscape(std::stringstream & ss, const std::string & str);
 
 #endif

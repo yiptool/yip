@@ -15,6 +15,8 @@ ADD_LIBRARY(util STATIC
 	git.h
 	image.cpp
 	image.h
+	java_escape.cpp
+	java_escape.h
 	json_escape.cpp
 	json_escape.h
 	sha1.cpp

@@ -1029,6 +1029,7 @@ void ProjectFileParser::parseAndroid()
 
 		try {
 			m_Project->androidAddView(view);
+			m_Project->setShouldImportAndroidUtil();
 		} catch (const Error &) {
 			throw;
 		} catch (const std::exception & e) {

@@ -126,6 +126,7 @@ static void usage()
 static ProjectPtr loadProject(Platform::Type platform = Platform::None)
 {
 	bool ios = (platform & Platform::iOS) != 0;
+	bool android = (platform & Platform::Android) != 0;
 	bool tizen = (platform & Platform::Tizen) != 0;
 
 	std::string projectPath = pathGetDirectory(pathMakeAbsolute(g_Config->projectFileName));
@@ -141,6 +142,16 @@ static ProjectPtr loadProject(Platform::Type platform = Platform::None)
 		{
 			ProjectFileParser::parseFromGit(project, url, Platform::iOS);
 			project->yipDirectory()->setDidBuildIOS();
+		}
+	}
+
+	if ((android || project->yipDirectory()->didBuildAndroid()) && project->shouldImportAndroidUtil())
+	{
+		std::string url = "https://github.com/yiptool/android-util.git";
+		if (project->addImport(url))
+		{
+			ProjectFileParser::parseFromGit(project, url, Platform::Android);
+			project->yipDirectory()->setDidBuildAndroid();
 		}
 	}
 

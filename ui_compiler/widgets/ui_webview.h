@@ -38,7 +38,10 @@ public:
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 	// In android_generator.cpp
-	const char * androidClassName() const override { return "WebView"; }
+	const char * androidClassName() const override { return "android.webkit.WebView"; }
+	void androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+		std::stringstream & ss, std::map<std::string, std::string> & translations) override;
+	void androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 protected:
 	bool parseAttribute(const TiXmlAttribute * attr) override;

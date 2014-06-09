@@ -26,8 +26,10 @@
 #include "../project/project.h"
 #include "ui_layout.h"
 #include "parse_util.h"
+#include <map>
 
-void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project, const Project::AndroidView & view);
-void uiGenerateAndroidCommon(const ProjectPtr & project);
+void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project, const Project::AndroidView & view,
+	std::map<std::string, std::string> & translations);
+void uiGenerateAndroidCommon(const ProjectPtr & project, const std::map<std::string, std::string> & translations);
 
 #endif

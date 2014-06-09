@@ -28,6 +28,7 @@
 #include "../attributes/ui_alignment.h"
 #include "../../project/project.h"
 #include "../../3rdparty/tinyxml/tinyxml.h"
+#include <map>
 #include <string>
 #include <memory>
 
@@ -95,6 +96,9 @@ public:
 
 	// In android_generator.cpp
 	virtual const char * androidClassName() const = 0;
+	virtual void androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+		std::stringstream & ss, std::map<std::string, std::string> & translations);
+	virtual void androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss);
 
 protected:
 	virtual void beforeParseAttributes(const TiXmlElement * element);

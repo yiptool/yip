@@ -28,6 +28,8 @@
 
 enum UIAlignment
 {
+	// If you change this values, also change the 'ru.zapolnov.yip.Util' class in 'android-util'.
+
 	UIAlignUnspecified = 0,
 	UIAlignLeft = 0x01,
 	UIAlignRight = 0x02,

@@ -42,6 +42,9 @@ public:
 	bool didBuildIOS() const;
 	void setDidBuildIOS();
 
+	bool didBuildAndroid() const;
+	void setDidBuildAndroid();
+
 	bool didBuildTizen() const;
 	void setDidBuildTizen();
 

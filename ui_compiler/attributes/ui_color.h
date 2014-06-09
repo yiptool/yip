@@ -62,6 +62,7 @@ struct UIColor
 
 	// In ios_generator.cpp
 	std::string iosValue() const;
+	std::string androidValue() const;
 
 	inline bool operator==(const UIColor & c) const { return r == c.r && g == c.g && b == c.b && a == c.a; }
 

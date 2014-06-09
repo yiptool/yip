@@ -43,6 +43,7 @@ Project::Project(const std::string & prjPath)
 	  m_AndroidMinSdkVersion(-1),
 	  m_AndroidTargetSdkVersion(-1),
 	  m_ShouldImportIOSUtil(false),
+	  m_ShouldImportAndroidUtil(false),
 	  m_IOSAllowIPad(false),
 	  m_IOSAllowIPhone(false),
 	  m_Valid(true)

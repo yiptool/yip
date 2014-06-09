@@ -32,41 +32,329 @@
 #include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/cxx-util/cxx-util/replace.h"
 #include "../util/path-util/path-util.h"
+#include "../util/sha1.h"
+#include "../util/java_escape.h"
+#include "../util/xml.h"
 #include <cassert>
 #include <stdexcept>
+#include <iomanip>
+
+std::string androidScaleFunc(UIScaleMode mode, bool horz)
+{
+	switch (mode)
+	{
+	case UIScaleDefault: return (horz ? "horzScale" : "vertScale");
+	case UIScaleMin: return "Math.min(horzScale, vertScale)";
+	case UIScaleMax: return "Math.max(horzScale, vertScale)";
+	case UIScaleHorz: return "horzScale";
+	case UIScaleVert: return "vertScale";
+	case UIScaleAvg: return "((horzScale + vertScale) * 0.5f)";
+	}
+
+	assert(false);
+	throw std::runtime_error("invalid scale mode.");
+}
+
+std::string androidTextAlignment(UITextAlignment align)
+{
+	switch (align)
+	{
+	case UITextAlignUnspecified: return "TEXT_ALIGNMENT_VIEW_START";
+	case UITextAlignLeft: return "TEXT_ALIGNMENT_VIEW_START";
+	case UITextAlignRight: return "TEXT_ALIGNMENT_VIEW_END";
+	case UITextAlignCenter: return "TEXT_ALIGNMENT_CENTER";
+	}
+
+	assert(false);
+	throw std::runtime_error("invalid text alignment.");
+}
+
+void androidChooseTranslation(const ProjectPtr & project, std::stringstream & ss,
+	const std::string & text, std::map<std::string, std::string> & translations)
+{
+	if (project->translationFiles().size() == 0)
+	{
+		ss << "\"";
+		javaEscape(ss, text);
+		ss << '"';
+		return;
+	}
+
+	std::string id = "YIP_" + sha1(text);
+	translations.insert(std::make_pair(id, text));
+
+	ss << "R.string." << id;
+}
+
+void androidGenerateLayoutCode(const UIWidget * wd, const std::string & prefix, std::stringstream & ss, bool landscape)
+{
+	UIAlignment alignment = (!landscape ? wd->alignment() : wd->landscapeAlignment());
+
+	float x = (!landscape ? wd->x() : wd->landscapeX());
+	float y = (!landscape ? wd->y() : wd->landscapeY());
+	float w = (!landscape ? wd->width() : wd->landscapeWidth());
+	float h = (!landscape ? wd->height() : wd->landscapeHeight());
+
+	std::string xMode = androidScaleFunc(!landscape ? wd->xScaleMode() : wd->landscapeXScaleMode(), true);
+	std::string yMode = androidScaleFunc(!landscape ? wd->yScaleMode() : wd->landscapeYScaleMode(), false);
+	std::string wMode = androidScaleFunc(!landscape ? wd->widthScaleMode() : wd->landscapeWidthScaleMode(), true);
+	std::string hMode = androidScaleFunc(!landscape ? wd->heightScaleMode() : wd->landscapeHeightScaleMode(), false);
+
+	ss << prefix << "ru.zapolnov.yip.Util.layoutChild(" << wd->id() << ", " << alignment << ", " << x << ", "
+		<< y << ", " << w << ", " << h << ", " << xMode << ", " << yMode << ", " << wMode << ", " << hMode
+		<< ", horzScale, vertScale);\n";
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UIColor
+
+std::string UIColor::androidValue() const
+{
+	std::stringstream ss;
+	ss << "0x";
+	ss << std::hex << std::setw(2) << std::setfill('0') << int(a);
+	ss << std::hex << std::setw(2) << std::setfill('0') << int(r);
+	ss << std::hex << std::setw(2) << std::setfill('0') << int(g);
+	ss << std::hex << std::setw(2) << std::setfill('0') << int(b);
+	return ss.str();
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UIWidget
+
+void UIWidget::androidGenerateInitCode(const ProjectPtr &, const std::string & prefix, std::stringstream & ss,
+	std::map<std::string, std::string> &)
+{
+	ss << prefix << m_ID << ".setBackgroundColor(" << m_BackgroundColor.androidValue() << ");\n";
+}
+
+void UIWidget::androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	ss << prefix << "if (landscape)\n";
+	::androidGenerateLayoutCode(this, prefix + "\t", ss, true);
+	ss << prefix << "else\n";
+	::androidGenerateLayoutCode(this, prefix + "\t", ss, false);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UIGroup
+
+void UIGroup::androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+	std::stringstream & ss, std::map<std::string, std::string> & translations)
+{
+	ss << prefix << id() << " = new DummyViewGroup(getContext());\n";
+	UIWidget::androidGenerateInitCode(project, prefix, ss, translations);
+
+	for (const UIWidgetPtr & widget : m_Widgets)
+	{
+		widget->androidGenerateInitCode(project, prefix, ss, translations);
+		ss << prefix << id() << ".addView(" << widget->id() << ");\n";
+	}
+}
+
+void UIGroup::androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIWidget::androidGenerateLayoutCode(prefix, ss);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UILabel
+
+void UILabel::androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+	std::stringstream & ss, std::map<std::string, std::string> & translations)
+{
+	ss << prefix << id() << " = new " << androidClassName() << "(getContext());\n";
+	UIWidget::androidGenerateInitCode(project, prefix, ss, translations);
+
+	if (!text().empty())
+	{
+		ss << prefix << id() << ".setText(";
+		androidChooseTranslation(project, ss, text(), translations);
+		ss << ");\n";
+	}
+
+	if (font().get())
+	{
+		ss << prefix << id() << ".setTypeface(ru.zapolnov.yip.Util.getTypeface(getResources().getAssets(), \"";
+		javaEscape(ss, font()->family);
+		ss << ".ttf\"));\n";
+	}
+
+	ss << prefix << id() << ".setTextColor(" << textColor().androidValue() << ");\n";
+}
+
+void UILabel::androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIWidget::androidGenerateLayoutCode(prefix, ss);
+
+	if (font().get())
+	{
+		ss << prefix << id() << ".setTextSize(landscape ? " << font()->landscapeSize << " * "
+			<< androidScaleFunc(landscapeFontScaleMode(), false) << " : " << font()->size << " * "
+			<< androidScaleFunc(fontScaleMode(), false) << ");\n";
+	}
+
+	ss << prefix << id() << ".setTextAlignment(" << androidTextAlignment(m_TextAlignment) << ");\n";
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UIImageView
+
+void UIImageView::androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+	std::stringstream & ss, std::map<std::string, std::string> & translations)
+{
+	ss << prefix << id() << " = new " << androidClassName() << "(getContext());\n";
+	UIWidget::androidGenerateInitCode(project, prefix, ss, translations);
+
+/*
+	if (m_Image.get())
+	{
+		ss << prefix << "objc_setAssociatedObject(" << id() << ", &YIP::KEY_IMAGE, ";
+		androidGetImage(ss, m_Image);
+		ss << ", OBJC_ASSOCIATION_RETAIN_NONATOMIC);\n";
+	}
+*/
+}
+
+void UIImageView::androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIWidget::androidGenerateLayoutCode(prefix, ss);
+
+/*
+	if (m_Image.get())
+	{
+		ss << prefix << id() << ".image = ";
+		androidGetScaledImage(this, ss, m_Image, fmt() << "objc_getAssociatedObject(" << id() << ", &YIP::KEY_IMAGE)");
+		ss << ";\n";
+	}
+*/
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UISwitch
+
+void UISwitch::androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+	std::stringstream & ss, std::map<std::string, std::string> & translations)
+{
+	ss << prefix << id() << " = new " << androidClassName() << "(getContext());\n";
+/*
+	if (!isCustom())
+		ss << prefix << id() << " = [[UISwitch alloc] initWithFrame:CGRectZero];\n";
+	else
+	{
+		ss << prefix << id() << " = [[NZSwitchControl alloc] init];\n";
+
+		ss << prefix << id() << ".knob.image = androidImageFromResource(@\"";
+		cxxEscape(ss, m_KnobImage);
+		ss << "\");\n";
+
+		ss << prefix << id() << ".turnedOn.image = androidImageFromResource(@\"";
+		cxxEscape(ss, m_OnImage);
+		ss << "\");\n";
+
+		ss << prefix << id() << ".turnedOff.image = androidImageFromResource(@\"";
+		cxxEscape(ss, m_OffImage);
+		ss << "\");\n";
+	}
+*/
+
+	UIWidget::androidGenerateInitCode(project, prefix, ss, translations);
+}
+
+void UISwitch::androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIWidget::androidGenerateLayoutCode(prefix, ss);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UIButton
+
+void UIButton::androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+	std::stringstream & ss, std::map<std::string, std::string> & translations)
+{
+	ss << prefix << id() << " = new " << androidClassName() << "(getContext());\n";
+	UIWidget::androidGenerateInitCode(project, prefix, ss, translations);
+
+	if (!text().empty())
+	{
+		ss << prefix << id() << ".setText(";
+		androidChooseTranslation(project, ss, text(), translations);
+		ss << ");\n";
+	}
+
+	ss << prefix << id() << ".setTextColor(" << textColor().androidValue() << ");\n";
+
+	if (font().get())
+	{
+		ss << prefix << id() << ".setTypeface(ru.zapolnov.yip.Util.getTypeface(getResources().getAssets(), \"";
+		javaEscape(ss, font()->family);
+		ss << ".ttf\"));\n";
+	}
+
+/*
+	if (m_Image.get())
+	{
+		ss << prefix << "objc_setAssociatedObject(" << id() << ", &YIP::KEY_IMAGE, ";
+		androidGetImage(ss, m_Image);
+		ss << ", OBJC_ASSOCIATION_RETAIN_NONATOMIC);\n";
+	}
+*/
+}
+
+void UIButton::androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIWidget::androidGenerateLayoutCode(prefix, ss);
+
+	if (font().get())
+	{
+		ss << prefix << id() << ".setTextSize(landscape ? " << font()->landscapeSize << " * "
+			<< androidScaleFunc(landscapeFontScaleMode(), false) << " : " << font()->size << " * "
+			<< androidScaleFunc(fontScaleMode(), false) << ");\n";
+	}
+
+/*
+	if (m_Image.get())
+	{
+		ss << prefix << '[' << id() << " setImage:";
+		androidGetScaledImage(this, ss, m_Image, fmt() << "objc_getAssociatedObject(" << id() << ", &YIP::KEY_IMAGE)");
+		ss << " forState:UIControlStateNormal];\n";
+	}
+*/
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UIWebView
+
+void UIWebView::androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+	std::stringstream & ss, std::map<std::string, std::string> & translations)
+{
+	ss << prefix << id() << " = new " << androidClassName() << "(getContext());\n";
+	UIWidget::androidGenerateInitCode(project, prefix, ss, translations);
+}
+
+void UIWebView::androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIWidget::androidGenerateLayoutCode(prefix, ss);
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
-	const Project::AndroidView & view)
+	const Project::AndroidView & view, std::map<std::string, std::string> & translations)
 {
 	std::string yipDir = project->yipDirectory()->path();
 
 	std::string targetName = replace(view.name, '.', "/");
 	std::string targetPath = pathConcat(".yip-android", targetName) + ".java";
-
-	bool shouldProcessFile =
-		(view.phone.get() &&
-			project->yipDirectory()->shouldProcessFile(targetPath, view.phone->path(), true)) ||
-		(view.tablet7.get() &&
-			project->yipDirectory()->shouldProcessFile(targetPath, view.tablet7->path(), true)) ||
-		(view.tablet10.get() &&
-			project->yipDirectory()->shouldProcessFile(targetPath, view.tablet10->path(), true));
-
-	if (!shouldProcessFile)
-	{
-		for (auto it : project->translationFiles())
-		{
-			if (project->yipDirectory()->shouldProcessFile(targetPath, it.second->path(), false))
-			{
-				shouldProcessFile = true;
-				break;
-			}
-		}
-	}
-
-	if (!shouldProcessFile)
-		return;
 
 	UILayoutPtr phoneLayout = uiLoadLayout(layouts, view.phone);
 	UILayoutPtr tablet7Layout = uiLoadLayout(layouts, view.tablet7);
@@ -106,10 +394,13 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 		ss << '\n';
 	}
 	ss << "import android.content.Context;\n";
+	ss << "import android.content.res.Configuration;\n";
 	ss << "import android.view.View;\n";
 	ss << "import android.view.View.MeasureSpec;\n";
 	ss << "import android.view.ViewGroup;\n";
 	ss << "import android.util.AttributeSet;\n";
+	ss << "import ru.zapolnov.yip.DummyViewGroup;\n";
+	ss << "import " << project->androidPackage() << ".R;\n";
 	ss << '\n';
 	ss << "public class " << className << " extends ViewGroup\n";
 	ss << "{\n";
@@ -117,28 +408,67 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 	{
 		const UIWidgetPtr & widget = (it.second.phone.get() ? it.second.phone :
 			(it.second.tablet7.get() ? it.second.tablet7 : it.second.tablet10));
-		ss << "public final " << widget->androidClassName() << ' ' << it.first << ";\n";
+		ss << "\tpublic final " << widget->androidClassName() << ' ' << it.first << ";\n";
 	}
 	ss << '\n';
 	ss << "\tpublic " << className << "(Context context)\n";
 	ss << "\t{\n";
-	ss << "\t\tsuper(context);\n";
-	ss << "\t\tyip_createChildViews();\n";
+	ss << "\t\tthis(context, null, 0);\n";
 	ss << "\t}\n";
 	ss << '\n';
 	ss << "\tpublic " << className << "(Context context, AttributeSet attrs)\n";
 	ss << "\t{\n";
-	ss << "\t\tsuper(context, attrs, 0);\n";
-	ss << "\t\tyip_createChildViews();\n";
+	ss << "\t\tthis(context, attrs, 0);\n";
 	ss << "\t}\n";
 	ss << '\n';
 	ss << "\tpublic " << className << "(Context context, AttributeSet attrs, int defStyle)\n";
 	ss << "\t{\n";
 	ss << "\t\tsuper(context, attrs, defStyle);\n";
-	ss << "\t\tyip_createChildViews();\n";
+	bool first = true;
+	if (hasPhone)
+	{
+		ss << (first ? "\n\t\t" : "\t\telse ");
+		ss << "if (\"P\".equals(R.string.YIP_screen_type))\n";
+		ss << "\t\t{\n";
+		for (const UIWidgetPtr & widget : phoneLayout->widgets())
+		{
+			widget->androidGenerateInitCode(project, "\t\t\t", ss, translations);
+			ss << "\t\t\taddView(" << widget->id() << ");\n";
+		}
+		ss << "\t\t}\n";
+		first = false;
+	}
+	if (hasTablet7)
+	{
+		ss << (first ? "\n\t\t" : "\t\telse ");
+		ss << "if (\"7\".equals(R.string.YIP_screen_type))\n";
+		ss << "\t\t{\n";
+		for (const UIWidgetPtr & widget : tablet7Layout->widgets())
+		{
+			widget->androidGenerateInitCode(project, "\t\t\t", ss, translations);
+			ss << "\t\t\taddView(" << widget->id() << ");\n";
+		}
+		ss << "\t\t}\n";
+		first = false;
+	}
+	if (hasTablet10)
+	{
+		ss << (first ? "\n\t\t" : "\t\telse ");
+		ss << "if (\"T\".equals(R.string.YIP_screen_type))\n";
+		ss << "\t\t{\n";
+		for (const UIWidgetPtr & widget : tablet10Layout->widgets())
+		{
+			widget->androidGenerateInitCode(project, "\t\t\t", ss, translations);
+			ss << "\t\t\taddView(" << widget->id() << ");\n";
+		}
+		ss << "\t\t}\n";
+		first = false;
+	}
+	ss << (first ? "" : "\t\telse\n");
+	ss << "\t\t\tthrow new RuntimeException(\"Unsupported screen type '\" + R.string.YIP_screen_type + \"'.\");\n";
 	ss << "\t}\n";
 	ss << '\n';
-	ss << "\t@Override public boolean shouldDelayChildPressedState()\n";
+	ss << "\t/*@Override*/ public boolean shouldDelayChildPressedState()\n";
 	ss << "\t{\n";
 	ss << "\t\treturn false;\n";
 	ss << "\t}\n";
@@ -148,24 +478,79 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 	ss << "\t\tsetMeasuredDimension(MeasureSpec.getSize(widthSpec), MeasureSpec.getSize(heightSpec));\n";
 	ss << "\t}\n";
 	ss << '\n';
-	ss << "\tprivate final void yip_createChildViews()\n";
-	ss << "\t{\n";
-	// FIXME
-	ss << "\t}\n";
-	ss << '\n';
 	ss << "\t@Override public void onLayout(boolean changed, int left, int top, int right, int bottom)\n";
 	ss << "\t{\n";
-	// FIXME
+	ss << "\t\tboolean landscape = (getResources().getConfiguration().orientation == "
+		"Configuration.ORIENTATION_LANDSCAPE);\n";
+	if (hasPhone)
+	{
+		ss << '\n';
+		ss << "\t\tif (\"P\".equals(R.string.YIP_screen_type))\n";
+		ss << "\t\t{\n";
+		ss << "\t\t\tfinal float horzScale = (right - left) / (landscape ? "
+			<< phoneLayout->landscapeWidth() << " : " << phoneLayout->width() << ");\n";
+		ss << "\t\t\tfinal float vertScale = (bottom - top) / (landscape ? "
+			<< phoneLayout->landscapeHeight() << " : " << phoneLayout->height() << ");\n";
+		for (auto it : widgetInfos)
+		{
+			const UIWidgetPtr & w = it.second.phone;
+			if (!w.get())
+				continue;
+			ss << '\n';
+			w->androidGenerateLayoutCode("\t\t\t", ss);
+		}
+		ss << "\t\t}\n";
+	}
+	if (hasTablet7)
+	{
+		ss << '\n';
+		ss << "\t\tif (\"7\".equals(R.string.YIP_screen_type))\n";
+		ss << "\t\t{\n";
+		ss << "\t\t\tfinal float horzScale = (right - left) / (landscape ? "
+			<< tablet7Layout->landscapeWidth() << " : " << tablet7Layout->width() << ");\n";
+		ss << "\t\t\tfinal float vertScale = (bottom - top) / (landscape ? "
+			<< tablet7Layout->landscapeHeight() << " : " << tablet7Layout->height() << ");\n";
+		for (auto it : widgetInfos)
+		{
+			const UIWidgetPtr & w = it.second.tablet7;
+			if (!w.get())
+				continue;
+			ss << '\n';
+			w->androidGenerateLayoutCode("\t\t\t", ss);
+		}
+		ss << "\t\t}\n";
+	}
+	if (hasTablet10)
+	{
+		ss << '\n';
+		ss << "\t\tif (\"T\".equals(R.string.YIP_screen_type))\n";
+		ss << "\t\t{\n";
+		ss << "\t\t\tfinal float horzScale = (right - left) / (landscape ? "
+			<< tablet10Layout->landscapeWidth() << " : " << tablet10Layout->width() << ");\n";
+		ss << "\t\t\tfinal float vertScale = (bottom - top) / (landscape ? "
+			<< tablet10Layout->landscapeHeight() << " : " << tablet10Layout->height() << ");\n";
+		for (auto it : widgetInfos)
+		{
+			const UIWidgetPtr & w = it.second.tablet10;
+			if (!w.get())
+				continue;
+			ss << '\n';
+			w->androidGenerateLayoutCode("\t\t\t", ss);
+		}
+		ss << "\t\t}\n";
+	}
 	ss << "\t}\n";
 	ss << "}\n";
 
 	project->yipDirectory()->writeFile(targetPath, ss.str());
 }
 
-void uiGenerateAndroidCommon(const ProjectPtr & project)
+void uiGenerateAndroidCommon(const ProjectPtr & project, const std::map<std::string, std::string> & translations)
 {
 	std::string yipDir = project->yipDirectory()->path();
 	project->androidAddJavaSourceDir(pathConcat(yipDir, ".yip-android"));
+
+	// Screen type
 
 	std::stringstream ss;
 	ss << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
@@ -186,6 +571,34 @@ void uiGenerateAndroidCommon(const ProjectPtr & project)
 	ss << "<resources>\n";
 	ss << "\t<string name=\"YIP_screen_type\">T</string>\n";
 	ss << "</resources>\n";
-
 	project->yipDirectory()->writeFile("android/res/values-sw720dp/YIP_screen.xml", ss.str());
+
+	// Translations
+
+	ss.str(std::string());
+	ss << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+	ss << "<resources>\n";
+	for (const auto & it : translations)
+	{
+		ss << "\t<string name=\"" << xmlEscape(it.first) << "\" formatted=\"false\">";
+		ss << xmlEscape(it.second);
+		ss << "</string>\n";
+	}
+	ss << "</resources>\n";
+	project->yipDirectory()->writeFile("android/res/values/YIP_translations.xml", ss.str());
+
+	for (const auto & it : project->translationFiles())
+	{
+		ss.str(std::string());
+		ss << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+		ss << "<resources>\n";
+		for (const auto & jt : translations)
+		{
+			ss << "\t<string name=\"" << xmlEscape(jt.first) << "\" formatted=\"false\">";
+			ss << xmlEscape(it.second->getTranslation(jt.second));
+			ss << "</string>\n";
+		};
+		ss << "</resources>\n";
+		project->yipDirectory()->writeFile("android/res/values-" + it.first + "/YIP_translations.xml", ss.str());
+	}
 }

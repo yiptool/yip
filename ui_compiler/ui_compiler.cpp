@@ -29,18 +29,21 @@
 static void uiCompileIOS(const ProjectPtr & project)
 {
 	UILayoutMap layouts;
+
 	for (const Project::IOSViewController & cntrl : project->iosViewControllers())
 		uiGenerateIOSViewController(layouts, project, cntrl);
 }
 
 static void uiCompileAndroid(const ProjectPtr & project)
 {
+	std::map<std::string, std::string> translations;
 	UILayoutMap layouts;
+
 	if (!project->androidViews().empty())
 	{
 		for (const Project::AndroidView & view : project->androidViews())
-			uiGenerateAndroidView(layouts, project, view);
-		uiGenerateAndroidCommon(project);
+			uiGenerateAndroidView(layouts, project, view, translations);
+		uiGenerateAndroidCommon(project, translations);
 	}
 }
 
