@@ -45,19 +45,26 @@ public:
 	{
 		IMAGESIZE_INVALID = 0,
 		// iOS icons
-		IMAGESIZE_IPHONE_STANDARD,				// 57x57
-		IMAGESIZE_IPAD_STANDARD_IOS6,			// 72x72
-		IMAGESIZE_IPAD_STANDARD,				// 76x76
-		IMAGESIZE_IPHONE_RETINA_IOS6,			// 114x114
-		IMAGESIZE_IPHONE_RETINA,				// 120x120
-		IMAGESIZE_IPAD_RETINA_IOS6,				// 144x144
-		IMAGESIZE_IPAD_RETINA,					// 152x152
+		IMAGESIZE_IPHONE_STANDARD,								// 57x57
+		IMAGESIZE_IPAD_STANDARD_IOS6,							// 72x72
+		IMAGESIZE_IPAD_STANDARD,								// 76x76
+		IMAGESIZE_IPHONE_RETINA_IOS6,							// 114x114
+		IMAGESIZE_IPHONE_RETINA,								// 120x120
+		IMAGESIZE_IPAD_RETINA_IOS6,								// 144x144
+		IMAGESIZE_IPAD_RETINA,									// 152x152
 		// iOS launch images
-		IMAGESIZE_LAUNCH_IPHONE_STANDARD,		// 320x480
-		IMAGESIZE_LAUNCH_IPHONE_RETINA,			// 640x960
-		IMAGESIZE_LAUNCH_IPHONE5_RETINA,		// 640x1136
-		IMAGESIZE_LAUNCH_IPAD_PORTRAIT,			// 768x1024
-		IMAGESIZE_LAUNCH_IPAD_PORTRAIT_RETINA,	// 1536x2048
+		IMAGESIZE_LAUNCH_IPHONE_STANDARD,						// 320x480
+		IMAGESIZE_LAUNCH_IPHONE_RETINA,							// 640x960
+		IMAGESIZE_LAUNCH_IPHONE5_RETINA,						// 640x1136
+		IMAGESIZE_LAUNCH_IPAD_PORTRAIT,							// 768x1024
+		IMAGESIZE_LAUNCH_IPAD_PORTRAIT_RETINA,					// 1536x2048
+		// Android icons
+		IMAGESIZE_ANDROID_LDPI,									// 36x36
+		IMAGESIZE_ANDROID_MDPI,									// 48x48
+		IMAGESIZE_ANDROID_HDPI = IMAGESIZE_IPAD_STANDARD_IOS6,	// 72x72
+		IMAGESIZE_ANDROID_XHDPI,								// 96x96
+		IMAGESIZE_ANDROID_XXHDPI = IMAGESIZE_IPAD_RETINA_IOS6,	// 144x144
+		IMAGESIZE_ANDROID_XXXHDPI,								// 192x192
 	};
 
 	struct ToDo
@@ -250,6 +257,9 @@ public:
 	void androidAddNativeLib(const std::string & name) { m_AndroidNativeLibs.insert(name); }
 	inline const std::set<std::string> & androidNativeLibs() const { return m_AndroidNativeLibs; }
 
+	void androidAddIcon(ImageSize size, const std::string & path);
+	inline const std::map<ImageSize, std::string> & androidIcons() const { return m_AndroidIcons; }
+
 	// Tizen
 
 	void tizenAddPrivilege(const std::string & url);
@@ -307,6 +317,7 @@ private:
 	std::vector<AndroidView> m_AndroidViews;
 	std::unordered_set<std::string> m_AndroidViewNames;
 	std::set<std::string> m_AndroidNativeLibs;
+	std::map<ImageSize, std::string> m_AndroidIcons;
 	int m_AndroidMinSdkVersion;
 	int m_AndroidTargetSdkVersion;
 	std::vector<std::string> m_AndroidManifestActivities;

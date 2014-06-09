@@ -45,6 +45,8 @@ namespace
 		void deleteOldSrcFiles(const std::string & path, const std::string & fullpath);
 		void generateAssetFiles();
 		void deleteOldAssetFiles(const std::string & path, const std::string & fullpath);
+		void generateIconFiles();
+		void deleteOldIconFiles();
 		void writeIpr();
 		void writeIml();
 		void writeIws();
@@ -61,6 +63,16 @@ namespace
 		void generate();
 	};
 }
+
+static const std::map<std::string, Project::ImageSize> g_IconFiles =
+{
+	{ "drawable-ldpi", Project::IMAGESIZE_ANDROID_LDPI },
+	{ "drawable-mdpi", Project::IMAGESIZE_ANDROID_MDPI },
+	{ "drawable-hdpi", Project::IMAGESIZE_ANDROID_HDPI },
+	{ "drawable-xhdpi", Project::IMAGESIZE_ANDROID_XHDPI },
+	{ "drawable-xxhdpi", Project::IMAGESIZE_ANDROID_XXHDPI },
+	{ "drawable-xxxhdpi", Project::IMAGESIZE_ANDROID_XXXHDPI },
+};
 
 static bool isJavaFileType(FileType type)
 {
@@ -122,8 +134,8 @@ void Gen::deleteOldSrcFiles(const std::string & path, const std::string & fullpa
 
 		if (srcFiles.find(file) == srcFiles.end())
 		{
-			std::cout << "killing " << pathConcat(path, it.name).c_str() << std::endl;
-			pathDeleteFile(file.c_str());
+			std::cout << "killing " << pathConcat(path, it.name) << std::endl;
+			pathDeleteFile(file);
 		}
 	}
 }
@@ -163,8 +175,44 @@ void Gen::deleteOldAssetFiles(const std::string & path, const std::string & full
 
 		if (assetFiles.find(file) == assetFiles.end())
 		{
-			std::cout << "killing " << pathConcat(path, it.name).c_str() << std::endl;
-			pathDeleteFile(file.c_str());
+			std::cout << "killing " << pathConcat(path, it.name) << std::endl;
+			pathDeleteFile(file);
+		}
+	}
+}
+
+void Gen::generateIconFiles()
+{
+	std::string iconDir = "android/res";
+	for (const auto & it : g_IconFiles)
+	{
+		auto jt = project->androidIcons().find(it.second);
+		if (jt == project->androidIcons().end())
+			continue;
+
+		std::string name = pathConcat(iconDir, pathConcat(it.first, "ic_launcher.png"));
+		std::string path = pathSimplify(pathConcat(project->yipDirectory()->path(), name));
+
+		pathCreate(pathGetDirectory(path));
+		pathCreateSymLink(jt->second, path);
+	}
+}
+
+void Gen::deleteOldIconFiles()
+{
+	std::string iconDir = "android/res";
+	for (const auto & it : g_IconFiles)
+	{
+		if (project->androidIcons().find(it.second) != project->androidIcons().end())
+			continue;
+
+		std::string name = pathConcat(iconDir, pathConcat(it.first, "ic_launcher.png"));
+		std::string path = pathSimplify(pathConcat(project->yipDirectory()->path(), name));
+
+		if (pathIsExistent(path))
+		{
+			std::cout << "killing " << pathToUnixSeparators(name) << std::endl;
+			pathDeleteFile(path);
 		}
 	}
 }
@@ -540,6 +588,8 @@ void Gen::writeAndroidManifest()
 	ss << "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n";
 	ss << "\t\tpackage=\"" << xmlEscape(project->androidPackage()) << "\">\n";
 	ss << "\t<application\n";
+	if (!project->androidIcons().empty())
+		ss << "\t\t\tandroid:icon=\"@drawable/ic_launcher\"\n";
 	ss << "\t\t\tandroid:label=\"@string/app_title\">\n";
 
 	for (const std::string & activity : project->androidManifestActivities())
@@ -582,6 +632,9 @@ void Gen::generate()
 
 	generateAssetFiles();
 	deleteOldAssetFiles("assets", pathConcat(projectPath, "assets"));
+
+	generateIconFiles();
+	deleteOldIconFiles();
 
 	writeIpr();
 	writeIml();

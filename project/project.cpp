@@ -196,6 +196,12 @@ void Project::androidAddView(const AndroidView & view)
 	m_AndroidViews.push_back(view);
 }
 
+void Project::androidAddIcon(ImageSize size, const std::string & path)
+{
+	if (!m_AndroidIcons.insert(std::make_pair(size, path)).second)
+		throw std::runtime_error("duplicate icon of the same size.");
+}
+
 void Project::tizenAddPrivilege(const std::string & url)
 {
 	m_TizenPrivileges.insert(url);

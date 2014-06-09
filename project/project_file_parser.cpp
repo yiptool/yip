@@ -1038,6 +1038,42 @@ void ProjectFileParser::parseAndroid()
 
 		return;
 	}
+	else if (m_TokenText == "icon")
+	{
+		if (getToken() != Token::Literal)
+			{ reportError(fmt() << "expected icon path after '" << prefix << ":icon'."); return; }
+
+		std::string path = pathMakeAbsolute(m_TokenText, m_ProjectPath);
+
+		unsigned width = 0, height = 0;
+		ImageFormat format;
+		imageGetInfo(path, &format, &width, &height);
+
+		if (format != FORMAT_PNG)
+			{ reportError(fmt() << "file '" << path << "' is not png."); return; }
+
+		Project::ImageSize imageSize = validateImageSize(width, height, {
+			{ Project::IMAGESIZE_ANDROID_LDPI,			36,		36 },
+			{ Project::IMAGESIZE_ANDROID_MDPI,			48,		48 },
+			{ Project::IMAGESIZE_ANDROID_HDPI,			72,		72 },
+			{ Project::IMAGESIZE_ANDROID_XHDPI,			96,		96 },
+			{ Project::IMAGESIZE_ANDROID_XXHDPI,		144,	144 },
+			{ Project::IMAGESIZE_ANDROID_XXXHDPI,		192,	192 },
+		});
+
+		if (imageSize == Project::IMAGESIZE_INVALID)
+			return;
+
+		try {
+			m_Project->androidAddIcon(imageSize, path);
+		} catch (const Error &) {
+			throw;
+		} catch (const std::exception & e) {
+			reportWarning(e.what());
+		}
+
+		return;
+	}
 
 	reportError(fmt() << "invalid variable '" << prefix << ":" << m_TokenText << "'.");
 }
