@@ -83,7 +83,7 @@ void androidChooseTranslation(const ProjectPtr & project, std::stringstream & ss
 	std::string id = "YIP_" + sha1(text);
 	translations.insert(std::make_pair(id, text));
 
-	ss << "R.string." << id;
+	ss << "getContext().getString(R.string." << id << ')';
 }
 
 void androidGenerateLayoutCode(const UIWidget * wd, const std::string & prefix, std::stringstream & ss, bool landscape)
@@ -193,7 +193,7 @@ void UILabel::androidGenerateLayoutCode(const std::string & prefix, std::strings
 
 	if (font().get())
 	{
-		ss << prefix << id() << ".setTextSize(landscape ? " << font()->landscapeSize << " * "
+		ss << prefix << id() << ".setTextSize(TypedValue.COMPLEX_UNIT_PT, landscape ? " << font()->landscapeSize << " * "
 			<< androidScaleFunc(landscapeFontScaleMode(), false) << " : " << font()->size << " * "
 			<< androidScaleFunc(fontScaleMode(), false) << ");\n";
 	}
@@ -314,7 +314,7 @@ void UIButton::androidGenerateLayoutCode(const std::string & prefix, std::string
 
 	if (font().get())
 	{
-		ss << prefix << id() << ".setTextSize(landscape ? " << font()->landscapeSize << " * "
+		ss << prefix << id() << ".setTextSize(TypedValue.COMPLEX_UNIT_PT, landscape ? " << font()->landscapeSize << " * "
 			<< androidScaleFunc(landscapeFontScaleMode(), false) << " : " << font()->size << " * "
 			<< androidScaleFunc(fontScaleMode(), false) << ");\n";
 	}
@@ -399,6 +399,7 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 	ss << "import android.view.View.MeasureSpec;\n";
 	ss << "import android.view.ViewGroup;\n";
 	ss << "import android.util.AttributeSet;\n";
+	ss << "import android.util.TypedValue;\n";
 	ss << "import ru.zapolnov.yip.DummyViewGroup;\n";
 	ss << "import " << project->androidPackage() << ".R;\n";
 	ss << '\n';
@@ -428,7 +429,7 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 	if (hasPhone)
 	{
 		ss << (first ? "\n\t\t" : "\t\telse ");
-		ss << "if (\"P\".equals(R.string.YIP_screen_type))\n";
+		ss << "if (\"P\".equals(getContext().getString(R.string.YIP_screen_type)))\n";
 		ss << "\t\t{\n";
 		for (const UIWidgetPtr & widget : phoneLayout->widgets())
 		{
@@ -441,7 +442,7 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 	if (hasTablet7)
 	{
 		ss << (first ? "\n\t\t" : "\t\telse ");
-		ss << "if (\"7\".equals(R.string.YIP_screen_type))\n";
+		ss << "if (\"7\".equals(getContext().getString(R.string.YIP_screen_type)))\n";
 		ss << "\t\t{\n";
 		for (const UIWidgetPtr & widget : tablet7Layout->widgets())
 		{
@@ -454,7 +455,7 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 	if (hasTablet10)
 	{
 		ss << (first ? "\n\t\t" : "\t\telse ");
-		ss << "if (\"T\".equals(R.string.YIP_screen_type))\n";
+		ss << "if (\"T\".equals(getContext().getString(R.string.YIP_screen_type)))\n";
 		ss << "\t\t{\n";
 		for (const UIWidgetPtr & widget : tablet10Layout->widgets())
 		{
@@ -465,7 +466,8 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 		first = false;
 	}
 	ss << (first ? "" : "\t\telse\n");
-	ss << "\t\t\tthrow new RuntimeException(\"Unsupported screen type '\" + R.string.YIP_screen_type + \"'.\");\n";
+	ss << "\t\t\tthrow new RuntimeException(\"Unsupported screen type '\" + "
+		"getContext().getString(R.string.YIP_screen_type) + \"'.\");\n";
 	ss << "\t}\n";
 	ss << '\n';
 	ss << "\t/*@Override*/ public boolean shouldDelayChildPressedState()\n";
@@ -485,11 +487,11 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 	if (hasPhone)
 	{
 		ss << '\n';
-		ss << "\t\tif (\"P\".equals(R.string.YIP_screen_type))\n";
+		ss << "\t\tif (\"P\".equals(getContext().getString(R.string.YIP_screen_type)))\n";
 		ss << "\t\t{\n";
-		ss << "\t\t\tfinal float horzScale = (right - left) / (landscape ? "
+		ss << "\t\t\tfinal float horzScale = (float)(right - left) / (float)(landscape ? "
 			<< phoneLayout->landscapeWidth() << " : " << phoneLayout->width() << ");\n";
-		ss << "\t\t\tfinal float vertScale = (bottom - top) / (landscape ? "
+		ss << "\t\t\tfinal float vertScale = (float)(bottom - top) / (float)(landscape ? "
 			<< phoneLayout->landscapeHeight() << " : " << phoneLayout->height() << ");\n";
 		for (auto it : widgetInfos)
 		{
@@ -504,11 +506,11 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 	if (hasTablet7)
 	{
 		ss << '\n';
-		ss << "\t\tif (\"7\".equals(R.string.YIP_screen_type))\n";
+		ss << "\t\tif (\"7\".equals(getContext().getString(R.string.YIP_screen_type)))\n";
 		ss << "\t\t{\n";
-		ss << "\t\t\tfinal float horzScale = (right - left) / (landscape ? "
+		ss << "\t\t\tfinal float horzScale = (float)(right - left) / (float)(landscape ? "
 			<< tablet7Layout->landscapeWidth() << " : " << tablet7Layout->width() << ");\n";
-		ss << "\t\t\tfinal float vertScale = (bottom - top) / (landscape ? "
+		ss << "\t\t\tfinal float vertScale = (float)(bottom - top) / (float)(landscape ? "
 			<< tablet7Layout->landscapeHeight() << " : " << tablet7Layout->height() << ");\n";
 		for (auto it : widgetInfos)
 		{
@@ -523,11 +525,11 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 	if (hasTablet10)
 	{
 		ss << '\n';
-		ss << "\t\tif (\"T\".equals(R.string.YIP_screen_type))\n";
+		ss << "\t\tif (\"T\".equals(getContext().getString(R.string.YIP_screen_type)))\n";
 		ss << "\t\t{\n";
-		ss << "\t\t\tfinal float horzScale = (right - left) / (landscape ? "
+		ss << "\t\t\tfinal float horzScale = (float)(right - left) / (float)(landscape ? "
 			<< tablet10Layout->landscapeWidth() << " : " << tablet10Layout->width() << ");\n";
-		ss << "\t\t\tfinal float vertScale = (bottom - top) / (landscape ? "
+		ss << "\t\t\tfinal float vertScale = (float)(bottom - top) / (float)(landscape ? "
 			<< tablet10Layout->landscapeHeight() << " : " << tablet10Layout->height() << ");\n";
 		for (auto it : widgetInfos)
 		{
