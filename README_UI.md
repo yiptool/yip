@@ -12,10 +12,12 @@ Root element should be named `layout` and should contain some mandatory attribut
   represents dimensions of the landscape layout.
 
   * `portrait` is a boolean value (either `yes` or `no`); set it to `yes` if your layout supports portrait
-  orientations.
+  orientations. You can set two boolean values separated with a slash (`/`) for this attribute. The first
+  one will be used for phones and the second one will be used for tablets.
 
   * `landscape` is a boolean value (either `yes` or `no`); set it to `yes` if your layout supports landscape
-  orientations.
+  orientations. You can set two boolean values separated with a slash (`/`) for this attribute. The first
+  one will be used for phones and the second one will be used for tablets.
 
 Each non-root element in the UI file represents a UI widget or a widget group. Widget group may
 have children widgets or groups.
