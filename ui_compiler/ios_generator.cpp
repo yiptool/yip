@@ -443,9 +443,9 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 
 		std::stringstream sm;
 		sm << "#import \"" << targetName << ".h\"\n";
-		sh << "#import <yip-imports/ios/i18n.h>\n";
-		sh << "#import <yip-imports/ios/resource.h>\n";
-		sh << "#import <yip-imports/ios/font.h>\n";
+		sm << "#import <yip-imports/ios/i18n.h>\n";
+		sm << "#import <yip-imports/ios/resource.h>\n";
+		sm << "#import <yip-imports/ios/font.h>\n";
 		sm << '\n';
 		sm << "namespace YIP\n";
 		sm << "{\n";
