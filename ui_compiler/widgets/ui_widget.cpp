@@ -29,6 +29,7 @@
 #include "ui_webview.h"
 #include "ui_switch.h"
 #include "ui_scroll_view.h"
+#include "ui_spinner.h"
 #include "ui_text_field.h"
 #include "../parse_util.h"
 #include "../../util/tinyxml-util/tinyxml-util.h"
@@ -70,7 +71,7 @@ UIWidgetPtr UIWidget::create(UILayout * layout, UIGroup * parentGroup, const std
 {
 	if (className == "group")
 		return std::make_shared<UIGroup>(layout, parentGroup);
-	else if (className == "scroll_view")
+	else if (className == "scrollview")
 		return std::make_shared<UIScrollView>(layout, parentGroup);
 	else if (className == "button")
 		return std::make_shared<UIButton>(layout, parentGroup);
@@ -82,6 +83,8 @@ UIWidgetPtr UIWidget::create(UILayout * layout, UIGroup * parentGroup, const std
 		return std::make_shared<UIImageView>(layout, parentGroup);
 	else if (className == "textfield")
 		return std::make_shared<UITextField>(layout, parentGroup);
+	else if (className == "spinner")
+		return std::make_shared<UISpinner>(layout, parentGroup);
 	else if (className == "webview")
 		return std::make_shared<UIWebView>(layout, parentGroup);
 

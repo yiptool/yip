@@ -28,6 +28,7 @@
 #include "widgets/ui_label.h"
 #include "widgets/ui_image_view.h"
 #include "widgets/ui_webview.h"
+#include "widgets/ui_spinner.h"
 #include "widgets/ui_switch.h"
 #include "widgets/ui_scroll_view.h"
 #include "widgets/ui_text_field.h"
@@ -326,6 +327,23 @@ void UISwitch::androidGenerateInitCode(const ProjectPtr & project, const std::st
 }
 
 void UISwitch::androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIWidget::androidGenerateLayoutCode(prefix, ss);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UISpinner
+
+void UISpinner::androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+	std::stringstream & ss, std::map<std::string, std::string> & translations)
+{
+	// FIXME: style
+	ss << prefix << id() << " = new android.widget.Spinner(getContext());\n";
+	UIWidget::androidGenerateInitCode(project, prefix, ss, translations);
+}
+
+void UISpinner::androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
 {
 	UIWidget::androidGenerateLayoutCode(prefix, ss);
 }

@@ -31,6 +31,7 @@ It will be of string type and will contain value of `text` translated to the cur
 The following widgets are available:
 
   * `group`: a group of widgets.
+  * `scrollview`: a group of widgets.
   * `label`: a block of text.
   * `image`: a static image.
   * `switch`: a clickable switch with two possible values (usually "ON" and "OFF").

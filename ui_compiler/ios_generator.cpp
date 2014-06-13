@@ -28,6 +28,7 @@
 #include "widgets/ui_label.h"
 #include "widgets/ui_image_view.h"
 #include "widgets/ui_webview.h"
+#include "widgets/ui_spinner.h"
 #include "widgets/ui_switch.h"
 #include "widgets/ui_scroll_view.h"
 #include "widgets/ui_text_field.h"
@@ -351,6 +352,28 @@ void UISwitch::iosGenerateInitCode(const ProjectPtr & project, const std::string
 }
 
 void UISwitch::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIWidget::iosGenerateLayoutCode(prefix, ss);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UISpinner
+
+void UISpinner::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
+{
+	ss << prefix << id() << " = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:";
+	switch (m_Style)
+	{
+	case SmallDark: ss << "UIActivityIndicatorViewStyleGray"; break;
+	case SmallLight: ss << "UIActivityIndicatorViewStyleWhite"; break;
+	case LargeLight: ss << "UIActivityIndicatorViewStyleWhiteLarge"; break;
+	}
+	ss << "];\n";
+	UIWidget::iosGenerateInitCode(project, prefix, ss);
+}
+
+void UISpinner::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
 {
 	UIWidget::iosGenerateLayoutCode(prefix, ss);
 }

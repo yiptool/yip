@@ -49,6 +49,7 @@ public:
 		Image,
 		TextField,
 		Switch,
+		Spinner,
 		Button,
 		WebView,
 	};
