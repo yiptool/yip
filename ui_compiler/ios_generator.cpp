@@ -125,7 +125,8 @@ void iosGetScaledImage(const UIWidget * wd, std::stringstream & ss, const UIImag
 		ss << "iosScaledImage(" << imageObject << ", " << wMode << ", " << hMode << ')';
 	else
 	{
-		ss << "iosScaledImageWithCapInsets(" << imageObject << ", " << wMode << ", " << hMode << ", "
+		std::string scaleMode = fmt() << "std::min(" << wMode << ", " << hMode << ')';
+		ss << "iosScaledImageWithCapInsets(" << imageObject << ", " << scaleMode << ", " << scaleMode << ", "
 			<< image->left << ", " << image->top << ", " << image->right << ", " << image->bottom << ')';
 	}
 }
