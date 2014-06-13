@@ -79,10 +79,10 @@ UIColor UIColor::fromString(const std::string & str)
 		}
 		else if (str.length() == 5)
 		{
-			float R = unhex(str[1]) / 15.0f;
-			float G = unhex(str[2]) / 15.0f;
-			float B = unhex(str[3]) / 15.0f;
-			float A = unhex(str[4]) / 15.0f;
+			float A = unhex(str[1]) / 15.0f;
+			float R = unhex(str[2]) / 15.0f;
+			float G = unhex(str[3]) / 15.0f;
+			float B = unhex(str[4]) / 15.0f;
 			return UIColor(R, G, B, A);
 		}
 		else if (str.length() == 7)
@@ -94,10 +94,10 @@ UIColor UIColor::fromString(const std::string & str)
 		}
 		else if (str.length() == 9)
 		{
-			float R = unhex2(str[1], str[2]) / 255.0f;
-			float G = unhex2(str[3], str[4]) / 255.0f;
-			float B = unhex2(str[5], str[6]) / 255.0f;
-			float A = unhex2(str[7], str[8]) / 255.0f;
+			float A = unhex2(str[1], str[2]) / 255.0f;
+			float R = unhex2(str[3], str[4]) / 255.0f;
+			float G = unhex2(str[5], str[6]) / 255.0f;
+			float B = unhex2(str[7], str[8]) / 255.0f;
 			return UIColor(R, G, B, A);
 		}
 	}
