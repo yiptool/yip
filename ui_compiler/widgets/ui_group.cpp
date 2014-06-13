@@ -23,8 +23,8 @@
 #include "ui_group.h"
 #include "../../util/tinyxml-util/tinyxml-util.h"
 
-UIGroup::UIGroup(UILayout * layout, UIGroup * parentGroup)
-	: UIWidget(layout, parentGroup, UIWidget::Group)
+UIGroup::UIGroup(UILayout * layout, UIGroup * parentGroup, Kind kind)
+	: UIWidget(layout, parentGroup, kind)
 {
 }
 

@@ -29,6 +29,7 @@
 #include "widgets/ui_image_view.h"
 #include "widgets/ui_webview.h"
 #include "widgets/ui_switch.h"
+#include "widgets/ui_scroll_view.h"
 #include "widgets/ui_text_field.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/cxx-util/cxx-util/replace.h"
@@ -159,6 +160,21 @@ void UIGroup::androidGenerateInitCode(const ProjectPtr & project, const std::str
 void UIGroup::androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
 {
 	UIWidget::androidGenerateLayoutCode(prefix, ss);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UIScrollView
+
+void UIScrollView::androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+	std::stringstream & ss, std::map<std::string, std::string> & translations)
+{
+	UIGroup::androidGenerateInitCode(project, prefix, ss, translations);
+}
+
+void UIScrollView::androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIGroup::androidGenerateLayoutCode(prefix, ss);
 }
 
 

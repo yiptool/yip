@@ -20,6 +20,8 @@ ADD_LIBRARY(ui_compiler STATIC
 	widgets/ui_image_view.h
 	widgets/ui_label.cpp
 	widgets/ui_label.h
+	widgets/ui_scroll_view.cpp
+	widgets/ui_scroll_view.h
 	widgets/ui_switch.cpp
 	widgets/ui_switch.h
 	widgets/ui_text_field.cpp

@@ -44,8 +44,10 @@ public:
 	enum Kind
 	{
 		Group = 0,
+		ScrollView,
 		Label,
 		Image,
+		TextField,
 		Switch,
 		Button,
 		WebView,

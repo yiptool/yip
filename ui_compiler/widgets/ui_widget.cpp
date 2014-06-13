@@ -28,6 +28,7 @@
 #include "ui_image_view.h"
 #include "ui_webview.h"
 #include "ui_switch.h"
+#include "ui_scroll_view.h"
 #include "ui_text_field.h"
 #include "../parse_util.h"
 #include "../../util/tinyxml-util/tinyxml-util.h"
@@ -69,6 +70,8 @@ UIWidgetPtr UIWidget::create(UILayout * layout, UIGroup * parentGroup, const std
 {
 	if (className == "group")
 		return std::make_shared<UIGroup>(layout, parentGroup);
+	else if (className == "scroll_view")
+		return std::make_shared<UIScrollView>(layout, parentGroup);
 	else if (className == "button")
 		return std::make_shared<UIButton>(layout, parentGroup);
 	else if (className == "label")

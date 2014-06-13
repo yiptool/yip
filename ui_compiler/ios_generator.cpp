@@ -29,6 +29,7 @@
 #include "widgets/ui_image_view.h"
 #include "widgets/ui_webview.h"
 #include "widgets/ui_switch.h"
+#include "widgets/ui_scroll_view.h"
 #include "widgets/ui_text_field.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/path-util/path-util.h"
@@ -196,7 +197,7 @@ void UIWidget::iosGenerateLayoutCode(const std::string & prefix, std::stringstre
 
 void UIGroup::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
 {
-	ss << prefix << id() << " = [[UIView alloc] initWithFrame:CGRectZero];\n";
+	ss << prefix << id() << " = [[" << iosClassName() << " alloc] initWithFrame:CGRectZero];\n";
 	UIWidget::iosGenerateInitCode(project, prefix, ss);
 
 	for (const UIWidgetPtr & widget : m_Widgets)
@@ -209,6 +210,20 @@ void UIGroup::iosGenerateInitCode(const ProjectPtr & project, const std::string 
 void UIGroup::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
 {
 	UIWidget::iosGenerateLayoutCode(prefix, ss);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UIScrollView
+
+void UIScrollView::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
+{
+	UIGroup::iosGenerateInitCode(project, prefix, ss);
+}
+
+void UIScrollView::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIGroup::iosGenerateLayoutCode(prefix, ss);
 }
 
 
@@ -462,6 +477,7 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sh << "#import <UIKit/UIKit.h>\n";
 		sh << "#import <yip-imports/ios/NZSwitchControl.h>\n";
 		sh << "#import <yip-imports/ios/image.h>\n";
+		sh << "#import <yip-imports/TPKeyboardAvoiding/TPKeyboardAvoidingScrollView.h>\n";
 		sh << "#import <objc/runtime.h>\n";
 		sh << '\n';
 		sh << "@interface " << cntrl.name << " : " << cntrl.parentClass << "\n";

@@ -20,37 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifndef __df5c366bb5e5a0236358507a6b4b189e__
-#define __df5c366bb5e5a0236358507a6b4b189e__
+#include "ui_scroll_view.h"
 
-#include "ui_widget.h"
-#include <vector>
-
-class UIGroup : public UIWidget
+UIScrollView::UIScrollView(UILayout * layout, UIGroup * parentGroup)
+	: UIGroup(layout, parentGroup, UIWidget::ScrollView)
 {
-public:
-	UIGroup(UILayout * layout, UIGroup * parentGroup, Kind kind = UIWidget::Group);
-	~UIGroup();
+}
 
-	// In ios_generator.cpp
-	const char * iosClassName() const override { return "UIView"; }
-	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss) override;
-	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
-
-	// In android_generator.cpp
-	const char * androidClassName() const override { return "DummyViewGroup"; }
-	void androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
-		std::stringstream & ss, std::map<std::string, std::string> & translations) override;
-	void androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
-
-protected:
-	void afterParseAttributes(const TiXmlElement * element) override;
-
-private:
-	std::vector<UIWidgetPtr> m_Widgets;
-
-	UIGroup(const UIGroup &) = delete;
-	UIGroup & operator=(const UIGroup &) = delete;
-};
-
-#endif
+UIScrollView::~UIScrollView()
+{
+}

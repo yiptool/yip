@@ -23,7 +23,7 @@
 #include "ui_text_field.h"
 
 UITextField::UITextField(UILayout * layout, UIGroup * parentGroup)
-	: UIWidgetWithText(layout, parentGroup, UIWidget::Label),
+	: UIWidgetWithText(layout, parentGroup, UIWidget::TextField),
 	  m_TextAlignment(UITextAlignUnspecified)
 {
 }
