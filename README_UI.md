@@ -119,6 +119,7 @@ The following values are available for the scale mode:
   * `horz`: use horizontal scale ratio.
   * `vert`: use vertical scale ratio.
   * `avg`: use an average of horizontal and vertical scale ratio.
+  * `none`: always use scale ratio of 1.
 
 You may specify two scale modes, separated with a slash (`/`) - one for the portrait orientation and one
 for the landscape orientation.

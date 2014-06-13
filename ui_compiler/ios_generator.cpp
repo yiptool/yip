@@ -48,6 +48,7 @@ std::string iosScaleFunc(UIScaleMode mode, bool horz)
 	case UIScaleHorz: return "horzScale";
 	case UIScaleVert: return "vertScale";
 	case UIScaleAvg: return "((horzScale + vertScale) * 0.5f)";
+	case UIScaleNone: return "1.0f";
 	}
 
 	assert(false);

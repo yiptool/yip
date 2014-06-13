@@ -34,6 +34,7 @@ enum UIScaleMode
 	UIScaleHorz,
 	UIScaleVert,
 	UIScaleAvg,
+	UIScaleNone
 };
 
 UIScaleMode uiScaleModeFromString(const std::string & str);

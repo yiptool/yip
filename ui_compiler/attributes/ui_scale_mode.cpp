@@ -33,6 +33,7 @@ static const std::unordered_map<std::string, UIScaleMode> g_ScaleModeNames = {
 	{ "horz", UIScaleHorz },
 	{ "vert", UIScaleVert },
 	{ "avg", UIScaleAvg },
+	{ "none", UIScaleNone },
 };
 
 UIScaleMode uiScaleModeFromString(const std::string & str)
