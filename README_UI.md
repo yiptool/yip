@@ -31,11 +31,13 @@ It will be of string type and will contain value of `text` translated to the cur
 The following widgets are available:
 
   * `group`: a group of widgets.
-  * `scrollview`: a group of widgets.
+  * `scrollview`: a scrollable group of widgets.
   * `label`: a block of text.
   * `image`: a static image.
   * `switch`: a clickable switch with two possible values (usually "ON" and "OFF").
   * `button`: a clickable element with a background, optional icon and/or optional title.
+  * `textfield`: a text input field.
+  * `spinner`: a spinner widget.
   * `webview`: a browser view.
 
 The following attributes are available for all widgets and groups:
@@ -88,9 +90,9 @@ The following values may be used for colors:
   * `purple`
   * `brown`
   * `#RGB` (*R*, *G* and *B* are hexadecimal digits)
-  * `#RGBA` (*R*, *G*, *B* and *A* are hexadecimal digits)
+  * `#ARGB` (*R*, *G*, *B* and *A* are hexadecimal digits)
   * `#RRGGBB` (*R*, *G* and *B* are hexadecimal digits)
-  * `#RRGGBBAA` (*R*, *G*, *B* and *A* are hexadecimal digits)
+  * `#AARRGGBB` (*R*, *G*, *B* and *A* are hexadecimal digits)
 
 ### Scale mode
 
@@ -190,6 +192,23 @@ For a label you may additionaly specify the following attributes:
   * `fontScale`: scale mode for the label text font. You may specify two scale modes, separated with a
   slash (`/`) - one for the portrait orientation and one for the landscape orientation.
   * `textAlign`: alignment of the text, one of `left`, `right` or `center`.
+
+## Text Field
+
+For a text field you may additionaly specify the following attributes:
+
+  * `text`: placeholder text to display in the field when it is empty.
+  * `textColor`: color of the text.
+  * `font`: font for the text.
+  * `fontScale`: scale mode for the text font. You may specify two scale modes, separated with a
+  slash (`/`) - one for the portrait orientation and one for the landscape orientation.
+  * `textAlign`: alignment of the text, one of `left`, `right` or `center`.
+
+## Spinner
+
+For a spinner you may additionally specify the following attributes:
+
+  * `style`: style of a spinner, could be one of `small_dark`, `small_light` or `large_light`.
 
 ## Image
 
