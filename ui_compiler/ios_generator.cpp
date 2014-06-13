@@ -167,7 +167,7 @@ std::string UIColor::iosValue() const
 
 	std::stringstream ss;
 	ss << "[UIColor colorWithRed:" << r / 255.0f << " green:" << g / 255.0f << " blue:" << b / 255.0f
-		<< " alpha:" << a << "]";
+		<< " alpha:" << a / 255.0f << "]";
 
 	return ss.str();
 }
