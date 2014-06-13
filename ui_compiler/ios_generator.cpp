@@ -110,7 +110,7 @@ void iosGetImage(std::stringstream & ss, const UIImagePtr & image)
 }
 
 void iosGetScaledImage(const UIWidget * wd, std::stringstream & ss, const UIImagePtr & image,
-	const std::string & imageObject)
+	const std::string & imageObject, bool keepAspectRatio)
 {
 	std::string wMode1 = iosScaleFunc(wd->widthScaleMode(), true);
 	std::string hMode1 = iosScaleFunc(wd->heightScaleMode(), false);
@@ -122,7 +122,15 @@ void iosGetScaledImage(const UIWidget * wd, std::stringstream & ss, const UIImag
 	std::string hMode = fmt() << "(landscape ? " << hMode2 << " : " << hMode1 << ')';
 
 	if (!image->isNinePatch)
-		ss << "iosScaledImage(" << imageObject << ", " << wMode << ", " << hMode << ')';
+	{
+		if (!keepAspectRatio)
+			ss << "iosScaledImage(" << imageObject << ", " << wMode << ", " << hMode << ')';
+		else
+		{
+			std::string scaleMode = fmt() << "std::min(" << wMode << ", " << hMode << ')';
+			ss << "iosScaledImage(" << imageObject << ", " << scaleMode << ", " << scaleMode << ')';
+		}
+	}
 	else
 	{
 		std::string scaleMode = fmt() << "std::min(" << wMode << ", " << hMode << ')';
@@ -286,7 +294,8 @@ void UIImageView::iosGenerateLayoutCode(const std::string & prefix, std::strings
 	if (m_Image.get())
 	{
 		ss << prefix << id() << ".image = ";
-		iosGetScaledImage(this, ss, m_Image, fmt() << "objc_getAssociatedObject(" << id() << ", &YIP::KEY_IMAGE)");
+		iosGetScaledImage(this, ss, m_Image,
+			fmt() << "objc_getAssociatedObject(" << id() << ", &YIP::KEY_IMAGE)", false);
 		ss << ";\n";
 	}
 }
@@ -412,6 +421,16 @@ void UIButton::iosGenerateLayoutCode(const std::string & prefix, std::stringstre
 {
 	UIWidget::iosGenerateLayoutCode(prefix, ss);
 
+	std::string wMode1 = iosScaleFunc(widthScaleMode(), true);
+	std::string hMode1 = iosScaleFunc(heightScaleMode(), false);
+	std::string wMode2 = iosScaleFunc(landscapeWidthScaleMode(), true);
+	std::string hMode2 = iosScaleFunc(landscapeHeightScaleMode(), false);
+	std::string wMode = fmt() << "(landscape ? " << wMode2 << " : " << wMode1 << ')';
+	std::string hMode = fmt() << "(landscape ? " << hMode2 << " : " << hMode1 << ')';
+	std::string scaleMode = fmt() << "std::min(" << wMode << ", " << hMode << ')';
+	ss << prefix << id() << ".imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 7.0f * " << scaleMode << ");\n";
+	ss << prefix << id() << ".titleEdgeInsets = UIEdgeInsetsMake(0, 7.0f * " << scaleMode << ", 0, 0);\n";
+
 	if (font().get())
 	{
 		ss << prefix << id() << ".titleLabel.font = ";
@@ -422,7 +441,8 @@ void UIButton::iosGenerateLayoutCode(const std::string & prefix, std::stringstre
 	if (m_Image.get())
 	{
 		ss << prefix << '[' << id() << " setImage:";
-		iosGetScaledImage(this, ss, m_Image, fmt() << "objc_getAssociatedObject(" << id() << ", &YIP::KEY_IMAGE)");
+		iosGetScaledImage(this, ss, m_Image,
+			fmt() << "objc_getAssociatedObject(" << id() << ", &YIP::KEY_IMAGE)", true);
 		ss << " forState:UIControlStateNormal];\n";
 	}
 }
