@@ -29,6 +29,7 @@
 #include "widgets/ui_image_view.h"
 #include "widgets/ui_webview.h"
 #include "widgets/ui_switch.h"
+#include "widgets/ui_text_field.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/path-util/path-util.h"
 #include "../util/cxx_escape.h"
@@ -271,6 +272,39 @@ void UIImageView::iosGenerateLayoutCode(const std::string & prefix, std::strings
 		iosGetScaledImage(this, ss, m_Image, fmt() << "objc_getAssociatedObject(" << id() << ", &YIP::KEY_IMAGE)");
 		ss << ";\n";
 	}
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UITextField
+
+void UITextField::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
+{
+	ss << prefix << id() << " = [[UITextField alloc] initWithFrame:CGRectZero];\n";
+	UIWidget::iosGenerateInitCode(project, prefix, ss);
+
+	if (!text().empty())
+	{
+		ss << prefix << id() << ".placeholder = ";
+		iosChooseTranslation(project, prefix, ss, text());
+		ss << ";\n";
+	}
+
+	ss << prefix << id() << ".textColor = " << textColor().iosValue() << ";\n";
+}
+
+void UITextField::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIWidget::iosGenerateLayoutCode(prefix, ss);
+
+	if (font().get())
+	{
+		ss << prefix << id() << ".font = ";
+		iosGetFont(ss, font(), fontScaleMode(), landscapeFontScaleMode());
+		ss << ";\n";
+	}
+
+	ss << prefix << id() << ".textAlignment = " << iosTextAlignment(m_TextAlignment) << ";\n";
 }
 
 

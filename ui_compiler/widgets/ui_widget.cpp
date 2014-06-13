@@ -28,6 +28,7 @@
 #include "ui_image_view.h"
 #include "ui_webview.h"
 #include "ui_switch.h"
+#include "ui_text_field.h"
 #include "../parse_util.h"
 #include "../../util/tinyxml-util/tinyxml-util.h"
 #include "../../util/cxx-util/cxx-util/fmt.h"
@@ -76,6 +77,8 @@ UIWidgetPtr UIWidget::create(UILayout * layout, UIGroup * parentGroup, const std
 		return std::make_shared<UISwitch>(layout, parentGroup);
 	else if (className == "image")
 		return std::make_shared<UIImageView>(layout, parentGroup);
+	else if (className == "textfield")
+		return std::make_shared<UITextField>(layout, parentGroup);
 	else if (className == "webview")
 		return std::make_shared<UIWebView>(layout, parentGroup);
 

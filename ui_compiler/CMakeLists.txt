@@ -22,6 +22,8 @@ ADD_LIBRARY(ui_compiler STATIC
 	widgets/ui_label.h
 	widgets/ui_switch.cpp
 	widgets/ui_switch.h
+	widgets/ui_text_field.cpp
+	widgets/ui_text_field.h
 	widgets/ui_webview.cpp
 	widgets/ui_webview.h
 	widgets/ui_widget.cpp
