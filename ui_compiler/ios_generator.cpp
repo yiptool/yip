@@ -464,6 +464,12 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		UILayoutPtr iphoneLayout = uiLoadLayout(layouts, cntrl.iphone);
 		UILayoutPtr ipadLayout = uiLoadLayout(layouts, cntrl.ipad);
 
+		std::set<std::string> stringIDs;
+		for (const auto & it : iphoneLayout->strings())
+			stringIDs.insert(it.first);
+		for (const auto & it : ipadLayout->strings())
+			stringIDs.insert(it.first);
+
 		UIWidgetInfos widgetInfos = uiGetWidgetInfos({
 			// Don't change order of this items: it's important
 			iphoneLayout,
@@ -481,12 +487,14 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sh << "#import <objc/runtime.h>\n";
 		sh << '\n';
 		sh << "@interface " << cntrl.name << " : " << cntrl.parentClass << "\n";
-		for (auto it : widgetInfos)
+		for (const auto & it : widgetInfos)
 		{
 			const UIWidgetPtr & widget = (it.second.iphone.get() ? it.second.iphone : it.second.ipad);
 			sh << "@property (nonatomic, readonly, retain) " << widget->iosClassName()
 				<< " * " << it.first << ";\n";
 		}
+		for (const auto & it : stringIDs)
+			sh << "@property (nonatomic, readonly, copy) NSString * " << it << ";\n";
 		sh << "-(id)init;\n";
 		sh << "-(void)dealloc;\n";
 		sh << "@end\n";
@@ -527,8 +535,10 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sm << '\n';
 		sm << "@implementation " << cntrl.name << '\n';
 		sm << '\n';
-		for (auto it : widgetInfos)
+		for (const auto & it : widgetInfos)
 			sm << "@synthesize " << it.first << ";\n";
+		for (const auto & it : stringIDs)
+			sm << "@synthesize " << it << ";\n";
 		sm << '\n';
 		sm << "-(id)init\n";
 		sm << "{\n";
@@ -540,6 +550,12 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 			sm << '\n';
 			sm << "\t\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)\n";
 			sm << "\t\t{\n";
+			for (const auto & it : iphoneLayout->strings())
+			{
+				sm << "\t\t\t" << it.first << " = ";
+				iosChooseTranslation(project, "\t\t\t", sm, it.second);
+				sm << ";\n";
+			}
 			for (const UIWidgetPtr & widget : iphoneLayout->widgets())
 			{
 				widget->iosGenerateInitCode(project, "\t\t\t", sm);
@@ -552,6 +568,12 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 			sm << '\n';
 			sm << "\t\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)\n";
 			sm << "\t\t{\n";
+			for (const auto & it : ipadLayout->strings())
+			{
+				sm << "\t\t\t" << it.first << " = ";
+				iosChooseTranslation(project, "\t\t\t", sm, it.second);
+				sm << ";\n";
+			}
 			for (const UIWidgetPtr & widget : ipadLayout->widgets())
 			{
 				widget->iosGenerateInitCode(project, "\t\t\t", sm);
@@ -565,7 +587,12 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sm << '\n';
 		sm << "-(void)dealloc\n";
 		sm << "{\n";
-		for (auto it : widgetInfos)
+		for (const auto & it : stringIDs)
+		{
+			sm << "\t[" << it << " release];\n";
+			sm << "\t" << it << " = nil;\n";
+		}
+		for (const auto & it : widgetInfos)
 		{
 			sm << "\t[" << it.first << " release];\n";
 			sm << "\t" << it.first << " = nil;\n";

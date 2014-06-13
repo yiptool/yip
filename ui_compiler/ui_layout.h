@@ -28,6 +28,7 @@
 #include <vector>
 #include <memory>
 #include <unordered_map>
+#include <map>
 
 class UILayout
 {
@@ -51,12 +52,15 @@ public:
 	inline const std::unordered_map<std::string, UIWidgetPtr> & widgetMap() const { return m_WidgetMap; }
 	UIWidgetPtr widgetForID(const std::string & id) const;
 
+	inline const std::map<std::string, std::string> & strings() const { return m_Strings; }
+
 	void parse(const TiXmlDocument * doc);
 
 private:
 	size_t m_NextUniqueID;
 	std::vector<UIWidgetPtr> m_Widgets;
 	std::unordered_map<std::string, UIWidgetPtr> m_WidgetMap;
+	std::map<std::string, std::string> m_Strings;
 	float m_Width;
 	float m_Height;
 	float m_LandscapeWidth;

@@ -19,8 +19,12 @@ Root element should be named `layout` and should contain some mandatory attribut
   orientations. You can set two boolean values separated with a slash (`/`) for this attribute. The first
   one will be used for phones and the second one will be used for tablets.
 
-Each non-root element in the UI file represents a UI widget or a widget group. Widget group may
+Each non-root element (except `string`) in the UI file represents a UI widget or a widget group. Widget group may
 have children widgets or groups.
+
+You can also specify translatable string constants using the `string` element. It should have two mandatory
+attributes: `id` and `text`. Attribute `id` should contain a name for a property or variable to be generated.
+It will be of string type and will contain value of `text` translated to the current user's language.
 
 ## Widgets
 

@@ -418,6 +418,14 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 	UILayoutPtr tablet7Layout = uiLoadLayout(layouts, view.tablet7);
 	UILayoutPtr tablet10Layout = uiLoadLayout(layouts, view.tablet10);
 
+	std::set<std::string> stringIDs;
+	for (const auto & it : phoneLayout->strings())
+		stringIDs.insert(it.first);
+	for (const auto & it : tablet7Layout->strings())
+		stringIDs.insert(it.first);
+	for (const auto & it : tablet10Layout->strings())
+		stringIDs.insert(it.first);
+
 	UIWidgetInfos widgetInfos = uiGetWidgetInfos({
 		// Don't change order of this items: it's important
 		phoneLayout,
@@ -463,6 +471,8 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 	ss << '\n';
 	ss << "public class " << className << " extends ViewGroup\n";
 	ss << "{\n";
+	for (const auto & it : stringIDs)
+		ss << "\tpublic final String " << it << ";\n";
 	for (auto it : widgetInfos)
 	{
 		const UIWidgetPtr & widget = (it.second.phone.get() ? it.second.phone :
@@ -489,6 +499,16 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 		ss << (first ? "\n\t\t" : "\t\telse ");
 		ss << "if (\"P\".equals(getContext().getString(R.string.YIP_screen_type)))\n";
 		ss << "\t\t{\n";
+		for (const auto & it : stringIDs)
+		{
+			auto jt = phoneLayout->strings().find(it);
+			ss << "\t\t\t" << it << " = ";
+			if (jt == phoneLayout->strings().end())
+				ss << "null;";
+			else
+				androidChooseTranslation(project, ss, jt->second, translations);
+			ss << ";\n";
+		}
 		for (const UIWidgetPtr & widget : phoneLayout->widgets())
 		{
 			widget->androidGenerateInitCode(project, "\t\t\t", ss, translations);
@@ -502,6 +522,16 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 		ss << (first ? "\n\t\t" : "\t\telse ");
 		ss << "if (\"7\".equals(getContext().getString(R.string.YIP_screen_type)))\n";
 		ss << "\t\t{\n";
+		for (const auto & it : stringIDs)
+		{
+			auto jt = tablet7Layout->strings().find(it);
+			ss << "\t\t\t" << it << " = ";
+			if (jt == tablet7Layout->strings().end())
+				ss << "null";
+			else
+				androidChooseTranslation(project, ss, jt->second, translations);
+			ss << ";\n";
+		}
 		for (const UIWidgetPtr & widget : tablet7Layout->widgets())
 		{
 			widget->androidGenerateInitCode(project, "\t\t\t", ss, translations);
@@ -515,6 +545,16 @@ void uiGenerateAndroidView(UILayoutMap & layouts, const ProjectPtr & project,
 		ss << (first ? "\n\t\t" : "\t\telse ");
 		ss << "if (\"T\".equals(getContext().getString(R.string.YIP_screen_type)))\n";
 		ss << "\t\t{\n";
+		for (const auto & it : stringIDs)
+		{
+			auto jt = tablet10Layout->strings().find(it);
+			ss << "\t\t\t" << it << " = ";
+			if (jt == tablet10Layout->strings().end())
+				ss << "null";
+			else
+				androidChooseTranslation(project, ss, jt->second, translations);
+			ss << ";\n";
+		}
 		for (const UIWidgetPtr & widget : tablet10Layout->widgets())
 		{
 			widget->androidGenerateInitCode(project, "\t\t\t", ss, translations);

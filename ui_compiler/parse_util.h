@@ -28,6 +28,8 @@
 #include "attributes/ui_alignment.h"
 #include "ui_layout.h"
 #include "../3rdparty/tinyxml/tinyxml.h"
+#include <map>
+#include <string>
 
 struct UIWidgetInfo
 {

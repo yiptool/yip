@@ -78,6 +78,38 @@ void UILayout::parse(const TiXmlDocument * doc)
 
 	for (const TiXmlElement * child = element->FirstChildElement(); child; child = child->NextSiblingElement())
 	{
+		if (child->ValueStr() == "string")
+		{
+			const TiXmlAttribute * id = nullptr, * text = nullptr;
+			for (const TiXmlAttribute * attr = child->FirstAttribute(); attr; attr = attr->Next())
+			{
+				if (attr->NameTStr() == "id")
+					id = attr;
+				else if (attr->NameTStr() == "text")
+					text = attr;
+				else
+				{
+					throw std::runtime_error(xmlError(attr,
+						fmt() << "unexpected attribute '" << attr->NameTStr() << "'."));
+				}
+			}
+
+			if (!id)
+				throw std::runtime_error(xmlMissingAttribute(child, "id"));
+			if (!text)
+				throw std::runtime_error(xmlMissingAttribute(child, "text"));
+
+			if (id->ValueStr().empty())
+				throw std::runtime_error(xmlInvalidAttributeValue(id));
+			if (text->ValueStr().empty())
+				throw std::runtime_error(xmlInvalidAttributeValue(text));
+
+			if (!m_Strings.insert(std::make_pair(id->ValueStr(), text->ValueStr())).second)
+				throw std::runtime_error(xmlError(id, fmt() << "duplicate string id '" << id->ValueStr() << "'."));
+
+			continue;
+		}
+
 		UIWidgetPtr widget;
 		try {
 			widget = UIWidget::create(this, nullptr, child->ValueStr());
