@@ -544,6 +544,10 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sh << "#import <yip-imports/ios/NZSwitchControl.h>\n";
 		sh << "#import <yip-imports/ios/image.h>\n";
 		sh << "#import <yip-imports/TPKeyboardAvoiding/TPKeyboardAvoidingScrollView.h>\n";
+		sh << "#import <yip-imports/ios/NSNotificationCenter+ExtraMethods.h>\n";
+		sh << "#import <yip-imports/ios/UIButton+ExtraMethods.h>\n";
+		sh << "#import <yip-imports/ios/UIBarButtonItem+ExtraMethods.h>\n";
+		sh << "#import <yip-imports/ios/UINavigationBar+ExtraMethods.h>\n";
 		sh << "#import <objc/runtime.h>\n";
 		sh << '\n';
 		sh << "@interface " << cntrl.name << " : " << cntrl.parentClass << "\n";
