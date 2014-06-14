@@ -76,9 +76,28 @@ void UILayout::parse(const TiXmlDocument * doc)
 			"neither portrait, nor landscape orientation were enabled for tablets."));
 	}
 
+	parseWidgetList(element, true);
+}
+
+void UILayout::parse(const TiXmlElement * element, UILayout & parentLayout)
+{
+	m_Width = parentLayout.m_Width;
+	m_Height = parentLayout.m_Height;
+	m_LandscapeWidth = parentLayout.m_LandscapeWidth;
+	m_LandscapeHeight = parentLayout.m_LandscapeHeight;
+	m_AllowPortrait = parentLayout.m_AllowPortrait;
+	m_AllowPortraitTablet = parentLayout.m_AllowPortraitTablet;
+	m_AllowLandscape = parentLayout.m_AllowLandscape;
+	m_AllowLandscapeTablet = parentLayout.m_AllowLandscapeTablet;
+	parseWidgetList(element, false);
+	parentLayout.m_ChildLayouts.push_back(shared_from_this());
+}
+
+void UILayout::parseWidgetList(const TiXmlElement * element, bool allowStrings)
+{
 	for (const TiXmlElement * child = element->FirstChildElement(); child; child = child->NextSiblingElement())
 	{
-		if (child->ValueStr() == "string")
+		if (allowStrings && child->ValueStr() == "string")
 		{
 			const TiXmlAttribute * id = nullptr, * text = nullptr;
 			for (const TiXmlAttribute * attr = child->FirstAttribute(); attr; attr = attr->Next())

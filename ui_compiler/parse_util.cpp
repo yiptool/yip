@@ -60,6 +60,19 @@ void uiBoolPairFromAttr(const TiXmlAttribute * attr, bool * out1, bool * out2)
 		throw std::runtime_error(xmlInvalidAttributeValue(attr));
 }
 
+void uiFloatFromAttr(const TiXmlAttribute * attr, float * out1, float * out2)
+{
+	std::vector<std::string> lists = explode(attr->ValueStr(), '/');
+	if (lists.size() < 1 || lists.size() > 2)
+		throw std::runtime_error(xmlInvalidAttributeValue(attr));
+
+	const std::string & val1 = lists[0];
+	const std::string & val2 = (lists.size() > 1 ? lists[1] : lists[0]);
+
+	if (!strToFloat(trim(val1), *out1) || !strToFloat(trim(val2), *out2))
+		throw std::runtime_error(xmlInvalidAttributeValue(attr));
+}
+
 void uiFloatPairFromAttr(const TiXmlAttribute * attr, float * outX, float * outY,
 	float * outLandscapeX, float * outLandscapeY)
 {

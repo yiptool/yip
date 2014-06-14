@@ -31,6 +31,7 @@
 #include "widgets/ui_spinner.h"
 #include "widgets/ui_switch.h"
 #include "widgets/ui_scroll_view.h"
+#include "widgets/ui_table_view.h"
 #include "widgets/ui_text_field.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/path-util/path-util.h"
@@ -233,6 +234,20 @@ void UIScrollView::iosGenerateInitCode(const ProjectPtr & project, const std::st
 }
 
 void UIScrollView::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIGroup::iosGenerateLayoutCode(prefix, ss);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UITableView
+
+void UITableView::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
+{
+	UIGroup::iosGenerateInitCode(project, prefix, ss);
+}
+
+void UITableView::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
 {
 	UIGroup::iosGenerateLayoutCode(prefix, ss);
 }
@@ -481,6 +496,208 @@ void UIWebView::iosGenerateLayoutCode(const std::string & prefix, std::stringstr
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+void uiGenerateIOSInterface(std::stringstream & sh, const UIWidgetInfos & widgetInfos,
+	const std::string & className, const std::string & parentClass, const std::set<std::string> & stringIDs)
+{
+	sh << '\n';
+	sh << "@interface " << className << " : " << parentClass << "\n";
+	for (const auto & it : widgetInfos)
+	{
+		const UIWidgetPtr & widget = (it.second.iphone.get() ? it.second.iphone : it.second.ipad);
+		sh << "@property (nonatomic, readonly, retain) " << widget->iosClassName()
+			<< " * " << it.first << ";\n";
+	}
+	for (const auto & it : stringIDs)
+		sh << "@property (nonatomic, readonly, copy) NSString * " << it << ";\n";
+	sh << "-(id)init;\n";
+	sh << "-(void)dealloc;\n";
+	sh << "@end\n";
+}
+
+void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetInfos & widgetInfos,
+	const std::string & className, const std::set<std::string> & stringIDs, bool hasIPhone, bool hasIPad,
+	const UILayoutPtr & iphoneLayout, const UILayoutPtr & ipadLayout, const ProjectPtr & project,
+	const std::string & rootView, bool isViewController)
+{
+	sm << '\n';
+	sm << "@implementation " << className << '\n';
+	sm << '\n';
+	for (const auto & it : widgetInfos)
+		sm << "@synthesize " << it.first << ";\n";
+	for (const auto & it : stringIDs)
+		sm << "@synthesize " << it << ";\n";
+	sm << '\n';
+	sm << "-(id)init\n";
+	sm << "{\n";
+	sm << "\tself = [super init];\n";
+	sm << "\tif (self)\n";
+	sm << "\t{\n";
+	if (hasIPhone)
+	{
+		sm << '\n';
+		sm << "\t\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)\n";
+		sm << "\t\t{\n";
+		for (const auto & it : iphoneLayout->strings())
+		{
+			sm << "\t\t\t" << it.first << " = ";
+			iosChooseTranslation(project, "\t\t\t", sm, it.second);
+			sm << ";\n";
+		}
+		for (const UIWidgetPtr & widget : iphoneLayout->widgets())
+		{
+			widget->iosGenerateInitCode(project, "\t\t\t", sm);
+			sm << "\t\t\t[" << rootView << " addSubview:" << widget->id() << "];\n";
+		}
+		sm << "\t\t}\n";
+	}
+	if (hasIPad)
+	{
+		sm << '\n';
+		sm << "\t\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)\n";
+		sm << "\t\t{\n";
+		for (const auto & it : ipadLayout->strings())
+		{
+			sm << "\t\t\t" << it.first << " = ";
+			iosChooseTranslation(project, "\t\t\t", sm, it.second);
+			sm << ";\n";
+		}
+		for (const UIWidgetPtr & widget : ipadLayout->widgets())
+		{
+			widget->iosGenerateInitCode(project, "\t\t\t", sm);
+			sm << "\t\t\t[" << rootView << " addSubview:" << widget->id() << "];\n";
+		}
+		sm << "\t\t}\n";
+	}
+	sm << "\t}\n";
+	sm << "\treturn self;\n";
+	sm << "}\n";
+	sm << '\n';
+	sm << "-(void)dealloc\n";
+	sm << "{\n";
+	for (const auto & it : stringIDs)
+	{
+		sm << "\t[" << it << " release];\n";
+		sm << "\t" << it << " = nil;\n";
+	}
+	for (const auto & it : widgetInfos)
+	{
+		sm << "\t[" << it.first << " release];\n";
+		sm << "\t" << it.first << " = nil;\n";
+	}
+	sm << "\t[super dealloc];\n";
+	sm << "}\n";
+	sm << '\n';
+	if (!isViewController)
+	{
+		sm << "-(void)layoutSubviews\n";
+		sm << "{\n";
+		sm << "\t[super layoutSubviews];\n";
+	}
+	else
+	{
+		sm << "-(void)viewWillAppear:(BOOL)animated\n";
+		sm << "{\n";
+		sm << "\t[super viewWillAppear:animated];\n";
+		sm << "\tif ([self respondsToSelector:@selector(prefersStatusBarHidden)])\n";
+		sm << "\t{\n";
+		sm << "\t\t[[UIApplication sharedApplication] setStatusBarHidden:[self prefersStatusBarHidden]\n";
+		sm << "\t\t\twithAnimation:[self preferredStatusBarUpdateAnimation]];\n";
+		sm << "\t\tif ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)])\n";
+		sm << "\t\t\t[self setNeedsStatusBarAppearanceUpdate];\n";
+		sm << "\t}\n";
+		sm << "}\n";
+		sm << '\n';
+		sm << "-(void)viewWillLayoutSubviews\n";
+		sm << "{\n";
+		sm << "\t[super viewWillLayoutSubviews];\n";
+	}
+	sm << '\n';
+	sm << "\tCGRect frame = " << rootView << ".bounds;\n";
+	sm << "\tBOOL landscape = UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation);\n";
+	sm << '\n';
+	sm << "\t(void)frame;\n";
+	sm << "\t(void)landscape;\n";
+	sm << '\n';
+	if (hasIPhone)
+	{
+		sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)\n";
+		sm << "\t{\n";
+		sm << "\t\tconst float horzScale = frame.size.width / (landscape ? "
+			<< iphoneLayout->landscapeWidth() << " : " << iphoneLayout->width() << ");\n";
+		sm << "\t\tconst float vertScale = frame.size.height / (landscape ? "
+			<< iphoneLayout->landscapeHeight() << " : " << iphoneLayout->height() << ");\n";
+		sm << '\n';
+		sm << "\t\t(void)horzScale;\n";
+		sm << "\t\t(void)vertScale;\n";
+		for (auto it : widgetInfos)
+		{
+			const UIWidgetPtr & w = it.second.iphone;
+			if (!w.get())
+				continue;
+			sm << '\n';
+			w->iosGenerateLayoutCode("\t\t", sm);
+		}
+		sm << "\t}\n";
+	}
+	if (hasIPad)
+	{
+		sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)\n";
+		sm << "\t{\n";
+		sm << "\t\tconst float horzScale = frame.size.width / (landscape ? "
+			<< ipadLayout->landscapeWidth() << " : " << ipadLayout->width() << ");\n";
+		sm << "\t\tconst float vertScale = frame.size.height / (landscape ? "
+			<< ipadLayout->landscapeHeight() << " : " << ipadLayout->height() << ");\n";
+		sm << '\n';
+		sm << "\t\t(void)horzScale;\n";
+		sm << "\t\t(void)vertScale;\n";
+		for (auto it : widgetInfos)
+		{
+			const UIWidgetPtr & w = it.second.ipad;
+			if (!w.get())
+				continue;
+			sm << '\n';
+			w->iosGenerateLayoutCode("\t\t", sm);
+		}
+		sm << "\t}\n";
+	}
+	sm << "}\n";
+	if (isViewController)
+	{
+		sm << '\n';
+		sm << "-(BOOL)shouldAutoRotate\n";
+		sm << "{\n";
+		sm << "\treturn YES;\n";
+		sm << "}\n";
+		sm << '\n';
+		sm << "-(NSUInteger)supportedInterfaceOrientations\n";
+		sm << "{\n";
+		if (hasIPhone)
+		{
+			sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)\n";
+			sm << "\t\treturn 0";
+			if (iphoneLayout->allowPortrait())
+				sm << " | UIInterfaceOrientationMaskPortrait";
+			if (iphoneLayout->allowLandscape())
+				sm << " | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight";
+			sm << ";\n";
+		}
+		if (hasIPad)
+		{
+			sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)\n";
+			sm << "\t\treturn 0";
+			if (ipadLayout->allowPortraitTablet())
+				sm << " | UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown";
+			if (ipadLayout->allowLandscapeTablet())
+				sm << " | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight";
+			sm << ";\n";
+		}
+		sm << "\treturn 0;\n";
+		sm << "}\n";
+	}
+	sm << '\n';
+	sm << "@end\n";
+}
+
 void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & project,
 	const Project::IOSViewController & cntrl)
 {
@@ -549,19 +766,7 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sh << "#import <yip-imports/ios/UIBarButtonItem+ExtraMethods.h>\n";
 		sh << "#import <yip-imports/ios/UINavigationBar+ExtraMethods.h>\n";
 		sh << "#import <objc/runtime.h>\n";
-		sh << '\n';
-		sh << "@interface " << cntrl.name << " : " << cntrl.parentClass << "\n";
-		for (const auto & it : widgetInfos)
-		{
-			const UIWidgetPtr & widget = (it.second.iphone.get() ? it.second.iphone : it.second.ipad);
-			sh << "@property (nonatomic, readonly, retain) " << widget->iosClassName()
-				<< " * " << it.first << ";\n";
-		}
-		for (const auto & it : stringIDs)
-			sh << "@property (nonatomic, readonly, copy) NSString * " << it << ";\n";
-		sh << "-(id)init;\n";
-		sh << "-(void)dealloc;\n";
-		sh << "@end\n";
+		uiGenerateIOSInterface(sh, widgetInfos, cntrl.name, cntrl.parentClass, stringIDs);
 
 		std::stringstream sm;
 		sm << "#import \"" << targetName << ".h\"\n";
@@ -604,171 +809,8 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sm << "\t\treturn CGRectMake(widgetX, widgetY, widgetW, widgetH);\n";
 		sm << "\t}\n";
 		sm << "}\n";
-		sm << '\n';
-		sm << "@implementation " << cntrl.name << '\n';
-		sm << '\n';
-		for (const auto & it : widgetInfos)
-			sm << "@synthesize " << it.first << ";\n";
-		for (const auto & it : stringIDs)
-			sm << "@synthesize " << it << ";\n";
-		sm << '\n';
-		sm << "-(id)init\n";
-		sm << "{\n";
-		sm << "\tself = [super init];\n";
-		sm << "\tif (self)\n";
-		sm << "\t{\n";
-		if (hasIPhone)
-		{
-			sm << '\n';
-			sm << "\t\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)\n";
-			sm << "\t\t{\n";
-			for (const auto & it : iphoneLayout->strings())
-			{
-				sm << "\t\t\t" << it.first << " = ";
-				iosChooseTranslation(project, "\t\t\t", sm, it.second);
-				sm << ";\n";
-			}
-			for (const UIWidgetPtr & widget : iphoneLayout->widgets())
-			{
-				widget->iosGenerateInitCode(project, "\t\t\t", sm);
-				sm << "\t\t\t[self.view addSubview:" << widget->id() << "];\n";
-			}
-			sm << "\t\t}\n";
-		}
-		if (hasIPad)
-		{
-			sm << '\n';
-			sm << "\t\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)\n";
-			sm << "\t\t{\n";
-			for (const auto & it : ipadLayout->strings())
-			{
-				sm << "\t\t\t" << it.first << " = ";
-				iosChooseTranslation(project, "\t\t\t", sm, it.second);
-				sm << ";\n";
-			}
-			for (const UIWidgetPtr & widget : ipadLayout->widgets())
-			{
-				widget->iosGenerateInitCode(project, "\t\t\t", sm);
-				sm << "\t\t\t[self.view addSubview:" << widget->id() << "];\n";
-			}
-			sm << "\t\t}\n";
-		}
-		sm << "\t}\n";
-		sm << "\treturn self;\n";
-		sm << "}\n";
-		sm << '\n';
-		sm << "-(void)dealloc\n";
-		sm << "{\n";
-		for (const auto & it : stringIDs)
-		{
-			sm << "\t[" << it << " release];\n";
-			sm << "\t" << it << " = nil;\n";
-		}
-		for (const auto & it : widgetInfos)
-		{
-			sm << "\t[" << it.first << " release];\n";
-			sm << "\t" << it.first << " = nil;\n";
-		}
-		sm << "\t[super dealloc];\n";
-		sm << "}\n";
-		sm << '\n';
-		sm << "-(void)viewWillAppear:(BOOL)animated\n";
-		sm << "{\n";
-		sm << "\t[super viewWillAppear:animated];\n";
-		sm << "\tif ([self respondsToSelector:@selector(prefersStatusBarHidden)])\n";
-		sm << "\t{\n";
-		sm << "\t\t[[UIApplication sharedApplication] setStatusBarHidden:[self prefersStatusBarHidden]\n";
-		sm << "\t\t\twithAnimation:[self preferredStatusBarUpdateAnimation]];\n";
-		sm << "\t\tif ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)])\n";
-		sm << "\t\t\t[self setNeedsStatusBarAppearanceUpdate];\n";
-		sm << "\t}\n";
-		sm << "}\n";
-		sm << '\n';
-		sm << "-(void)viewWillLayoutSubviews\n";
-		sm << "{\n";
-		sm << "\t[super viewWillLayoutSubviews];\n";
-		sm << '\n';
-		sm << "\tCGRect frame = self.view.bounds;\n";
-		sm << "\tBOOL landscape = UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation);\n";
-		sm << '\n';
-		sm << "\t(void)frame;\n";
-		sm << "\t(void)landscape;\n";
-		sm << '\n';
-		if (hasIPhone)
-		{
-			sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)\n";
-			sm << "\t{\n";
-			sm << "\t\tconst float horzScale = frame.size.width / (landscape ? "
-				<< iphoneLayout->landscapeWidth() << " : " << iphoneLayout->width() << ");\n";
-			sm << "\t\tconst float vertScale = frame.size.height / (landscape ? "
-				<< iphoneLayout->landscapeHeight() << " : " << iphoneLayout->height() << ");\n";
-			sm << '\n';
-			sm << "\t\t(void)horzScale;\n";
-			sm << "\t\t(void)vertScale;\n";
-			for (auto it : widgetInfos)
-			{
-				const UIWidgetPtr & w = it.second.iphone;
-				if (!w.get())
-					continue;
-				sm << '\n';
-				w->iosGenerateLayoutCode("\t\t", sm);
-			}
-			sm << "\t}\n";
-		}
-		if (hasIPad)
-		{
-			sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)\n";
-			sm << "\t{\n";
-			sm << "\t\tconst float horzScale = frame.size.width / (landscape ? "
-				<< ipadLayout->landscapeWidth() << " : " << ipadLayout->width() << ");\n";
-			sm << "\t\tconst float vertScale = frame.size.height / (landscape ? "
-				<< ipadLayout->landscapeHeight() << " : " << ipadLayout->height() << ");\n";
-			sm << '\n';
-			sm << "\t\t(void)horzScale;\n";
-			sm << "\t\t(void)vertScale;\n";
-			for (auto it : widgetInfos)
-			{
-				const UIWidgetPtr & w = it.second.ipad;
-				if (!w.get())
-					continue;
-				sm << '\n';
-				w->iosGenerateLayoutCode("\t\t", sm);
-			}
-			sm << "\t}\n";
-		}
-		sm << "}\n";
-		sm << '\n';
-		sm << "-(BOOL)shouldAutoRotate\n";
-		sm << "{\n";
-		sm << "\treturn YES;\n";
-		sm << "}\n";
-		sm << '\n';
-		sm << "-(NSUInteger)supportedInterfaceOrientations\n";
-		sm << "{\n";
-		if (hasIPhone)
-		{
-			sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)\n";
-			sm << "\t\treturn 0";
-			if (iphoneLayout->allowPortrait())
-				sm << " | UIInterfaceOrientationMaskPortrait";
-			if (iphoneLayout->allowLandscape())
-				sm << " | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight";
-			sm << ";\n";
-		}
-		if (hasIPad)
-		{
-			sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)\n";
-			sm << "\t\treturn 0";
-			if (ipadLayout->allowPortraitTablet())
-				sm << " | UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown";
-			if (ipadLayout->allowLandscapeTablet())
-				sm << " | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight";
-			sm << ";\n";
-		}
-		sm << "\treturn 0;\n";
-		sm << "}\n";
-		sm << '\n';
-		sm << "@end\n";
+		uiGenerateIOSImplementation(sm, widgetInfos, cntrl.name, stringIDs, hasIPhone, hasIPad, iphoneLayout,
+			ipadLayout, project, "self.view", true);
 
 		std::string generatedPathH = project->yipDirectory()->writeFile(targetPathH, sh.str());
 		sourceFileH = project->addSourceFile(targetPathH, generatedPathH);

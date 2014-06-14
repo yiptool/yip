@@ -29,6 +29,7 @@
 #include "ui_webview.h"
 #include "ui_switch.h"
 #include "ui_scroll_view.h"
+#include "ui_table_view.h"
 #include "ui_spinner.h"
 #include "ui_text_field.h"
 #include "../parse_util.h"
@@ -73,6 +74,8 @@ UIWidgetPtr UIWidget::create(UILayout * layout, UIGroup * parentGroup, const std
 		return std::make_shared<UIGroup>(layout, parentGroup);
 	else if (className == "scrollview")
 		return std::make_shared<UIScrollView>(layout, parentGroup);
+	else if (className == "tableview")
+		return std::make_shared<UITableView>(layout, parentGroup);
 	else if (className == "button")
 		return std::make_shared<UIButton>(layout, parentGroup);
 	else if (className == "label")

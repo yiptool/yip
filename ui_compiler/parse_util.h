@@ -45,6 +45,7 @@ typedef std::unordered_map<std::string, UIWidgetInfo> UIWidgetInfos;
 typedef std::unordered_map<SourceFilePtr, UILayoutPtr> UILayoutMap;
 
 void uiBoolPairFromAttr(const TiXmlAttribute * attr, bool * out1, bool * out2);
+void uiFloatFromAttr(const TiXmlAttribute * attr, float * out1, float * out2);
 void uiFloatPairFromAttr(const TiXmlAttribute * attr, float * outX, float * outY,
 	float * outLandscapeX, float * outLandscapeY);
 void uiScaleModeFromAttr(const TiXmlAttribute * attr, UIScaleMode * outMode1, UIScaleMode * outMode2);

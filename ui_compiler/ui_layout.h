@@ -30,7 +30,10 @@
 #include <unordered_map>
 #include <map>
 
-class UILayout
+class UILayout;
+typedef std::shared_ptr<UILayout> UILayoutPtr;
+
+class UILayout : public std::enable_shared_from_this<UILayout>
 {
 public:
 	UILayout();
@@ -54,13 +57,17 @@ public:
 
 	inline const std::map<std::string, std::string> & strings() const { return m_Strings; }
 
+	inline const std::vector<UILayoutPtr> & childLayouts() const { return m_ChildLayouts; }
+
 	void parse(const TiXmlDocument * doc);
+	void parse(const TiXmlElement * element, UILayout & parentLayout);
 
 private:
 	size_t m_NextUniqueID;
 	std::vector<UIWidgetPtr> m_Widgets;
 	std::unordered_map<std::string, UIWidgetPtr> m_WidgetMap;
 	std::map<std::string, std::string> m_Strings;
+	std::vector<UILayoutPtr> m_ChildLayouts;
 	float m_Width;
 	float m_Height;
 	float m_LandscapeWidth;
@@ -70,12 +77,12 @@ private:
 	bool m_AllowPortraitTablet;
 	bool m_AllowLandscapeTablet;
 
+	void parseWidgetList(const TiXmlElement * element, bool allowStrings);
+
 	UILayout(const UILayout &) = delete;
 	UILayout & operator=(const UILayout &) = delete;
 
 	friend class UIWidget;
 };
-
-typedef std::shared_ptr<UILayout> UILayoutPtr;
 
 #endif

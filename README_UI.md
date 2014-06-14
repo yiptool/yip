@@ -38,6 +38,7 @@ The following widgets are available:
   * `button`: a clickable element with a background, optional icon and/or optional title.
   * `textfield`: a text input field.
   * `spinner`: a spinner widget.
+  * `tableview`: a view that shows items in a vertically scrolling list.
   * `webview`: a browser view.
 
 The following attributes are available for all widgets and groups:
@@ -177,6 +178,7 @@ To specify custom images for the switch, use the following attributes:
 For a button you may additionaly specify the following attributes:
 
   * `image`: icon to display on the button.
+  * `bgimage`: background image for the button.
   * `text`: text to display on the button.
   * `textColor`: color of the button text.
   * `font`: font for the button text.
@@ -216,3 +218,25 @@ For a spinner you may additionally specify the following attributes:
 For an image you may additionaly specify the following attributes:
 
   * `image`: path to the image resource.
+
+## Table view
+
+Table view may contain cell views as subelements. They should be declared using the `cell` element:
+
+    <tableview pos="0,0" size="100,100">
+      <cell className="TableCell" height="50">
+        <label pos="0,0" size="100,50" />
+      </cell>
+    </tableview>
+
+A separate class is created for each cell. You have to always specify the `className` attribute with
+a valid class name. It will also be used as a *reusable cell identifier* on the iOS platform.
+
+Also, you are obligated to specify the `height` attribute containing a height of a cell. You may also
+specify two heights, separated with a slash (`/`) - one for the portrait orientation and one for the
+landscape orientation.
+
+The following optional attributes are available for the `cell` element:
+
+  * `ios:parentClass`: name of a parent class on the iOS platform. Default is `UITableViewCell`.
+  * `android:parentClass`: name of a parent class on the Android platform. Default is `android.view.ViewGroup`.

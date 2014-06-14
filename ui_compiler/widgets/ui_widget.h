@@ -45,6 +45,7 @@ public:
 	{
 		Group = 0,
 		ScrollView,
+		TableView,
 		Label,
 		Image,
 		TextField,

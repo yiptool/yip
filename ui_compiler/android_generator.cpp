@@ -31,6 +31,7 @@
 #include "widgets/ui_spinner.h"
 #include "widgets/ui_switch.h"
 #include "widgets/ui_scroll_view.h"
+#include "widgets/ui_table_view.h"
 #include "widgets/ui_text_field.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/cxx-util/cxx-util/replace.h"
@@ -175,6 +176,21 @@ void UIScrollView::androidGenerateInitCode(const ProjectPtr & project, const std
 }
 
 void UIScrollView::androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIGroup::androidGenerateLayoutCode(prefix, ss);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UITableView
+
+void UITableView::androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+	std::stringstream & ss, std::map<std::string, std::string> & translations)
+{
+	UIGroup::androidGenerateInitCode(project, prefix, ss, translations);
+}
+
+void UITableView::androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
 {
 	UIGroup::androidGenerateLayoutCode(prefix, ss);
 }
