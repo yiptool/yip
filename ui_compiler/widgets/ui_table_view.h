@@ -34,13 +34,13 @@ public:
 	struct Cell
 	{
 		UILayoutPtr layout;
-		float height;
-		float landscapeHeight;
+		UIColor backgroundColor;
 		std::string className;
 		std::string androidParentClass;
 		std::string iosParentClass;
+		bool isHeader;
 
-		Cell();
+		Cell(bool isHeaderCell);
 	};
 
 	typedef std::shared_ptr<Cell> CellPtr;
@@ -48,11 +48,16 @@ public:
 	UITableView(UILayout * layout, UIGroup * parentGroup);
 	~UITableView();
 
+	inline float rowHeight() const { return m_RowHeight; }
+	inline float landscapeRowHeight() const { return m_LandscapeRowHeight; }
+	inline bool hasRowHeight() const { return m_HasRowHeight; }
+
 	inline const std::vector<CellPtr> & cells() const { return m_Cells; }
 
 	// In ios_generator.cpp
 	const char * iosClassName() const override { return "UITableView"; }
-	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss) override;
+	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
+		bool isViewController) override;
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 	// In android_generator.cpp
@@ -62,10 +67,14 @@ public:
 	void androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 protected:
+	bool parseAttribute(const TiXmlAttribute * attr) override;
 	void afterParseAttributes(const TiXmlElement * element) override;
 
 private:
 	std::vector<CellPtr> m_Cells;
+	float m_RowHeight;
+	float m_LandscapeRowHeight;
+	bool m_HasRowHeight;
 
 	UITableView(const UITableView &) = delete;
 	UITableView & operator=(const UITableView &) = delete;

@@ -50,6 +50,11 @@ struct UITableCellInfo
 {
 	UITableView::CellPtr cell;
 	UIWidgetInfos widgetInfos;
+	UILayoutPtr iphoneLayout;
+	UILayoutPtr ipadLayout;
+	UILayoutPtr phoneLayout;
+	UILayoutPtr tablet7Layout;
+	UILayoutPtr tablet10Layout;
 };
 
 typedef std::map<std::string, UITableCellInfo> UITableCellInfos;

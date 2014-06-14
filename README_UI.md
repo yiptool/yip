@@ -221,10 +221,16 @@ For an image you may additionaly specify the following attributes:
 
 ## Table view
 
+For a table view you may additionally specify the following attributes:
+
+  * `rowHeight`: row height for the table.
+
+### Table cells
+
 Table view may contain cell views as subelements. They should be declared using the `cell` element:
 
     <tableview pos="0,0" size="100,100">
-      <cell className="TableCell" height="50">
+      <cell className="TableCell" size="100,50">
         <label pos="0,0" size="100,50" />
       </cell>
     </tableview>
@@ -232,11 +238,16 @@ Table view may contain cell views as subelements. They should be declared using 
 A separate class is created for each cell. You have to always specify the `className` attribute with
 a valid class name. It will also be used as a *reusable cell identifier* on the iOS platform.
 
-Also, you are obligated to specify the `height` attribute containing a height of a cell. You may also
-specify two heights, separated with a slash (`/`) - one for the portrait orientation and one for the
+Also, you are obligated to specify the `size` attribute containing a width and height of a cell. You may also
+specify two sizes, separated with a slash (`/`) - one for the portrait orientation and one for the
 landscape orientation.
 
 The following optional attributes are available for the `cell` element:
 
   * `ios:parentClass`: name of a parent class on the iOS platform. Default is `UITableViewCell`.
   * `android:parentClass`: name of a parent class on the Android platform. Default is `android.view.ViewGroup`.
+
+### Header cells
+
+You can also declare a `header_cell` element. Their syntax is the same as for the `cell` element, but they
+are intented for use as section headers or footers.

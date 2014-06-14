@@ -266,6 +266,15 @@ static void uiGetTableCellClasses(size_t index, const UILayoutPtr & layout, UITa
 				throw std::runtime_error(fmt() << "duplicate cell class name: '" << className << "'.");
 
 			auto & cellInfo = classes[className];
+
+			switch (index)
+			{
+			case 1: (android ? cellInfo.phoneLayout = cell->layout : cellInfo.iphoneLayout = cell->layout); break;
+			case 2: (android ? cellInfo.tablet7Layout = cell->layout : cellInfo.ipadLayout = cell->layout); break;
+			case 3: cellInfo.tablet10Layout = cell->layout; break;
+			default: assert(false); throw std::runtime_error("internal error: invalid layout index.");
+			}
+
 			cellInfo.cell = cell;
 			uiGetWidgetInfos(index, cell->layout, cellInfo.widgetInfos, android);
 

@@ -26,58 +26,75 @@
 #include "../../util/cxx-util/cxx-util/fmt.h"
 #include <stdexcept>
 
-UITableView::Cell::Cell()
-	: height(0.0f),
-	  landscapeHeight(0.0f),
+UITableView::Cell::Cell(bool isHeaderCell)
+	: backgroundColor(UIColor::white),
 	  androidParentClass("android.view.ViewGroup"),
-	  iosParentClass("UITableViewCell")
+	  iosParentClass(isHeaderCell ? "UITableViewHeaderFooterView" : "UITableViewCell"),
+	  isHeader(isHeaderCell)
 {
 }
 
 UITableView::UITableView(UILayout * layout, UIGroup * parentGroup)
-	: UIGroup(layout, parentGroup, UIWidget::TableView)
+	: UIGroup(layout, parentGroup, UIWidget::TableView),
+	  m_RowHeight(0.0f),
+	  m_LandscapeRowHeight(0.0f),
+	  m_HasRowHeight(false)
 {
+	layout->m_HasTableViews = true;
 }
 
 UITableView::~UITableView()
 {
 }
 
+bool UITableView::parseAttribute(const TiXmlAttribute * attr)
+{
+	if (attr->NameTStr() == "rowHeight")
+	{
+		uiFloatFromAttr(attr, &m_RowHeight, &m_LandscapeRowHeight);
+		m_HasRowHeight = true;
+		return true;
+	}
+
+	return UIGroup::parseAttribute(attr);
+}
+
 void UITableView::afterParseAttributes(const TiXmlElement * element)
 {
 	for (const TiXmlElement * child = element->FirstChildElement(); child; child = child->NextSiblingElement())
 	{
-		if (child->ValueStr() == "cell")
+		bool isHeaderCell = (child->ValueStr() == "header_cell");
+		if (isHeaderCell || child->ValueStr() == "cell")
 		{
 			const TiXmlAttribute * classNameAttr = nullptr;
-			CellPtr cell = std::make_shared<Cell>();
-			bool hasHeight = false;
+			bool hasSize = false;
 
+			CellPtr cell = std::make_shared<Cell>(isHeaderCell);
 			for (const TiXmlAttribute * attr = child->FirstAttribute(); attr; attr = attr->Next())
 			{
 				if (attr->NameTStr() == "ios:parentClass")
 					cell->iosParentClass = attr->ValueStr();
 				else if (attr->NameTStr() == "android:parentClass")
 					cell->androidParentClass = attr->ValueStr();
+				else if (attr->NameTStr() == "bgcolor")
+					cell->backgroundColor = UIColor::fromAttr(attr);
+				else if (attr->NameTStr() == "size")
+					hasSize = true;
 				else if (attr->NameTStr() == "className")
 				{
 					cell->className = attr->ValueStr();
 					classNameAttr = attr;
 				}
-				else if (attr->NameTStr() == "height")
-				{
-					uiFloatFromAttr(attr, &cell->height, &cell->landscapeHeight);
-					hasHeight = true;
-				}
 			}
 
 			if (!classNameAttr)
 				throw std::runtime_error(xmlMissingAttribute(child, "className"));
-			if (!hasHeight)
-				throw std::runtime_error(xmlMissingAttribute(child, "height"));
+			if (!hasSize)
+				throw std::runtime_error(xmlMissingAttribute(child, "size"));
 
 			cell->layout = std::make_shared<UILayout>();
 			cell->layout->parse(child, *layout());
+			m_Cells.push_back(cell);
 		}
 		else
 			throw std::runtime_error(xmlError(child, fmt() << "unexpected element '" << child->ValueStr() << "'."));

@@ -37,7 +37,8 @@ public:
 
 	// In ios_generator.cpp
 	const char * iosClassName() const override { return "UILabel"; }
-	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss) override;
+	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
+		bool isViewController) override;
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 	// In android_generator.cpp

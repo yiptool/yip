@@ -51,6 +51,8 @@ public:
 	inline float landscapeWidth() const { return m_LandscapeWidth; }
 	inline float landscapeHeight() const { return m_LandscapeHeight; }
 
+	inline bool hasTableViews() const { return m_HasTableViews; }
+
 	inline const std::vector<UIWidgetPtr> & widgets() const { return m_Widgets; }
 	inline const std::unordered_map<std::string, UIWidgetPtr> & widgetMap() const { return m_WidgetMap; }
 	UIWidgetPtr widgetForID(const std::string & id) const;
@@ -76,6 +78,7 @@ private:
 	bool m_AllowLandscape;
 	bool m_AllowPortraitTablet;
 	bool m_AllowLandscapeTablet;
+	bool m_HasTableViews;
 
 	void parseWidgetList(const TiXmlElement * element, bool allowStrings);
 
@@ -83,6 +86,7 @@ private:
 	UILayout & operator=(const UILayout &) = delete;
 
 	friend class UIWidget;
+	friend class UITableView;
 };
 
 #endif

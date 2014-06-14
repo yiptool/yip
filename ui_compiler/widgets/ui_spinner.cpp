@@ -45,6 +45,7 @@ bool UISpinner::parseAttribute(const TiXmlAttribute * attr)
 			m_Style = LargeLight;
 		else
 			throw std::runtime_error(xmlInvalidAttributeValue(attr));
+		return true;
 	}
 
 	return UIWidget::parseAttribute(attr);

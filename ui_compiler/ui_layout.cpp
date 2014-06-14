@@ -34,7 +34,8 @@ UILayout::UILayout()
 	  m_AllowPortrait(false),
 	  m_AllowLandscape(false),
 	  m_AllowPortraitTablet(false),
-	  m_AllowLandscapeTablet(false)
+	  m_AllowLandscapeTablet(false),
+	  m_HasTableViews(false)
 {
 }
 
@@ -81,14 +82,16 @@ void UILayout::parse(const TiXmlDocument * doc)
 
 void UILayout::parse(const TiXmlElement * element, UILayout & parentLayout)
 {
-	m_Width = parentLayout.m_Width;
-	m_Height = parentLayout.m_Height;
-	m_LandscapeWidth = parentLayout.m_LandscapeWidth;
-	m_LandscapeHeight = parentLayout.m_LandscapeHeight;
 	m_AllowPortrait = parentLayout.m_AllowPortrait;
 	m_AllowPortraitTablet = parentLayout.m_AllowPortraitTablet;
 	m_AllowLandscape = parentLayout.m_AllowLandscape;
 	m_AllowLandscapeTablet = parentLayout.m_AllowLandscapeTablet;
+
+	const TiXmlAttribute * attr = element->GetAttribute("size");
+	if (!attr)
+		throw std::runtime_error(xmlMissingAttribute(element, "size"));
+	uiFloatPairFromAttr(attr, &m_Width, &m_Height, &m_LandscapeWidth, &m_LandscapeHeight);
+
 	parseWidgetList(element, false);
 	parentLayout.m_ChildLayouts.push_back(shared_from_this());
 }

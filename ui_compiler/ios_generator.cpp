@@ -190,7 +190,7 @@ std::string UIColor::iosValue() const
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // UIWidget
 
-void UIWidget::iosGenerateInitCode(const ProjectPtr &, const std::string & prefix, std::stringstream & ss)
+void UIWidget::iosGenerateInitCode(const ProjectPtr &, const std::string & prefix, std::stringstream & ss, bool)
 {
 	ss << prefix << m_ID << ".backgroundColor = " << m_BackgroundColor.iosValue() << ";\n";
 }
@@ -207,14 +207,15 @@ void UIWidget::iosGenerateLayoutCode(const std::string & prefix, std::stringstre
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // UIGroup
 
-void UIGroup::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
+void UIGroup::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
+	bool isViewController)
 {
 	ss << prefix << id() << " = [[" << iosClassName() << " alloc] initWithFrame:CGRectZero];\n";
-	UIWidget::iosGenerateInitCode(project, prefix, ss);
+	UIWidget::iosGenerateInitCode(project, prefix, ss, isViewController);
 
 	for (const UIWidgetPtr & widget : m_Widgets)
 	{
-		widget->iosGenerateInitCode(project, prefix, ss);
+		widget->iosGenerateInitCode(project, prefix, ss, isViewController);
 		ss << prefix << "[" << id() << " addSubview:" << widget->id() << "];\n";
 	}
 }
@@ -228,9 +229,10 @@ void UIGroup::iosGenerateLayoutCode(const std::string & prefix, std::stringstrea
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // UIScrollView
 
-void UIScrollView::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
+void UIScrollView::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+	std::stringstream & ss, bool isViewController)
 {
-	UIGroup::iosGenerateInitCode(project, prefix, ss);
+	UIGroup::iosGenerateInitCode(project, prefix, ss, isViewController);
 }
 
 void UIScrollView::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
@@ -242,13 +244,42 @@ void UIScrollView::iosGenerateLayoutCode(const std::string & prefix, std::string
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // UITableView
 
-void UITableView::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
+void UITableView::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+	std::stringstream & ss, bool isViewController)
 {
-	UIGroup::iosGenerateInitCode(project, prefix, ss);
+	UIGroup::iosGenerateInitCode(project, prefix, ss, isViewController);
+
+	if (isViewController)
+	{
+		ss << prefix << id() << ".delegate = self;\n";
+		ss << prefix << id() << ".dataSource = self;\n";
+	}
+
+	for (const auto & it : m_Cells)
+	{
+		ss << prefix << "[" << id() << " registerClass:[" << it->className << " class] for"
+			<< (it->isHeader ? "HeaderFooterView" : "Cell") << "ReuseIdentifier:@\"";
+		cxxEscape(ss, it->className);
+		ss << "\"];\n";
+	}
 }
 
 void UITableView::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
 {
+	if (m_HasRowHeight || m_Cells.size() > 0)
+	{
+		ss << prefix << id() << ".rowHeight = ";
+		if (m_HasRowHeight)
+			ss << "(landscape ? " << m_LandscapeRowHeight << " : " << m_RowHeight << ") * horzScale;\n";
+		else if (m_Cells.size() > 0)
+		{
+			ss << '[' << (*m_Cells.begin())->className << " rowHeightForWidth:("
+				<< "(landscape ? float(" << landscapeWidth() << ") : float(" << width()
+				<< ")) * (landscape ? " << iosScaleFunc(landscapeWidthScaleMode(), true) << " : "
+				<< iosScaleFunc(widthScaleMode(), true) << ")) landscape:landscape];\n";
+		}
+	}
+
 	UIGroup::iosGenerateLayoutCode(prefix, ss);
 }
 
@@ -256,10 +287,11 @@ void UITableView::iosGenerateLayoutCode(const std::string & prefix, std::strings
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // UILabel
 
-void UILabel::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
+void UILabel::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
+	bool isViewController)
 {
 	ss << prefix << id() << " = [[UILabel alloc] initWithFrame:CGRectZero];\n";
-	UIWidget::iosGenerateInitCode(project, prefix, ss);
+	UIWidget::iosGenerateInitCode(project, prefix, ss, isViewController);
 
 	if (!text().empty())
 	{
@@ -290,10 +322,10 @@ void UILabel::iosGenerateLayoutCode(const std::string & prefix, std::stringstrea
 // UIImageView
 
 void UIImageView::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
-	std::stringstream & ss)
+	std::stringstream & ss, bool isViewController)
 {
 	ss << prefix << id() << " = [[UIImageView alloc] initWithImage:nil];\n";
-	UIWidget::iosGenerateInitCode(project, prefix, ss);
+	UIWidget::iosGenerateInitCode(project, prefix, ss, isViewController);
 
 	if (m_Image.get())
 	{
@@ -320,10 +352,11 @@ void UIImageView::iosGenerateLayoutCode(const std::string & prefix, std::strings
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // UITextField
 
-void UITextField::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
+void UITextField::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+	std::stringstream & ss, bool isViewController)
 {
 	ss << prefix << id() << " = [[UITextField alloc] initWithFrame:CGRectZero];\n";
-	UIWidget::iosGenerateInitCode(project, prefix, ss);
+	UIWidget::iosGenerateInitCode(project, prefix, ss, isViewController);
 
 	if (!text().empty())
 	{
@@ -353,7 +386,8 @@ void UITextField::iosGenerateLayoutCode(const std::string & prefix, std::strings
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // UISwitch
 
-void UISwitch::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
+void UISwitch::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
+	bool isViewController)
 {
 	if (!isCustom())
 		ss << prefix << id() << " = [[UISwitch alloc] initWithFrame:CGRectZero];\n";
@@ -374,7 +408,7 @@ void UISwitch::iosGenerateInitCode(const ProjectPtr & project, const std::string
 		ss << "\");\n";
 	}
 
-	UIWidget::iosGenerateInitCode(project, prefix, ss);
+	UIWidget::iosGenerateInitCode(project, prefix, ss, isViewController);
 }
 
 void UISwitch::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
@@ -386,7 +420,8 @@ void UISwitch::iosGenerateLayoutCode(const std::string & prefix, std::stringstre
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // UISpinner
 
-void UISpinner::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
+void UISpinner::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+	std::stringstream & ss, bool isViewController)
 {
 	ss << prefix << id() << " = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:";
 	switch (m_Style)
@@ -396,7 +431,7 @@ void UISpinner::iosGenerateInitCode(const ProjectPtr & project, const std::strin
 	case LargeLight: ss << "UIActivityIndicatorViewStyleWhiteLarge"; break;
 	}
 	ss << "];\n";
-	UIWidget::iosGenerateInitCode(project, prefix, ss);
+	UIWidget::iosGenerateInitCode(project, prefix, ss, isViewController);
 }
 
 void UISpinner::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
@@ -408,10 +443,11 @@ void UISpinner::iosGenerateLayoutCode(const std::string & prefix, std::stringstr
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // UIButton
 
-void UIButton::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
+void UIButton::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
+	bool isViewController)
 {
 	ss << prefix << id() << " = [[UIButton buttonWithType:UIButtonTypeCustom] retain];\n";
-	UIWidget::iosGenerateInitCode(project, prefix, ss);
+	UIWidget::iosGenerateInitCode(project, prefix, ss, isViewController);
 
 	ss << prefix << id() << ".imageView.contentMode = UIViewContentModeScaleAspectFit;\n";
 
@@ -482,10 +518,11 @@ void UIButton::iosGenerateLayoutCode(const std::string & prefix, std::stringstre
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // UIWebView
 
-void UIWebView::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss)
+void UIWebView::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+	std::stringstream & ss, bool isViewController)
 {
 	ss << prefix << id() << " = [[UIWebView alloc] init];\n";
-	UIWidget::iosGenerateInitCode(project, prefix, ss);
+	UIWidget::iosGenerateInitCode(project, prefix, ss, isViewController);
 }
 
 void UIWebView::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
@@ -496,9 +533,18 @@ void UIWebView::iosGenerateLayoutCode(const std::string & prefix, std::stringstr
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void uiGenerateIOSInterface(std::stringstream & sh, const UIWidgetInfos & widgetInfos,
-	const std::string & className, const std::string & parentClass, const std::set<std::string> & stringIDs)
+static void uiGenerateIOSInterface(std::stringstream & sh, const UIWidgetInfos & widgetInfos,
+	const std::string & className, const std::string & parentClass, const std::set<std::string> & stringIDs,
+	bool isTableCell, bool isHeaderTableCell)
 {
+	if (isTableCell)
+	{
+		sh << '\n';
+		sh << "@protocol " << className << '\n';
+		sh << "@optional\n";
+		sh << "-(void)didLayoutSubviews;\n";
+		sh << "@end\n";
+	}
 	sh << '\n';
 	sh << "@interface " << className << " : " << parentClass << "\n";
 	for (const auto & it : widgetInfos)
@@ -509,15 +555,28 @@ void uiGenerateIOSInterface(std::stringstream & sh, const UIWidgetInfos & widget
 	}
 	for (const auto & it : stringIDs)
 		sh << "@property (nonatomic, readonly, copy) NSString * " << it << ";\n";
-	sh << "-(id)init;\n";
+	if (!isTableCell)
+		sh << "-(id)init;\n";
+	else if (isHeaderTableCell)
+		sh << "-(id)initWithReuseIdentifier:(NSString *)reuseIdentifier;\n";
+	else
+		sh << "-(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier;\n";
 	sh << "-(void)dealloc;\n";
+	if (isTableCell)
+	{
+		sh << "+(CGFloat)rowHeightForWidth:(CGFloat)width;\n";
+		sh << "+(CGFloat)rowHeightForWidth:(CGFloat)width landscape:(BOOL)landscape;\n";
+		sh << "+(CGFloat)rowHeightForTableView:(UITableView *)tableView;\n";
+		sh << "+(CGFloat)rowHeightForTableView:(UITableView *)tableView landscape:(BOOL)landscape;\n";
+	}
 	sh << "@end\n";
 }
 
-void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetInfos & widgetInfos,
+static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetInfos & widgetInfos,
 	const std::string & className, const std::set<std::string> & stringIDs, const UILayoutPtr & iphoneLayout,
 	const UILayoutPtr & ipadLayout, const ProjectPtr & project, const std::string & rootView,
-	bool isViewController)
+	bool isViewController, bool isTableCell, const UIColor * backgroundColor, bool isHeaderTableCell,
+	bool hasTableViews)
 {
 	bool hasIPhone = iphoneLayout.get() != nullptr;
 	bool hasIPad = ipadLayout.get() != nullptr;
@@ -530,11 +589,28 @@ void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetInfos & w
 	for (const auto & it : stringIDs)
 		sm << "@synthesize " << it << ";\n";
 	sm << '\n';
-	sm << "-(id)init\n";
-	sm << "{\n";
-	sm << "\tself = [super init];\n";
+	if (!isTableCell)
+	{
+		sm << "-(id)init\n";
+		sm << "{\n";
+		sm << "\tself = [super init];\n";
+	}
+	else if (isHeaderTableCell)
+	{
+		sm << "-(id)initWithReuseIdentifier:(NSString *)reuseIdentifier\n";
+		sm << "{\n";
+		sm << "\tself = [super initWithReuseIdentifier:reuseIdentifier];\n";
+	}
+	else
+	{
+		sm << "-(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier\n";
+		sm << "{\n";
+		sm << "\tself = [super initWithStyle:style reuseIdentifier:reuseIdentifier];\n";
+	}
 	sm << "\tif (self)\n";
 	sm << "\t{\n";
+	if (isTableCell)
+		sm << "\t\tself.backgroundView.backgroundColor = " << backgroundColor->iosValue() << ";\n";
 	if (hasIPhone)
 	{
 		sm << '\n';
@@ -548,7 +624,7 @@ void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetInfos & w
 		}
 		for (const UIWidgetPtr & widget : iphoneLayout->widgets())
 		{
-			widget->iosGenerateInitCode(project, "\t\t\t", sm);
+			widget->iosGenerateInitCode(project, "\t\t\t", sm, isViewController);
 			sm << "\t\t\t[" << rootView << " addSubview:" << widget->id() << "];\n";
 		}
 		sm << "\t\t}\n";
@@ -566,7 +642,7 @@ void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetInfos & w
 		}
 		for (const UIWidgetPtr & widget : ipadLayout->widgets())
 		{
-			widget->iosGenerateInitCode(project, "\t\t\t", sm);
+			widget->iosGenerateInitCode(project, "\t\t\t", sm, isViewController);
 			sm << "\t\t\t[" << rootView << " addSubview:" << widget->id() << "];\n";
 		}
 		sm << "\t\t}\n";
@@ -603,8 +679,11 @@ void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetInfos & w
 		sm << "\t[super viewWillAppear:animated];\n";
 		sm << "\tif ([self respondsToSelector:@selector(prefersStatusBarHidden)])\n";
 		sm << "\t{\n";
+		sm << "\t\tUIStatusBarAnimation animation = UIStatusBarAnimationFade;\n";
+		sm << "\t\tif ([self respondsToSelector:@selector(preferredStatusBarUpdateAnimation)])\n";
+		sm << "\t\t\tanimation = [self preferredStatusBarUpdateAnimation];\n";
 		sm << "\t\t[[UIApplication sharedApplication] setStatusBarHidden:[self prefersStatusBarHidden]\n";
-		sm << "\t\t\twithAnimation:[self preferredStatusBarUpdateAnimation]];\n";
+		sm << "\t\t\twithAnimation:animation];\n";
 		sm << "\t\tif ([self respondsToSelector:@selector(setNeedsStatusBarAppearanceUpdate)])\n";
 		sm << "\t\t\t[self setNeedsStatusBarAppearanceUpdate];\n";
 		sm << "\t}\n";
@@ -620,9 +699,9 @@ void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetInfos & w
 	sm << '\n';
 	sm << "\t(void)frame;\n";
 	sm << "\t(void)landscape;\n";
-	sm << '\n';
 	if (hasIPhone)
 	{
+		sm << '\n';
 		sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)\n";
 		sm << "\t{\n";
 		sm << "\t\tconst float horzScale = frame.size.width / (landscape ? "
@@ -644,6 +723,7 @@ void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetInfos & w
 	}
 	if (hasIPad)
 	{
+		sm << '\n';
 		sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)\n";
 		sm << "\t{\n";
 		sm << "\t\tconst float horzScale = frame.size.width / (landscape ? "
@@ -662,6 +742,12 @@ void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetInfos & w
 			w->iosGenerateLayoutCode("\t\t", sm);
 		}
 		sm << "\t}\n";
+	}
+	if (!isViewController)
+	{
+		sm << '\n';
+		sm << "\tif ([self respondsToSelector:@selector(didLayoutSubviews)])\n";
+		sm << "\t\t[(id<" << className << ">)self didLayoutSubviews];\n";
 	}
 	sm << "}\n";
 	if (isViewController)
@@ -695,6 +781,67 @@ void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetInfos & w
 			sm << ";\n";
 		}
 		sm << "\treturn 0;\n";
+		sm << "}\n";
+
+		if (hasTableViews)
+		{
+			sm << '\n';
+			sm << "-(UITableViewCell *)tableView:(UITableView *)tableView "
+				"cellForRowAtIndexPath:(NSIndexPath *)indexPath\n";
+			sm << "{\n";
+			sm << "\treturn nil;\n";
+			sm << "}\n";
+			sm << '\n';
+			sm << "-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section\n";
+			sm << "{\n";
+			sm << "\treturn 0;\n";
+			sm << "}\n";
+		}
+	}
+	if (isTableCell)
+	{
+		sm << '\n';
+		sm << "+(CGFloat)rowHeightForWidth:(CGFloat)width\n";
+		sm << "{\n";
+		sm << "\tBOOL landscape = UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation);\n";
+		sm << "\treturn [" << className << " rowHeightForWidth:width landscape:landscape];\n";
+		sm << "}\n";
+		sm << '\n';
+		sm << "+(CGFloat)rowHeightForWidth:(CGFloat)width landscape:(BOOL)landscape\n";
+		sm << "{\n";
+		if (hasIPhone)
+		{
+			sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)\n";
+			sm << "\t{\n";
+			sm << "\t\tconst float horzScale =  width / (landscape ? "
+				<< iphoneLayout->landscapeWidth() << " : " << iphoneLayout->width() << ");\n";
+			sm << "\t\treturn (landscape ? "
+				<< iphoneLayout->landscapeHeight() << " : " << iphoneLayout->height() << ") * horzScale;\n";
+			sm << "\t}\n";
+			sm << '\n';
+		}
+		if (hasIPad)
+		{
+			sm << "\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)\n";
+			sm << "\t{\n";
+			sm << "\t\tconst float horzScale =  width / (landscape ? "
+				<< ipadLayout->landscapeWidth() << " : " << ipadLayout->width() << ");\n";
+			sm << "\t\treturn (landscape ? "
+				<< ipadLayout->landscapeHeight() << " : " << ipadLayout->height() << ") * horzScale;\n";
+			sm << "\t}\n";
+			sm << '\n';
+		}
+		sm << "\treturn 0.0f;\n";
+		sm << "}\n";
+		sm << '\n';
+		sm << "+(CGFloat)rowHeightForTableView:(UITableView *)tableView\n";
+		sm << "{\n";
+		sm << "\treturn [" << className << " rowHeightForWidth:tableView.bounds.size.width];\n";
+		sm << "}\n";
+		sm << '\n';
+		sm << "+(CGFloat)rowHeightForTableView:(UITableView *)tableView landscape:(BOOL)landscape\n";
+		sm << "{\n";
+		sm << "\treturn [" << className << " rowHeightForWidth:tableView.bounds.size.width landscape:landscape];\n";
 		sm << "}\n";
 	}
 	sm << '\n';
@@ -763,6 +910,20 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 			ipadLayout
 		}, false);
 
+		bool hasTableViews = (iphoneLayout.get() && iphoneLayout->hasTableViews()) ||
+			(ipadLayout.get() && ipadLayout->hasTableViews());
+
+		std::string parentClass = cntrl.parentClass;
+		if (hasTableViews)
+		{
+			const char * suffix = "UITableViewDelegate,UITableViewDataSource>";
+			size_t last = parentClass.length() - 1;
+			if (parentClass.length() == 0 || parentClass[last] != '>')
+				parentClass = parentClass + '<' + suffix;
+			else
+				parentClass = parentClass.substr(0, last) + ',' + suffix;
+		}
+
 		std::stringstream sh;
 		sh << "#import <UIKit/UIKit.h>\n";
 		sh << "#import <yip-imports/ios/NZSwitchControl.h>\n";
@@ -773,12 +934,14 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sh << "#import <yip-imports/ios/UIBarButtonItem+ExtraMethods.h>\n";
 		sh << "#import <yip-imports/ios/UINavigationBar+ExtraMethods.h>\n";
 		sh << "#import <objc/runtime.h>\n";
+		sh << '\n';
+		sh << "@class " << cntrl.name << ";\n";
 		for (const auto & it : cellClasses)
 		{
 			uiGenerateIOSInterface(sh, it.second.widgetInfos, it.second.cell->className,
-				it.second.cell->iosParentClass, emptySet);
+				it.second.cell->iosParentClass, emptySet, true, it.second.cell->isHeader);
 		}
-		uiGenerateIOSInterface(sh, widgetInfos, cntrl.name, cntrl.parentClass, stringIDs);
+		uiGenerateIOSInterface(sh, widgetInfos, cntrl.name, parentClass, stringIDs, false, false);
 
 		std::stringstream sm;
 		sm << "#import \"" << targetName << ".h\"\n";
@@ -824,10 +987,11 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		for (const auto & it : cellClasses)
 		{
 			uiGenerateIOSImplementation(sm, it.second.widgetInfos, it.second.cell->className, emptySet,
-				iphoneLayout, ipadLayout, project, "self.contentView", false);
+				it.second.iphoneLayout, it.second.ipadLayout, project, "self.contentView", false, true,
+				&it.second.cell->backgroundColor, it.second.cell->isHeader, false);
 		}
 		uiGenerateIOSImplementation(sm, widgetInfos, cntrl.name, stringIDs, iphoneLayout, ipadLayout,
-			project, "self.view", true);
+			project, "self.view", true, false, nullptr, false, hasTableViews);
 
 		std::string generatedPathH = project->yipDirectory()->writeFile(targetPathH, sh.str());
 		sourceFileH = project->addSourceFile(targetPathH, generatedPathH);
