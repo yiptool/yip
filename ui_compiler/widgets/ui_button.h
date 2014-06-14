@@ -35,6 +35,7 @@ public:
 	~UIButton();
 
 	inline const UIImagePtr & image() const { return m_Image; }
+	inline const UIImagePtr & backgroundImage() const { return m_BackgroundImage; }
 
 	// In ios_generator.cpp
 	const char * iosClassName() const override { return "UIButton"; }
@@ -52,6 +53,7 @@ protected:
 
 private:
 	UIImagePtr m_Image;
+	UIImagePtr m_BackgroundImage;
 
 	UIButton(const UIButton &) = delete;
 	UIButton & operator=(const UIButton &) = delete;

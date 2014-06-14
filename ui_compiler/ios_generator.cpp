@@ -416,6 +416,13 @@ void UIButton::iosGenerateInitCode(const ProjectPtr & project, const std::string
 		iosGetImage(ss, m_Image);
 		ss << ", OBJC_ASSOCIATION_RETAIN_NONATOMIC);\n";
 	}
+
+	if (m_BackgroundImage.get())
+	{
+		ss << prefix << "objc_setAssociatedObject(" << id() << ", &YIP::KEY_IMAGE_2, ";
+		iosGetImage(ss, m_BackgroundImage);
+		ss << ", OBJC_ASSOCIATION_RETAIN_NONATOMIC);\n";
+	}
 }
 
 void UIButton::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
@@ -444,6 +451,14 @@ void UIButton::iosGenerateLayoutCode(const std::string & prefix, std::stringstre
 		ss << prefix << '[' << id() << " setImage:";
 		iosGetScaledImage(this, ss, m_Image,
 			fmt() << "objc_getAssociatedObject(" << id() << ", &YIP::KEY_IMAGE)", true);
+		ss << " forState:UIControlStateNormal];\n";
+	}
+
+	if (m_BackgroundImage.get())
+	{
+		ss << prefix << '[' << id() << " setBackgroundImage:";
+		iosGetScaledImage(this, ss, m_BackgroundImage,
+			fmt() << "objc_getAssociatedObject(" << id() << ", &YIP::KEY_IMAGE_2)", false);
 		ss << " forState:UIControlStateNormal];\n";
 	}
 }
@@ -553,11 +568,13 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sm << "namespace YIP\n";
 		sm << "{\n";
 		sm << "\tstatic char KEY_IMAGE;\n";
+		sm << "\tstatic char KEY_IMAGE_2;\n";
 		sm << '\n';
 		sm << "\ttemplate <unsigned char ALIGN> CGRect iosLayoutRect(float x, float y, float w, float h,\n";
 		sm << "\t\tfloat xScale, float yScale, float wScale, float hScale, float horzScale, float vertScale)\n";
 		sm << "\t{\n";
 		sm << "\t\t(void)KEY_IMAGE; /* Prevent compiler warning. */\n";
+		sm << "\t\t(void)KEY_IMAGE_2; /* Prevent compiler warning. */\n";
 		sm << '\n';
 		sm << "\t\tfloat widgetW = w * wScale;\n";
 		sm << "\t\tfloat widgetH = h * hScale;\n";

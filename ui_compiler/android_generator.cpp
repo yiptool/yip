@@ -382,6 +382,13 @@ void UIButton::androidGenerateInitCode(const ProjectPtr & project, const std::st
 		androidGetImage(ss, m_Image);
 		ss << ", OBJC_ASSOCIATION_RETAIN_NONATOMIC);\n";
 	}
+
+	if (m_BackgroundImage.get())
+	{
+		ss << prefix << "objc_setAssociatedObject(" << id() << ", &YIP::KEY_IMAGE_2, ";
+		androidGetImage(ss, m_BackgroundImage);
+		ss << ", OBJC_ASSOCIATION_RETAIN_NONATOMIC);\n";
+	}
 */
 }
 
@@ -401,6 +408,14 @@ void UIButton::androidGenerateLayoutCode(const std::string & prefix, std::string
 	{
 		ss << prefix << '[' << id() << " setImage:";
 		androidGetScaledImage(this, ss, m_Image, fmt() << "objc_getAssociatedObject(" << id() << ", &YIP::KEY_IMAGE)");
+		ss << " forState:UIControlStateNormal];\n";
+	}
+
+	if (m_BackgroundImage.get())
+	{
+		ss << prefix << '[' << id() << " setBackgroundImage:";
+		androidGetScaledImage(this, ss, m_BackgroundImage,
+			fmt() << "objc_getAssociatedObject(" << id() << ", &YIP::KEY_IMAGE_2)", false);
 		ss << " forState:UIControlStateNormal];\n";
 	}
 */

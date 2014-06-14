@@ -38,6 +38,11 @@ bool UIButton::parseAttribute(const TiXmlAttribute * attr)
 		m_Image = UIImage::fromAttr(attr);
 		return true;
 	}
+	else if (attr->NameTStr() == "bgimage")
+	{
+		m_BackgroundImage = UIImage::fromAttr(attr);
+		return true;
+	}
 
 	return UIWidgetWithText::parseAttribute(attr);
 }
