@@ -49,8 +49,9 @@ void UITableView::afterParseAttributes(const TiXmlElement * element)
 	{
 		if (child->ValueStr() == "cell")
 		{
-			bool hasClassName = false, hasHeight = false;
+			const TiXmlAttribute * classNameAttr = nullptr;
 			CellPtr cell = std::make_shared<Cell>();
+			bool hasHeight = false;
 
 			for (const TiXmlAttribute * attr = child->FirstAttribute(); attr; attr = attr->Next())
 			{
@@ -61,7 +62,7 @@ void UITableView::afterParseAttributes(const TiXmlElement * element)
 				else if (attr->NameTStr() == "className")
 				{
 					cell->className = attr->ValueStr();
-					hasClassName = true;
+					classNameAttr = attr;
 				}
 				else if (attr->NameTStr() == "height")
 				{
@@ -70,7 +71,7 @@ void UITableView::afterParseAttributes(const TiXmlElement * element)
 				}
 			}
 
-			if (!hasClassName)
+			if (!classNameAttr)
 				throw std::runtime_error(xmlMissingAttribute(child, "className"));
 			if (!hasHeight)
 				throw std::runtime_error(xmlMissingAttribute(child, "height"));

@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 //
 #include "parse_util.h"
+#include "widgets/ui_table_view.h"
 #include "../util/tinyxml-util/tinyxml-util.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/cxx-util/cxx-util/explode.h"
@@ -197,6 +198,45 @@ UILayoutPtr uiLoadLayout(UILayoutMap & layouts, const SourceFilePtr & sourceFile
 	return layout;
 }
 
+static void uiGetWidgetInfos(size_t index, const UILayoutPtr & layout, UIWidgetInfos & infos, bool android)
+{
+	if (!layout)
+		return;
+
+	for (auto it : layout->widgetMap())
+	{
+		const std::string & widgetID = it.first;
+		const UIWidgetPtr & widget = it.second;
+
+		UIWidgetInfo * infoPtr;
+
+		auto jt = infos.find(widgetID);
+		if (jt == infos.end())
+		{
+			UIWidgetInfo info;
+			info.kind = widget->kind();
+			infoPtr = &infos.insert(std::make_pair(widgetID, info)).first->second;
+		}
+		else
+		{
+			infoPtr = &jt->second;
+			if (jt->second.kind != widget->kind())
+			{
+				throw std::runtime_error(fmt() << "id '"
+					<< widgetID << "' corresponds to different widgets in different layout files.");
+			}
+		}
+
+		switch (index)
+		{
+		case 1: (android ? infoPtr->phone = widget : infoPtr->iphone = widget); break;
+		case 2: (android ? infoPtr->tablet7 = widget : infoPtr->ipad = widget); break;
+		case 3: infoPtr->tablet10 = widget; break;
+		default: assert(false); throw std::runtime_error("internal error: invalid layout index.");
+		}
+	}
+}
+
 UIWidgetInfos uiGetWidgetInfos(const std::initializer_list<UILayoutPtr> & layouts, bool android)
 {
 	UIWidgetInfos infos;
@@ -205,42 +245,46 @@ UIWidgetInfos uiGetWidgetInfos(const std::initializer_list<UILayoutPtr> & layout
 	for (const UILayoutPtr & layout : layouts)
 	{
 		++index;
-		if (!layout)
-			continue;
-
-		for (auto it : layout->widgetMap())
-		{
-			const std::string & widgetID = it.first;
-			const UIWidgetPtr & widget = it.second;
-
-			UIWidgetInfo * infoPtr;
-
-			auto jt = infos.find(widgetID);
-			if (jt == infos.end())
-			{
-				UIWidgetInfo info;
-				info.kind = widget->kind();
-				infoPtr = &infos.insert(std::make_pair(widgetID, info)).first->second;
-			}
-			else
-			{
-				infoPtr = &jt->second;
-				if (jt->second.kind != widget->kind())
-				{
-					throw std::runtime_error(fmt() << "id '"
-						<< widgetID << "' corresponds to different widgets in different layout files.");
-				}
-			}
-
-			switch (index)
-			{
-			case 1: (android ? infoPtr->phone = widget : infoPtr->iphone = widget); break;
-			case 2: (android ? infoPtr->tablet7 = widget : infoPtr->ipad = widget); break;
-			case 3: infoPtr->tablet10 = widget; break;
-			default: assert(false); throw std::runtime_error("internal error: invalid layout index.");
-			}
-		}
+		uiGetWidgetInfos(index, layout, infos, android);
 	}
 
 	return infos;
+}
+
+static void uiGetTableCellClasses(size_t index, const UILayoutPtr & layout, UITableCellInfos & classes,
+	std::set<std::string> & classNames, bool android)
+{
+	for (const auto & widget : layout->widgets())
+	{
+		if (widget->kind() != UIWidget::TableView)
+			continue;
+
+		for (const auto & cell : static_cast<UITableView *>(widget.get())->cells())
+		{
+			const std::string & className = cell->className;
+			if (!classNames.insert(className).second)
+				throw std::runtime_error(fmt() << "duplicate cell class name: '" << className << "'.");
+
+			auto & cellInfo = classes[className];
+			cellInfo.cell = cell;
+			uiGetWidgetInfos(index, cell->layout, cellInfo.widgetInfos, android);
+
+			uiGetTableCellClasses(index, cell->layout, classes, classNames, android);
+		}
+	}
+}
+
+UITableCellInfos uiGetTableCellClasses(const std::initializer_list<UILayoutPtr> & layouts, bool android)
+{
+	UITableCellInfos classes;
+	size_t index = 0;
+
+	for (const UILayoutPtr & layout : layouts)
+	{
+		++index;
+		std::set<std::string> layoutClasses;
+		uiGetTableCellClasses(index, layout, classes, layoutClasses, android);
+	}
+
+	return classes;
 }

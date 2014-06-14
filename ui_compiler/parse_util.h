@@ -24,11 +24,13 @@
 #define __4b98ede777219a9429cb75279ed170ba__
 
 #include "widgets/ui_widget.h"
+#include "widgets/ui_table_view.h"
 #include "attributes/ui_scale_mode.h"
 #include "attributes/ui_alignment.h"
 #include "ui_layout.h"
 #include "../3rdparty/tinyxml/tinyxml.h"
 #include <map>
+#include <set>
 #include <string>
 
 struct UIWidgetInfo
@@ -43,6 +45,14 @@ struct UIWidgetInfo
 
 typedef std::unordered_map<std::string, UIWidgetInfo> UIWidgetInfos;
 typedef std::unordered_map<SourceFilePtr, UILayoutPtr> UILayoutMap;
+
+struct UITableCellInfo
+{
+	UITableView::CellPtr cell;
+	UIWidgetInfos widgetInfos;
+};
+
+typedef std::map<std::string, UITableCellInfo> UITableCellInfos;
 
 void uiBoolPairFromAttr(const TiXmlAttribute * attr, bool * out1, bool * out2);
 void uiFloatFromAttr(const TiXmlAttribute * attr, float * out1, float * out2);
@@ -74,5 +84,7 @@ void uiAlignmentFromAttr(const TiXmlAttribute * attr, UIAlignment * outAlign1, U
 
 UILayoutPtr uiLoadLayout(UILayoutMap & layouts, const SourceFilePtr & sourceFile);
 UIWidgetInfos uiGetWidgetInfos(const std::initializer_list<UILayoutPtr> & layouts, bool android);
+
+UITableCellInfos uiGetTableCellClasses(const std::initializer_list<UILayoutPtr> & layouts, bool android);
 
 #endif

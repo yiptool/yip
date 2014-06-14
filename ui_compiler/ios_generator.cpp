@@ -515,10 +515,13 @@ void uiGenerateIOSInterface(std::stringstream & sh, const UIWidgetInfos & widget
 }
 
 void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetInfos & widgetInfos,
-	const std::string & className, const std::set<std::string> & stringIDs, bool hasIPhone, bool hasIPad,
-	const UILayoutPtr & iphoneLayout, const UILayoutPtr & ipadLayout, const ProjectPtr & project,
-	const std::string & rootView, bool isViewController)
+	const std::string & className, const std::set<std::string> & stringIDs, const UILayoutPtr & iphoneLayout,
+	const UILayoutPtr & ipadLayout, const ProjectPtr & project, const std::string & rootView,
+	bool isViewController)
 {
+	bool hasIPhone = iphoneLayout.get() != nullptr;
+	bool hasIPad = ipadLayout.get() != nullptr;
+
 	sm << '\n';
 	sm << "@implementation " << className << '\n';
 	sm << '\n';
@@ -629,7 +632,7 @@ void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetInfos & w
 		sm << '\n';
 		sm << "\t\t(void)horzScale;\n";
 		sm << "\t\t(void)vertScale;\n";
-		for (auto it : widgetInfos)
+		for (const auto & it : widgetInfos)
 		{
 			const UIWidgetPtr & w = it.second.iphone;
 			if (!w.get())
@@ -650,7 +653,7 @@ void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetInfos & w
 		sm << '\n';
 		sm << "\t\t(void)horzScale;\n";
 		sm << "\t\t(void)vertScale;\n";
-		for (auto it : widgetInfos)
+		for (const auto & it : widgetInfos)
 		{
 			const UIWidgetPtr & w = it.second.ipad;
 			if (!w.get())
@@ -748,13 +751,17 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 			stringIDs.insert(it.first);
 
 		UIWidgetInfos widgetInfos = uiGetWidgetInfos({
-			// Don't change order of this items: it's important
+			// Don't change order of these items: it's important
 			iphoneLayout,
 			ipadLayout,
 		}, false);
 
-		bool hasIPhone = iphoneLayout.get() != nullptr;
-		bool hasIPad = ipadLayout.get() != nullptr;
+		const std::set<std::string> emptySet;
+		UITableCellInfos cellClasses = uiGetTableCellClasses({
+			// Don't change order of these items: it's important
+			iphoneLayout,
+			ipadLayout
+		}, false);
 
 		std::stringstream sh;
 		sh << "#import <UIKit/UIKit.h>\n";
@@ -766,6 +773,11 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sh << "#import <yip-imports/ios/UIBarButtonItem+ExtraMethods.h>\n";
 		sh << "#import <yip-imports/ios/UINavigationBar+ExtraMethods.h>\n";
 		sh << "#import <objc/runtime.h>\n";
+		for (const auto & it : cellClasses)
+		{
+			uiGenerateIOSInterface(sh, it.second.widgetInfos, it.second.cell->className,
+				it.second.cell->iosParentClass, emptySet);
+		}
 		uiGenerateIOSInterface(sh, widgetInfos, cntrl.name, cntrl.parentClass, stringIDs);
 
 		std::stringstream sm;
@@ -809,8 +821,13 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sm << "\t\treturn CGRectMake(widgetX, widgetY, widgetW, widgetH);\n";
 		sm << "\t}\n";
 		sm << "}\n";
-		uiGenerateIOSImplementation(sm, widgetInfos, cntrl.name, stringIDs, hasIPhone, hasIPad, iphoneLayout,
-			ipadLayout, project, "self.view", true);
+		for (const auto & it : cellClasses)
+		{
+			uiGenerateIOSImplementation(sm, it.second.widgetInfos, it.second.cell->className, emptySet,
+				iphoneLayout, ipadLayout, project, "self.contentView", false);
+		}
+		uiGenerateIOSImplementation(sm, widgetInfos, cntrl.name, stringIDs, iphoneLayout, ipadLayout,
+			project, "self.view", true);
 
 		std::string generatedPathH = project->yipDirectory()->writeFile(targetPathH, sh.str());
 		sourceFileH = project->addSourceFile(targetPathH, generatedPathH);
