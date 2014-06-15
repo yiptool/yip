@@ -238,6 +238,8 @@ void UIScrollView::iosGenerateInitCode(const ProjectPtr & project, const std::st
 void UIScrollView::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
 {
 	UIGroup::iosGenerateLayoutCode(prefix, ss);
+	ss << prefix << id() << ".contentSize = [" << id()
+		<< " TPKeyboardAvoiding_calculatedContentSizeFromSubviewFrames];\n";
 }
 
 
