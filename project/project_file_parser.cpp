@@ -1295,9 +1295,15 @@ void ProjectFileParser::parseFileFlags(const SourceFilePtr & sourceFile, const S
 		else if (name == "arc")
 		{
 			if (value == "yes")
-				sourceFile->setArcEnabled(true);
+			{
+				if (sourceFile)
+					sourceFile->setArcEnabled(true);
+			}
 			else if (value == "no")
-				sourceFile->setArcEnabled(false);
+			{
+				if (sourceFile)
+					sourceFile->setArcEnabled(false);
+			}
 			else
 				reportWarning(fmt() << "invalid value '" << value << "' for option 'arc'.");
 		}
