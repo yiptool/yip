@@ -21,9 +21,11 @@
 // THE SOFTWARE.
 //
 #include "ui_button.h"
+#include "../../util/tinyxml-util/tinyxml-util.h"
 
 UIButton::UIButton(UILayout * layout, UIGroup * parentGroup)
-	: UIWidgetWithText(layout, parentGroup, UIWidget::Button)
+	: UIWidgetWithText(layout, parentGroup, UIWidget::Button),
+	  m_ImageOnRightSide(false)
 {
 }
 
@@ -41,6 +43,12 @@ bool UIButton::parseAttribute(const TiXmlAttribute * attr)
 	else if (attr->NameTStr() == "bgimage")
 	{
 		m_BackgroundImage = UIImage::fromAttr(attr);
+		return true;
+	}
+	else if (attr->NameTStr() == "righthanded")
+	{
+		if (!xmlAttrToBool(attr, m_ImageOnRightSide))
+			throw std::runtime_error(xmlInvalidAttributeValue(attr));
 		return true;
 	}
 

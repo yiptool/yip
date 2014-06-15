@@ -184,6 +184,7 @@ For a button you may additionaly specify the following attributes:
   * `font`: font for the button text.
   * `fontScale`: scale mode for the button text font. You may specify two scale modes, separated with a
   slash (`/`) - one for the portrait orientation and one for the landscape orientation.
+  * `righthanded`: set to `yes` if image should be on the right side of the text.
 
 ## Label
 

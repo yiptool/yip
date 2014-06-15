@@ -394,6 +394,8 @@ void UIButton::androidGenerateInitCode(const ProjectPtr & project, const std::st
 /*
 	if (m_Image.get())
 	{
+		if (m_ImageOnRightSide)
+			...
 		ss << prefix << "objc_setAssociatedObject(" << id() << ", &YIP::KEY_IMAGE, ";
 		androidGetImage(ss, m_Image);
 		ss << ", OBJC_ASSOCIATION_RETAIN_NONATOMIC);\n";

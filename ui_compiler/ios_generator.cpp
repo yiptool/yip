@@ -448,10 +448,11 @@ void UISpinner::iosGenerateLayoutCode(const std::string & prefix, std::stringstr
 void UIButton::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
 	bool isViewController)
 {
-	ss << prefix << id() << " = [[UIButton buttonWithType:UIButtonTypeCustom] retain];\n";
+	ss << prefix << id() << " = [[NZButton alloc] init];\n";
 	UIWidget::iosGenerateInitCode(project, prefix, ss, isViewController);
 
 	ss << prefix << id() << ".imageView.contentMode = UIViewContentModeScaleAspectFit;\n";
+	ss << prefix << id() << ".imageOnRightSide = " << (m_ImageOnRightSide ? "YES" : "NO") << ";\n";
 
 	if (!text().empty())
 	{
@@ -938,6 +939,7 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sh << "#import <yip-imports/ios/UIButton+ExtraMethods.h>\n";
 		sh << "#import <yip-imports/ios/UIBarButtonItem+ExtraMethods.h>\n";
 		sh << "#import <yip-imports/ios/UINavigationBar+ExtraMethods.h>\n";
+		sh << "#import <yip-imports/ios/NZButton.h>\n";
 		sh << "#import <objc/runtime.h>\n";
 		sh << '\n';
 		sh << "@class " << cntrl.name << ";\n";

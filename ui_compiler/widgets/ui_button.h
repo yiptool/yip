@@ -38,7 +38,7 @@ public:
 	inline const UIImagePtr & backgroundImage() const { return m_BackgroundImage; }
 
 	// In ios_generator.cpp
-	const char * iosClassName() const override { return "UIButton"; }
+	const char * iosClassName() const override { return "NZButton"; }
 	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
 		bool isViewController) override;
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
@@ -53,6 +53,7 @@ protected:
 	bool parseAttribute(const TiXmlAttribute * attr) override;
 
 private:
+	bool m_ImageOnRightSide;
 	UIImagePtr m_Image;
 	UIImagePtr m_BackgroundImage;
 
