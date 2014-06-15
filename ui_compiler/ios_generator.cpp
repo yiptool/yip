@@ -204,6 +204,10 @@ void UIWidget::iosGenerateLayoutCode(const std::string & prefix, std::stringstre
 	::iosGenerateLayoutCode(this, prefix + "\t", ss, false);
 }
 
+void UIWidget::iosGeneratePostLayoutCode(const std::string &, std::stringstream &)
+{
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // UIGroup
@@ -239,6 +243,13 @@ void UIScrollView::iosGenerateInitCode(const ProjectPtr & project, const std::st
 void UIScrollView::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
 {
 	UIGroup::iosGenerateLayoutCode(prefix, ss);
+	ss << prefix << id() << ".contentSize = [" << id()
+		<< " TPKeyboardAvoiding_calculatedContentSizeFromSubviewFrames];\n";
+}
+
+void UIScrollView::iosGeneratePostLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIGroup::iosGeneratePostLayoutCode(prefix, ss);
 	ss << prefix << id() << ".contentSize = [" << id()
 		<< " TPKeyboardAvoiding_calculatedContentSizeFromSubviewFrames];\n";
 }
@@ -756,6 +767,14 @@ static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetIn
 			sm << '\n';
 			w->iosGenerateLayoutCode("\t\t", sm);
 		}
+		for (const auto & it : widgetInfos)
+		{
+			const UIWidgetPtr & w = it.second.iphone;
+			if (!w.get())
+				continue;
+			sm << '\n';
+			w->iosGeneratePostLayoutCode("\t\t", sm);
+		}
 		sm << "\t}\n";
 	}
 	if (hasIPad)
@@ -777,6 +796,14 @@ static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetIn
 				continue;
 			sm << '\n';
 			w->iosGenerateLayoutCode("\t\t", sm);
+		}
+		for (const auto & it : widgetInfos)
+		{
+			const UIWidgetPtr & w = it.second.ipad;
+			if (!w.get())
+				continue;
+			sm << '\n';
+			w->iosGeneratePostLayoutCode("\t\t", sm);
 		}
 		sm << "\t}\n";
 	}

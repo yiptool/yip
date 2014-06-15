@@ -99,6 +99,7 @@ public:
 	virtual void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
 		std::stringstream & ss, bool isViewController);
 	virtual void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss);
+	virtual void iosGeneratePostLayoutCode(const std::string & prefix, std::stringstream & ss);
 
 	// In android_generator.cpp
 	virtual const char * androidClassName() const = 0;
