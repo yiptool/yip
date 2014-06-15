@@ -483,18 +483,16 @@ void UIButton::iosGenerateLayoutCode(const std::string & prefix, std::stringstre
 {
 	UIWidget::iosGenerateLayoutCode(prefix, ss);
 
-	if (!text().empty() && m_Image.get())
-	{
-		std::string wMode1 = iosScaleFunc(widthScaleMode(), true);
-		std::string hMode1 = iosScaleFunc(heightScaleMode(), false);
-		std::string wMode2 = iosScaleFunc(landscapeWidthScaleMode(), true);
-		std::string hMode2 = iosScaleFunc(landscapeHeightScaleMode(), false);
-		std::string wMode = fmt() << "(landscape ? " << wMode2 << " : " << wMode1 << ')';
-		std::string hMode = fmt() << "(landscape ? " << hMode2 << " : " << hMode1 << ')';
-		std::string scaleMode = fmt() << "std::min(" << wMode << ", " << hMode << ')';
-		ss << prefix << id() << ".imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 5.0f * " << scaleMode << ");\n";
-		ss << prefix << id() << ".titleEdgeInsets = UIEdgeInsetsMake(0, 5.0f * " << scaleMode << ", 0, 0);\n";
-	}
+	std::string wMode1 = iosScaleFunc(widthScaleMode(), true);
+	std::string hMode1 = iosScaleFunc(heightScaleMode(), false);
+	std::string wMode2 = iosScaleFunc(landscapeWidthScaleMode(), true);
+	std::string hMode2 = iosScaleFunc(landscapeHeightScaleMode(), false);
+	std::string wMode = fmt() << "(landscape ? " << wMode2 << " : " << wMode1 << ')';
+	std::string hMode = fmt() << "(landscape ? " << hMode2 << " : " << hMode1 << ')';
+	std::string scaleMode = fmt() << "std::min(" << wMode << ", " << hMode << ')';
+	std::string inset = fmt() << "5.0f * " << scaleMode;
+	ss << prefix << id() << ".imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, " << inset << ");\n";
+	ss << prefix << id() << ".titleEdgeInsets = UIEdgeInsetsMake(0, " << inset << ", 0, 0);\n";
 
 	if (font().get())
 	{
