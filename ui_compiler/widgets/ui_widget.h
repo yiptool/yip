@@ -49,6 +49,7 @@ public:
 		Label,
 		Image,
 		TextField,
+		TextArea,
 		Switch,
 		Spinner,
 		Button,

@@ -32,6 +32,7 @@
 #include "widgets/ui_switch.h"
 #include "widgets/ui_scroll_view.h"
 #include "widgets/ui_table_view.h"
+#include "widgets/ui_text_area.h"
 #include "widgets/ui_text_field.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/path-util/path-util.h"
@@ -382,6 +383,38 @@ void UITextField::iosGenerateLayoutCode(const std::string & prefix, std::strings
 	}
 
 	ss << prefix << id() << ".textAlignment = " << iosTextAlignment(m_TextAlignment) << ";\n";
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UITextArea
+
+void UITextArea::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+	std::stringstream & ss, bool isViewController)
+{
+	ss << prefix << id() << " = [[UITextView alloc] initWithFrame:CGRectZero];\n";
+	UIWidget::iosGenerateInitCode(project, prefix, ss, isViewController);
+
+	if (!text().empty())
+	{
+		ss << prefix << id() << ".text = ";
+		iosChooseTranslation(project, prefix, ss, text());
+		ss << ";\n";
+	}
+
+	ss << prefix << id() << ".textColor = " << textColor().iosValue() << ";\n";
+}
+
+void UITextArea::iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIWidget::iosGenerateLayoutCode(prefix, ss);
+
+	if (font().get())
+	{
+		ss << prefix << id() << ".font = ";
+		iosGetFont(ss, font(), fontScaleMode(), landscapeFontScaleMode());
+		ss << ";\n";
+	}
 }
 
 

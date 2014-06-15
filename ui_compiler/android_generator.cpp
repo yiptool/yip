@@ -32,6 +32,7 @@
 #include "widgets/ui_switch.h"
 #include "widgets/ui_scroll_view.h"
 #include "widgets/ui_table_view.h"
+#include "widgets/ui_text_area.h"
 #include "widgets/ui_text_field.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 #include "../util/cxx-util/cxx-util/replace.h"
@@ -309,6 +310,45 @@ void UITextField::androidGenerateLayoutCode(const std::string & prefix, std::str
 	}
 
 	ss << prefix << id() << ".setTextAlignment(" << androidTextAlignment(m_TextAlignment) << ");\n";
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UITextArea
+
+void UITextArea::androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
+	std::stringstream & ss, std::map<std::string, std::string> & translations)
+{
+	ss << prefix << id() << " = new " << androidClassName() << "(getContext());\n";
+	UIWidget::androidGenerateInitCode(project, prefix, ss, translations);
+
+	if (!text().empty())
+	{
+		ss << prefix << id() << ".setText(";
+		androidChooseTranslation(project, ss, text(), translations);
+		ss << ");\n";
+	}
+
+	if (font().get())
+	{
+		ss << prefix << id() << ".setTypeface(ru.zapolnov.yip.Util.getTypeface(getResources().getAssets(), \"";
+		javaEscape(ss, font()->family);
+		ss << ".ttf\"));\n";
+	}
+
+	ss << prefix << id() << ".setTextColor(" << textColor().androidValue() << ");\n";
+}
+
+void UITextArea::androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss)
+{
+	UIWidget::androidGenerateLayoutCode(prefix, ss);
+
+	if (font().get())
+	{
+		ss << prefix << id() << ".setTextSize(TypedValue.COMPLEX_UNIT_PT, landscape ? "
+			<< font()->landscapeSize << " * " << androidScaleFunc(landscapeFontScaleMode(), false) << " : "
+			<< font()->size << " * " << androidScaleFunc(fontScaleMode(), false) << ");\n";
+	}
 }
 
 

@@ -28,6 +28,8 @@ ADD_LIBRARY(ui_compiler STATIC
 	widgets/ui_switch.h
 	widgets/ui_table_view.cpp
 	widgets/ui_table_view.h
+	widgets/ui_text_area.cpp
+	widgets/ui_text_area.h
 	widgets/ui_text_field.cpp
 	widgets/ui_text_field.h
 	widgets/ui_webview.cpp
