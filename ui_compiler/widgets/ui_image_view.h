@@ -34,7 +34,7 @@ public:
 	~UIImageView();
 
 	// In ios_generator.cpp
-	const char * iosClassName() const override { return "UIImageView"; }
+	const char * iosClassName() const override { return "NZURLImageView"; }
 	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
 		bool isViewController) override;
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;

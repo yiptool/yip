@@ -304,7 +304,7 @@ void UITableView::iosGenerateLayoutCode(const std::string & prefix, std::strings
 void UILabel::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
 	bool isViewController)
 {
-	ss << prefix << id() << " = [[UILabel alloc] initWithFrame:CGRectZero];\n";
+	ss << prefix << id() << " = [[" << iosClassName() << " alloc] initWithFrame:CGRectZero];\n";
 	UIWidget::iosGenerateInitCode(project, prefix, ss, isViewController);
 
 	if (!text().empty())
@@ -338,7 +338,7 @@ void UILabel::iosGenerateLayoutCode(const std::string & prefix, std::stringstrea
 void UIImageView::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
 	std::stringstream & ss, bool isViewController)
 {
-	ss << prefix << id() << " = [[UIImageView alloc] initWithImage:nil];\n";
+	ss << prefix << id() << " = [[" << iosClassName() << " alloc] initWithImage:nil];\n";
 	UIWidget::iosGenerateInitCode(project, prefix, ss, isViewController);
 
 	if (m_Image.get())
@@ -369,7 +369,7 @@ void UIImageView::iosGenerateLayoutCode(const std::string & prefix, std::strings
 void UITextField::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
 	std::stringstream & ss, bool isViewController)
 {
-	ss << prefix << id() << " = [[UITextField alloc] initWithFrame:CGRectZero];\n";
+	ss << prefix << id() << " = [[" << iosClassName() << " alloc] initWithFrame:CGRectZero];\n";
 	UIWidget::iosGenerateInitCode(project, prefix, ss, isViewController);
 
 	if (!text().empty())
@@ -403,7 +403,7 @@ void UITextField::iosGenerateLayoutCode(const std::string & prefix, std::strings
 void UITextArea::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
 	std::stringstream & ss, bool isViewController)
 {
-	ss << prefix << id() << " = [[UITextView alloc] initWithFrame:CGRectZero];\n";
+	ss << prefix << id() << " = [[" << iosClassName() << " alloc] initWithFrame:CGRectZero];\n";
 	UIWidget::iosGenerateInitCode(project, prefix, ss, isViewController);
 
 	if (!text().empty())
@@ -436,10 +436,10 @@ void UISwitch::iosGenerateInitCode(const ProjectPtr & project, const std::string
 	bool isViewController)
 {
 	if (!isCustom())
-		ss << prefix << id() << " = [[UISwitch alloc] initWithFrame:CGRectZero];\n";
+		ss << prefix << id() << " = [[" << iosClassName() << " alloc] initWithFrame:CGRectZero];\n";
 	else
 	{
-		ss << prefix << id() << " = [[NZSwitchControl alloc] init];\n";
+		ss << prefix << id() << " = [[" << iosClassName() << " alloc] init];\n";
 
 		ss << prefix << id() << ".knob.image = iosImageFromResource(@\"";
 		cxxEscape(ss, m_KnobImage);
@@ -469,7 +469,7 @@ void UISwitch::iosGenerateLayoutCode(const std::string & prefix, std::stringstre
 void UISpinner::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
 	std::stringstream & ss, bool isViewController)
 {
-	ss << prefix << id() << " = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:";
+	ss << prefix << id() << " = [[" << iosClassName() << " alloc] initWithActivityIndicatorStyle:";
 	switch (m_Style)
 	{
 	case SmallDark: ss << "UIActivityIndicatorViewStyleGray"; break;
@@ -492,7 +492,7 @@ void UISpinner::iosGenerateLayoutCode(const std::string & prefix, std::stringstr
 void UIButton::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
 	bool isViewController)
 {
-	ss << prefix << id() << " = [[NZButton alloc] init];\n";
+	ss << prefix << id() << " = [[" << iosClassName() << " alloc] init];\n";
 	UIWidget::iosGenerateInitCode(project, prefix, ss, isViewController);
 
 	ss << prefix << id() << ".imageView.contentMode = UIViewContentModeScaleAspectFit;\n";
@@ -569,7 +569,7 @@ void UIButton::iosGenerateLayoutCode(const std::string & prefix, std::stringstre
 void UIWebView::iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
 	std::stringstream & ss, bool isViewController)
 {
-	ss << prefix << id() << " = [[UIWebView alloc] init];\n";
+	ss << prefix << id() << " = [[" << iosClassName() << " alloc] init];\n";
 	UIWidget::iosGenerateInitCode(project, prefix, ss, isViewController);
 }
 
@@ -998,6 +998,7 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sh << "#import <yip-imports/ios/UIBarButtonItem+ExtraMethods.h>\n";
 		sh << "#import <yip-imports/ios/UINavigationBar+ExtraMethods.h>\n";
 		sh << "#import <yip-imports/ios/NZButton.h>\n";
+		sh << "#import <yip-imports/ios/NZURLImageView.h>\n";
 		sh << "#import <objc/runtime.h>\n";
 		sh << '\n';
 		sh << "@class " << cntrl.name << ";\n";
