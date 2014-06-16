@@ -658,7 +658,7 @@ static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetIn
 	sm << "\tif (self)\n";
 	sm << "\t{\n";
 	if (isTableCell)
-		sm << "\t\tself.backgroundView.backgroundColor = " << backgroundColor->iosValue() << ";\n";
+		sm << "\t\tself.contentView.backgroundColor = " << backgroundColor->iosValue() << ";\n";
 	if (hasIPhone)
 	{
 		sm << '\n';
