@@ -36,7 +36,8 @@ The following widgets are available:
   * `image`: a static image.
   * `switch`: a clickable switch with two possible values (usually "ON" and "OFF").
   * `button`: a clickable element with a background, optional icon and/or optional title.
-  * `textfield`: a text input field.
+  * `textfield`: a single-line text input field.
+  * `textarea`: a multi-line text input field.
   * `spinner`: a spinner widget.
   * `tableview`: a view that shows items in a vertically scrolling list.
   * `webview`: a browser view.
@@ -208,6 +209,16 @@ For a text field you may additionaly specify the following attributes:
   slash (`/`) - one for the portrait orientation and one for the landscape orientation.
   * `textAlign`: alignment of the text, one of `left`, `right` or `center`.
 
+## Text Area
+
+For a text area you may additionaly specify the following attributes:
+
+  * `text`: initial text for the area.
+  * `textColor`: color of the text.
+  * `font`: font for the text.
+  * `fontScale`: scale mode for the text font. You may specify two scale modes, separated with a
+  slash (`/`) - one for the portrait orientation and one for the landscape orientation.
+
 ## Spinner
 
 For a spinner you may additionally specify the following attributes:
@@ -247,6 +258,7 @@ The following optional attributes are available for the `cell` element:
 
   * `ios:parentClass`: name of a parent class on the iOS platform. Default is `UITableViewCell`.
   * `android:parentClass`: name of a parent class on the Android platform. Default is `android.view.ViewGroup`.
+  * `bgcolor`: background color for the cell.
 
 ### Header cells
 
