@@ -62,6 +62,7 @@ Config::Config()
 	repos.insert(std::make_pair("ios-keyboard-avoiding", "https://github.com/oss-forks/ios-keyboard-avoiding.git"));
 	repos.insert(std::make_pair("ios-refresh-control", "https://github.com/oss-forks/ios-refresh-control.git"));
 	repos.insert(std::make_pair("ios-star-rating-view", "https://github.com/oss-forks/ios-star-rating-view.git"));
+	repos.insert(std::make_pair("ios-twitter-auth", "https://github.com/oss-forks/ios-twitter-auth.git"));
 	repos.insert(std::make_pair("ios-vk-sdk", "https://github.com/oss-forks/ios-vk-sdk.git"));
 	repos.insert(std::make_pair("kissfft", "https://github.com/oss-forks/kissfft.git"));
 	repos.insert(std::make_pair("libogg", "https://github.com/oss-forks/libogg.git"));
