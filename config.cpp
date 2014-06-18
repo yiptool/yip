@@ -97,6 +97,7 @@ Config::Config()
 	repos.insert(std::make_pair("ios-airplay-util", "https://github.com/yiptool/ios-airplay-util.git"));
 	repos.insert(std::make_pair("ios-opengl-view", "https://github.com/yiptool/ios-opengl-view.git"));
 	repos.insert(std::make_pair("ios-system-sound", "https://github.com/yiptool/ios-system-sound.git"));
+	repos.insert(std::make_pair("ios-twitter-util", "https://github.com/yiptool/ios-twitter-util.git"));
 	repos.insert(std::make_pair("ios-util", "https://github.com/yiptool/ios-util.git"));
 	repos.insert(std::make_pair("jni-util", "https://github.com/yiptool/jni-util.git"));
 	repos.insert(std::make_pair("math", "https://github.com/yiptool/math.git"));
