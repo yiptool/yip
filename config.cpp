@@ -83,6 +83,7 @@ Config::Config()
 
 	repos.insert(std::make_pair("amazon-aws-runtime", "https://github.com/yiptool/amazon-aws-runtime.git"));
 	repos.insert(std::make_pair("amazon-aws-s3", "https://github.com/yiptool/amazon-aws-s3.git"));
+	repos.insert(std::make_pair("amazon-aws-s3-util", "https://github.com/yiptool/amazon-aws-s3-util.git"));
 	repos.insert(std::make_pair("android-jni-util", "https://github.com/yiptool/android-jni-util.git"));
 	repos.insert(std::make_pair("android-util", "https://github.com/yiptool/android-util.git"));
 	repos.insert(std::make_pair("box2d-debug-renderer", "https://github.com/yiptool/box2d-debug-renderer.git"));
