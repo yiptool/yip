@@ -852,7 +852,9 @@ void ProjectFileParser::parseIOSorOSX()
 			{ reportError(fmt() << "expected view controller name after '" << prefix << ":view_controller'."); return; }
 		cntrl.name = m_TokenText;
 
-		if (getToken() == Token::Literal)
+		if (getToken() != Token::Literal)
+			cntrl.parentClass = "UIViewController";
+		else
 		{
 			cntrl.parentClass = m_TokenText;
 			getToken();
