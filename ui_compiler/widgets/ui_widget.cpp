@@ -136,6 +136,18 @@ void UIWidget::parse(const TiXmlElement * element)
 			uiScaleModeFromAttr4(attr, X, Y, Width, Height);
 		else if (name == "align")
 			uiAlignmentFromAttr(attr, &m_Alignment, &m_LandscapeAlignment);
+		else if (name == "ios:className")
+		{
+			m_IOSClassName = attr->ValueStr();
+			if (m_IOSClassName.length() == 0)
+				throw std::runtime_error(xmlInvalidAttributeValue(attr));
+		}
+		else if (name == "android:className")
+		{
+			m_AndroidClassName = attr->ValueStr();
+			if (m_AndroidClassName.length() == 0)
+				throw std::runtime_error(xmlInvalidAttributeValue(attr));
+		}
 		else if (!parseAttribute(attr))
 			throw std::runtime_error(xmlError(attr, fmt() << "unknown attribute '" << name << "'."));
 	}
@@ -149,6 +161,16 @@ void UIWidget::parse(const TiXmlElement * element)
 		throw std::runtime_error(xmlError(xmlID, fmt() << "duplicate id '" << m_ID << "'."));
 
 	afterParseAttributes(element);
+}
+
+const char * UIWidget::iosClassName() const
+{
+	return (m_IOSClassName.length() == 0 ? iosDefaultClassName() : m_IOSClassName.c_str());
+}
+
+const char * UIWidget::androidClassName() const
+{
+	return (m_AndroidClassName.length() == 0 ? androidDefaultClassName() : m_AndroidClassName.c_str());
 }
 
 void UIWidget::beforeParseAttributes(const TiXmlElement *)

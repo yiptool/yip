@@ -33,18 +33,19 @@ public:
 	~UIGroup();
 
 	// In ios_generator.cpp
-	const char * iosClassName() const override { return "UIView"; }
 	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
 		bool isViewController) override;
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 	// In android_generator.cpp
-	const char * androidClassName() const override { return "DummyViewGroup"; }
 	void androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
 		std::stringstream & ss, std::map<std::string, std::string> & translations) override;
 	void androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 protected:
+	const char * iosDefaultClassName() const override { return "UIView"; }
+	const char * androidDefaultClassName() const override { return "DummyViewGroup"; }
+
 	void afterParseAttributes(const TiXmlElement * element) override;
 
 private:

@@ -36,18 +36,19 @@ public:
 	inline UITextAlignment textAlignment() const { return m_TextAlignment; }
 
 	// In ios_generator.cpp
-	const char * iosClassName() const override { return "UILabel"; }
 	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
 		bool isViewController) override;
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 	// In android_generator.cpp
-	const char * androidClassName() const override { return "android.widget.TextView"; }
 	void androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
 		std::stringstream & ss, std::map<std::string, std::string> & translations) override;
 	void androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 protected:
+	const char * iosDefaultClassName() const override { return "UILabel"; }
+	const char * androidDefaultClassName() const override { return "android.widget.TextView"; }
+
 	bool parseAttribute(const TiXmlAttribute * attr) override;
 
 private:

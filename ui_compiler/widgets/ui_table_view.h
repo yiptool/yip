@@ -55,18 +55,19 @@ public:
 	inline const std::vector<CellPtr> & cells() const { return m_Cells; }
 
 	// In ios_generator.cpp
-	const char * iosClassName() const override { return "UITableView"; }
 	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
 		bool isViewController) override;
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 	// In android_generator.cpp
-	const char * androidClassName() const override { return "android.widget.ListView"; }
 	void androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
 		std::stringstream & ss, std::map<std::string, std::string> & translations) override;
 	void androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 protected:
+	const char * iosDefaultClassName() const override { return "UITableView"; }
+	const char * androidDefaultClassName() const override { return "android.widget.ListView"; }
+
 	bool parseAttribute(const TiXmlAttribute * attr) override;
 	void afterParseAttributes(const TiXmlElement * element) override;
 

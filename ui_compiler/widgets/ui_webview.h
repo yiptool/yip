@@ -33,18 +33,19 @@ public:
 	~UIWebView();
 
 	// In ios_generator.cpp
-	const char * iosClassName() const override { return "UIWebView"; }
 	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
 		bool isViewController) override;
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 	// In android_generator.cpp
-	const char * androidClassName() const override { return "android.webkit.WebView"; }
 	void androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
 		std::stringstream & ss, std::map<std::string, std::string> & translations) override;
 	void androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 protected:
+	const char * iosDefaultClassName() const override { return "UIWebView"; }
+	const char * androidDefaultClassName() const override { return "android.webkit.WebView"; }
+
 	bool parseAttribute(const TiXmlAttribute * attr) override;
 
 private:

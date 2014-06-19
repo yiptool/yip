@@ -151,7 +151,7 @@ void UIWidget::androidGenerateLayoutCode(const std::string & prefix, std::string
 void UIGroup::androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
 	std::stringstream & ss, std::map<std::string, std::string> & translations)
 {
-	ss << prefix << id() << " = new DummyViewGroup(getContext());\n";
+	ss << prefix << id() << " = new " << androidClassName() << "(getContext());\n";
 	UIWidget::androidGenerateInitCode(project, prefix, ss, translations);
 
 	for (const UIWidgetPtr & widget : m_Widgets)
@@ -396,7 +396,7 @@ void UISpinner::androidGenerateInitCode(const ProjectPtr & project, const std::s
 	std::stringstream & ss, std::map<std::string, std::string> & translations)
 {
 	// FIXME: style
-	ss << prefix << id() << " = new android.widget.Spinner(getContext());\n";
+	ss << prefix << id() << " = new " << androidClassName() << "(getContext());\n";
 	UIWidget::androidGenerateInitCode(project, prefix, ss, translations);
 }
 

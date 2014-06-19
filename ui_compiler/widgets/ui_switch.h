@@ -35,18 +35,19 @@ public:
 	bool isCustom() const;
 
 	// In ios_generator.cpp
-	const char * iosClassName() const override { return isCustom() ? "NZSwitchControl" : "UISwitch"; }
 	void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
 		bool isViewController) override;
 	void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 	// In android_generator.cpp
-	const char * androidClassName() const override { return "android.widget.Switch"; }
 	void androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
 		std::stringstream & ss, std::map<std::string, std::string> & translations) override;
 	void androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss) override;
 
 protected:
+	const char * iosDefaultClassName() const override { return isCustom() ? "NZSwitchControl" : "UISwitch"; }
+	const char * androidDefaultClassName() const override { return "android.widget.Switch"; }
+
 	bool parseAttribute(const TiXmlAttribute * attr) override;
 	void afterParseAttributes(const TiXmlElement * element) override;
 

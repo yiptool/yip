@@ -94,20 +94,24 @@ public:
 
 	void parse(const TiXmlElement * element);
 
+	const char * iosClassName() const;
+	const char * androidClassName() const;
+
 	// In ios_generator.cpp
-	virtual const char * iosClassName() const = 0;
 	virtual void iosGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
 		std::stringstream & ss, bool isViewController);
 	virtual void iosGenerateLayoutCode(const std::string & prefix, std::stringstream & ss);
 	virtual void iosGeneratePostLayoutCode(const std::string & prefix, std::stringstream & ss);
 
 	// In android_generator.cpp
-	virtual const char * androidClassName() const = 0;
 	virtual void androidGenerateInitCode(const ProjectPtr & project, const std::string & prefix,
 		std::stringstream & ss, std::map<std::string, std::string> & translations);
 	virtual void androidGenerateLayoutCode(const std::string & prefix, std::stringstream & ss);
 
 protected:
+	virtual const char * iosDefaultClassName() const = 0;
+	virtual const char * androidDefaultClassName() const = 0;
+
 	virtual void beforeParseAttributes(const TiXmlElement * element);
 	virtual bool parseAttribute(const TiXmlAttribute * attr);
 	virtual void afterParseAttributes(const TiXmlElement * element);
@@ -117,6 +121,8 @@ private:
 	UIGroup * m_Parent;
 	Kind m_Kind;
 	std::string m_ID;
+	std::string m_IOSClassName;
+	std::string m_AndroidClassName;
 	UIColor m_BackgroundColor;
 	float m_X;
 	float m_Y;
