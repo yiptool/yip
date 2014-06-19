@@ -160,6 +160,10 @@ is the same as for `sources`, even the platform specification suffix is allowed:
         ios_logo.png
       }
 
+Also, you may use the `resources_dir` directive to add entire directory with resources:
+
+      resources_dir resources
+
 Please note that there is a
 [convenient cross-platform library](https://github.com/zapolnov/yip-resources)
 for resource loading.

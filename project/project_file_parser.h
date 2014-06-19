@@ -83,6 +83,7 @@ private:
 	void parseAppDefines();
 	void parseImport();
 	void parseResources();
+	void parseResourcesDir();
 	void parseAppResources();
 	void parseWinRT();
 	void parseTizen();

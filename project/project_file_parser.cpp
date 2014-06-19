@@ -108,6 +108,7 @@ ProjectFileParser::ProjectFileParser(const std::string & filename, const std::st
 	m_CommandHandlers.insert(std::make_pair("app_defines", &ProjectFileParser::parseAppDefines));
 	m_CommandHandlers.insert(std::make_pair("import", &ProjectFileParser::parseImport));
 	m_CommandHandlers.insert(std::make_pair("resources", &ProjectFileParser::parseResources));
+	m_CommandHandlers.insert(std::make_pair("resources_dir", &ProjectFileParser::parseResourcesDir));
 	m_CommandHandlers.insert(std::make_pair("app_resources", &ProjectFileParser::parseAppResources));
 	m_CommandHandlers.insert(std::make_pair("winrt", &ProjectFileParser::parseWinRT));
 	m_CommandHandlers.insert(std::make_pair("ios", &ProjectFileParser::parseIOSorOSX));
@@ -478,6 +479,50 @@ void ProjectFileParser::parseResources()
 
 	if (m_Token != Token::RCurly)
 		reportError("expected '}'.");
+}
+
+void ProjectFileParser::parseResourcesDir()
+{
+	Platform::Type platforms = m_DefaultPlatformMask;
+	if (getToken() == Token::Colon)
+	{
+		getToken();
+		platforms = parsePlatformMask();
+	}
+
+	if (m_Token != Token::Literal)
+		{ reportError("expected directory name."); return; }
+
+	std::string name = m_TokenText;
+	std::string path = pathMakeAbsolute(name, m_ProjectPath);
+
+	std::function<void(const std::string &, const std::string &)> processDir =
+		[&processDir, platforms, this](const std::string & fullname, const std::string & fullpath)
+	{
+		DirEntryList list = pathEnumDirectoryContents(fullpath);
+		for (auto it : list)
+		{
+			std::string resName = pathConcat(fullname, it.name);
+			std::string resPath = pathConcat(fullpath, it.name);
+
+			if (it.type == DirEntry_Directory)
+			{
+				processDir(resName, resPath);
+				continue;
+			}
+
+			try {
+				SourceFilePtr sourceFile = m_Project->addResourceFile(resName, resPath);
+				sourceFile->setPlatforms(platforms);
+			} catch (const Error &) {
+				throw;
+			} catch (const std::exception & e) {
+				reportWarning(e.what());
+			}
+		}
+	};
+
+	processDir(name, path);
 }
 
 void ProjectFileParser::parseAppResources()
