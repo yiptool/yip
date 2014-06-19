@@ -22,6 +22,9 @@ Root element should be named `layout` and should contain some mandatory attribut
 Each non-root element (except `string`) in the UI file represents a UI widget or a widget group. Widget group may
 have children widgets or groups.
 
+Additionally, you may specify extra #imports for iOS code using the `ios_import` element. It should have a
+single attribute `file` containing a name of the include file.
+
 You can also specify translatable string constants using the `string` element. It should have two mandatory
 attributes: `id` and `text`. Attribute `id` should contain a name for a property or variable to be generated.
 It will be of string type and will contain value of `text` translated to the current user's language.
@@ -58,6 +61,8 @@ The following attributes are available for all widgets and groups:
   * `align`: alignment of widget after applying scale (this is only meaningful when scale mode is not
   `default`). You may specify two alignments, separated with a slash (`/`) - one for the
   portrait orientation and one for the landscape orientation.
+  * `ios:className`: custom class name for this widget for iOS.
+  * `android:className`: custom class name for this widget for Android.
 
 ### Unique ID
 
