@@ -254,6 +254,9 @@ UIWidgetInfos uiGetWidgetInfos(const std::initializer_list<UILayoutPtr> & layout
 static void uiGetTableCellClasses(size_t index, const UILayoutPtr & layout, UITableCellInfos & classes,
 	std::set<std::string> & classNames, bool android)
 {
+	if (!layout)
+		return;
+
 	for (const auto & widget : layout->widgets())
 	{
 		if (widget->kind() != UIWidget::TableView)

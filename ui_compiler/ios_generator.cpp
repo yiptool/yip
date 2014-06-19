@@ -956,16 +956,28 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		UILayoutPtr ipadLayout = uiLoadLayout(layouts, cntrl.ipad);
 
 		std::set<std::string> stringIDs;
-		for (const auto & it : iphoneLayout->strings())
-			stringIDs.insert(it.first);
-		for (const auto & it : ipadLayout->strings())
-			stringIDs.insert(it.first);
+		if (iphoneLayout)
+		{
+			for (const auto & it : iphoneLayout->strings())
+				stringIDs.insert(it.first);
+		}
+		if (ipadLayout)
+		{
+			for (const auto & it : ipadLayout->strings())
+				stringIDs.insert(it.first);
+		}
 
 		std::set<std::string> iosImports;
-		for (const auto & it : iphoneLayout->iosImports())
-			iosImports.insert(it);
-		for (const auto & it : ipadLayout->iosImports())
-			iosImports.insert(it);
+		if (iphoneLayout)
+		{
+			for (const auto & it : iphoneLayout->iosImports())
+				iosImports.insert(it);
+		}
+		if (ipadLayout)
+		{
+			for (const auto & it : ipadLayout->iosImports())
+				iosImports.insert(it);
+		}
 
 		UIWidgetInfos widgetInfos = uiGetWidgetInfos({
 			// Don't change order of these items: it's important
