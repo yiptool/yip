@@ -61,6 +61,8 @@ public:
 
 	inline const std::vector<UILayoutPtr> & childLayouts() const { return m_ChildLayouts; }
 
+	inline const std::set<std::string> & iosImports() const { return m_IOSImports; }
+
 	void parse(const TiXmlDocument * doc);
 	void parse(const TiXmlElement * element, UILayout & parentLayout);
 
@@ -69,6 +71,7 @@ private:
 	std::vector<UIWidgetPtr> m_Widgets;
 	std::unordered_map<std::string, UIWidgetPtr> m_WidgetMap;
 	std::map<std::string, std::string> m_Strings;
+	std::set<std::string> m_IOSImports;
 	std::vector<UILayoutPtr> m_ChildLayouts;
 	float m_Width;
 	float m_Height;

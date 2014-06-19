@@ -961,6 +961,12 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		for (const auto & it : ipadLayout->strings())
 			stringIDs.insert(it.first);
 
+		std::set<std::string> iosImports;
+		for (const auto & it : iphoneLayout->iosImports())
+			iosImports.insert(it);
+		for (const auto & it : ipadLayout->iosImports())
+			iosImports.insert(it);
+
 		UIWidgetInfos widgetInfos = uiGetWidgetInfos({
 			// Don't change order of these items: it's important
 			iphoneLayout,
@@ -999,6 +1005,10 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sh << "#import <yip-imports/ios/UINavigationBar+ExtraMethods.h>\n";
 		sh << "#import <yip-imports/ios/NZButton.h>\n";
 		sh << "#import <yip-imports/ios/NZURLImageView.h>\n";
+
+		for (const std::string & import : iosImports)
+			sh << "#import <" << import << ">\n";
+
 		sh << "#import <objc/runtime.h>\n";
 		sh << '\n';
 		sh << "@class " << cntrl.name << ";\n";

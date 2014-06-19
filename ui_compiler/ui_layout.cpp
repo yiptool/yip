@@ -100,6 +100,31 @@ void UILayout::parseWidgetList(const TiXmlElement * element, bool allowStrings)
 {
 	for (const TiXmlElement * child = element->FirstChildElement(); child; child = child->NextSiblingElement())
 	{
+		if (allowStrings && child->ValueStr() == "ios_import")
+		{
+			const TiXmlAttribute * file = nullptr;
+			for (const TiXmlAttribute * attr = child->FirstAttribute(); attr; attr = attr->Next())
+			{
+				if (attr->NameTStr() == "file")
+					file = attr;
+				else
+				{
+					throw std::runtime_error(xmlError(attr,
+						fmt() << "unexpected attribute '" << attr->NameTStr() << "'."));
+				}
+			}
+
+			if (!file)
+				throw std::runtime_error(xmlMissingAttribute(child, "file"));
+
+			if (file->ValueStr().empty())
+				throw std::runtime_error(xmlInvalidAttributeValue(file));
+
+			m_IOSImports.insert(file->ValueStr());
+
+			continue;
+		}
+
 		if (allowStrings && child->ValueStr() == "string")
 		{
 			const TiXmlAttribute * id = nullptr, * text = nullptr;
