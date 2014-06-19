@@ -172,6 +172,8 @@ User interface layout is described in XML files.
 To generate a descendant of `UIViewController` for iOS from given XML files,
 use the `ios:view_controller` directive:
 
+      ios:view_controller MyViewController => layout.xml
+
       ios:view_controller MyViewController UIViewController
       {
          iphone => ui/iphone.xml,

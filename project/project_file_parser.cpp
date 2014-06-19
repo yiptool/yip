@@ -807,56 +807,79 @@ void ProjectFileParser::parseIOSorOSX()
 			{ reportError(fmt() << "expected view controller name after '" << prefix << ":view_controller'."); return; }
 		cntrl.name = m_TokenText;
 
-		if (getToken() != Token::Literal)
-			{ reportError("expected parent view controller name."); return; }
-		cntrl.parentClass = m_TokenText;
+		if (getToken() == Token::Literal)
+		{
+			cntrl.parentClass = m_TokenText;
+			getToken();
+		}
 
-		if (getToken() != Token::LCurly)
-			{ reportError("expected '{'."); return; }
-		for (;;)
+		if (m_Token == Token::Arrow)
 		{
 			if (getToken() != Token::Literal)
-				{ reportError("expected device family/orientation name."); return; }
-
-			SourceFilePtr * target = nullptr;
-			if (m_TokenText == "iphone")
-				target = &cntrl.iphone;
-			else if (m_TokenText == "ipad")
-				target = &cntrl.ipad;
-			else
-				{ reportError(fmt() << "invalid device family/orientation name '" << m_TokenText << "'."); }
-
-			if (target->get() != nullptr)
-				{ reportError(fmt() << "duplicate family/orientation '" << m_TokenText << "'."); }
-
-			if (getToken() != Token::Arrow)
-				{ reportError("expected '=>'."); return; }
-
-			if (getToken() != Token::Literal)
-				{ reportError("expected XML file name."); return; }
+				{ reportError("expected XML file name after '=>'."); return; }
 
 			std::string name = m_TokenText;
 			std::string path = pathMakeAbsolute(name, m_ProjectPath);
 
 			try {
-				*target = m_Project->addUILayoutFile(name, path, Platform::iOS);
+				cntrl.iphone = m_Project->addUILayoutFile(name, path, Platform::iOS);
+				cntrl.ipad = m_Project->addUILayoutFile(name, path, Platform::iOS);
 			} catch (const Error &) {
 				throw;
 			} catch (const std::exception & e) {
 				reportWarning(e.what());
 			}
+		}
+		else
+		{
+			if (m_Token != Token::LCurly)
+				{ reportError("expected '{'."); return; }
 
-			switch (getToken())
+			for (;;)
 			{
-			case Token::RCurly:
+				if (getToken() != Token::Literal)
+					{ reportError("expected device family/orientation name."); return; }
+
+				SourceFilePtr * target = nullptr;
+				if (m_TokenText == "iphone")
+					target = &cntrl.iphone;
+				else if (m_TokenText == "ipad")
+					target = &cntrl.ipad;
+				else
+					{ reportError(fmt() << "invalid device family/orientation name '" << m_TokenText << "'."); }
+
+				if (target->get() != nullptr)
+					{ reportError(fmt() << "duplicate family/orientation '" << m_TokenText << "'."); }
+
+				if (getToken() != Token::Arrow)
+					{ reportError("expected '=>'."); return; }
+
+				if (getToken() != Token::Literal)
+					{ reportError("expected XML file name after '=>'."); return; }
+
+				std::string name = m_TokenText;
+				std::string path = pathMakeAbsolute(name, m_ProjectPath);
+
+				try {
+					*target = m_Project->addUILayoutFile(name, path, Platform::iOS);
+				} catch (const Error &) {
+					throw;
+				} catch (const std::exception & e) {
+					reportWarning(e.what());
+				}
+
+				switch (getToken())
+				{
+				case Token::RCurly:
+					break;
+				case Token::Comma:
+					continue;
+				default:
+					reportError("expected '}'.");
+					return;
+				}
 				break;
-			case Token::Comma:
-				continue;
-			default:
-				reportError("expected '}'.");
-				return;
 			}
-			break;
 		}
 
 		try {
