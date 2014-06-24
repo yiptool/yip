@@ -1016,6 +1016,7 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sh << "#import <yip-imports/ios/UIBarButtonItem+ExtraMethods.h>\n";
 		sh << "#import <yip-imports/ios/UINavigationBar+ExtraMethods.h>\n";
 		sh << "#import <yip-imports/ios/NZButton.h>\n";
+		sh << "#import <yip-imports/ios/NZNavigatableViewController.h>\n";
 		sh << "#import <yip-imports/ios/NZURLImageView.h>\n";
 
 		for (const std::string & import : iosImports)
