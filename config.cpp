@@ -99,9 +99,11 @@ Config::Config()
 	repos.insert(std::make_pair("ios-opengl-view", "https://github.com/yiptool/ios-opengl-view.git"));
 	repos.insert(std::make_pair("ios-parse-facebook-util", "https://github.com/yiptool/ios-parse-facebook-util.git"));
 	repos.insert(std::make_pair("ios-parse-twitter-util", "https://github.com/yiptool/ios-parse-twitter-util.git"));
+	repos.insert(std::make_pair("ios-parse-vk-util", "https://github.com/yiptool/ios-parse-vk-util.git"));
 	repos.insert(std::make_pair("ios-system-sound", "https://github.com/yiptool/ios-system-sound.git"));
 	repos.insert(std::make_pair("ios-twitter-util", "https://github.com/yiptool/ios-twitter-util.git"));
 	repos.insert(std::make_pair("ios-util", "https://github.com/yiptool/ios-util.git"));
+	repos.insert(std::make_pair("ios-vk-util", "https://github.com/yiptool/ios-vk-util.git"));
 	repos.insert(std::make_pair("jni-util", "https://github.com/yiptool/jni-util.git"));
 	repos.insert(std::make_pair("math", "https://github.com/yiptool/math.git"));
 	repos.insert(std::make_pair("ogg-vorbis-stream", "https://github.com/yiptool/ogg-vorbis-stream.git"));
