@@ -24,11 +24,14 @@
 #define __b869d7cae57c81e0e905d6c065d80352__
 
 #include "widgets/ui_widget.h"
+#include "attributes/ui_image.h"
 #include <string>
 #include <vector>
 #include <memory>
 #include <unordered_map>
 #include <map>
+
+class TiXmlAttribute;
 
 class UILayout;
 typedef std::shared_ptr<UILayout> UILayoutPtr;
@@ -36,6 +39,17 @@ typedef std::shared_ptr<UILayout> UILayoutPtr;
 class UILayout : public std::enable_shared_from_this<UILayout>
 {
 public:
+	struct Image
+	{
+		UIImagePtr m_ImagePtr;
+		UIScaleMode m_WidthScaleMode = UIScaleDefault;
+		UIScaleMode m_HeightScaleMode = UIScaleDefault;
+		UIScaleMode m_LandscapeWidthScaleMode = UIScaleDefault;
+		UIScaleMode m_LandscapeHeightScaleMode = UIScaleDefault;
+
+		bool initFromXml(const TiXmlAttribute * attr, bool & hasWidthScale, bool & hasHeightScale);
+	};
+
 	UILayout();
 	~UILayout();
 
@@ -59,6 +73,7 @@ public:
 	inline const std::unordered_map<std::string, UIWidgetPtr> & widgetMap() const { return m_WidgetMap; }
 	UIWidgetPtr widgetForID(const std::string & id) const;
 
+	inline const std::map<std::string, Image> & images() const { return m_Images; }
 	inline const std::map<std::string, std::string> & strings() const { return m_Strings; }
 
 	inline const std::vector<UILayoutPtr> & childLayouts() const { return m_ChildLayouts; }
@@ -72,6 +87,7 @@ private:
 	size_t m_NextUniqueID;
 	std::vector<UIWidgetPtr> m_Widgets;
 	std::unordered_map<std::string, UIWidgetPtr> m_WidgetMap;
+	std::map<std::string, Image> m_Images;
 	std::map<std::string, std::string> m_Strings;
 	std::set<std::string> m_IOSImports;
 	std::vector<UILayoutPtr> m_ChildLayouts;

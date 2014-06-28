@@ -25,6 +25,22 @@
 #include "../util/tinyxml-util/tinyxml-util.h"
 #include "../util/cxx-util/cxx-util/fmt.h"
 
+bool UILayout::Image::initFromXml(const TiXmlAttribute * attr, bool & hasWidthScale, bool & hasHeightScale)
+{
+	if (attr->NameTStr() == "scale")
+		uiScaleModeFromAttr2(attr, Width, Height);
+	else if (attr->NameTStr() == "wscale")
+		uiScaleModeFromAttr1(attr, Width);
+	else if (attr->NameTStr() == "hscale")
+		uiScaleModeFromAttr1(attr, Height);
+	else if (attr->NameTStr() == "whscale")
+		uiScaleModeFromAttr2(attr, Width, Height);
+	else
+		return false;
+
+	return true;
+}
+
 UILayout::UILayout()
 	: m_NextUniqueID(1),
 	  m_Width(0.0f),
@@ -156,6 +172,41 @@ void UILayout::parseWidgetList(const TiXmlElement * element, bool allowStrings)
 
 			if (!m_Strings.insert(std::make_pair(id->ValueStr(), text->ValueStr())).second)
 				throw std::runtime_error(xmlError(id, fmt() << "duplicate string id '" << id->ValueStr() << "'."));
+
+			continue;
+		}
+
+		if (allowStrings && child->ValueStr() == "image")
+		{
+			bool hasWidthScale = false, hasHeightScale = false;
+			const TiXmlAttribute * id = nullptr;
+			Image image;
+
+			for (const TiXmlAttribute * attr = child->FirstAttribute(); attr; attr = attr->Next())
+			{
+				if (attr->NameTStr() == "id")
+					id = attr;
+				else if (attr->NameTStr() == "file")
+					image.m_ImagePtr = UIImage::fromAttr(attr);
+				else if (image.initFromXml(attr, hasWidthScale, hasHeightScale))
+					;
+				else
+				{
+					throw std::runtime_error(xmlError(attr,
+						fmt() << "unexpected attribute '" << attr->NameTStr() << "'."));
+				}
+			}
+
+			if (!id)
+				throw std::runtime_error(xmlMissingAttribute(child, "id"));
+			if (!image.m_ImagePtr)
+				throw std::runtime_error(xmlMissingAttribute(child, "file"));
+
+			if (id->ValueStr().empty())
+				throw std::runtime_error(xmlInvalidAttributeValue(id));
+
+			if (!m_Images.insert(std::make_pair(id->ValueStr(), image)).second)
+				throw std::runtime_error(xmlError(id, fmt() << "duplicate image id '" << id->ValueStr() << "'."));
 
 			continue;
 		}

@@ -112,14 +112,15 @@ void iosGetImage(std::stringstream & ss, const UIImagePtr & image)
 	ss << "\")";
 }
 
-void iosGetScaledImage(const UIWidget * wd, std::stringstream & ss, const UIImagePtr & image,
-	const std::string & imageObject, bool keepAspectRatio)
+void iosGetScaledImage(std::stringstream & ss, const UIImagePtr & image,
+	const std::string & imageObject, UIScaleMode widthScaleMode, UIScaleMode heightScaleMode,
+	UIScaleMode landscapeWidthScaleMode, UIScaleMode landscapeHeightScaleMode, bool keepAspectRatio)
 {
-	std::string wMode1 = iosScaleFunc(wd->widthScaleMode(), true);
-	std::string hMode1 = iosScaleFunc(wd->heightScaleMode(), false);
+	std::string wMode1 = iosScaleFunc(widthScaleMode, true);
+	std::string hMode1 = iosScaleFunc(heightScaleMode, false);
 
-	std::string wMode2 = iosScaleFunc(wd->landscapeWidthScaleMode(), true);
-	std::string hMode2 = iosScaleFunc(wd->landscapeHeightScaleMode(), false);
+	std::string wMode2 = iosScaleFunc(landscapeWidthScaleMode, true);
+	std::string hMode2 = iosScaleFunc(landscapeHeightScaleMode, false);
 
 	std::string wMode = fmt() << "(landscape ? " << wMode2 << " : " << wMode1 << ')';
 	std::string hMode = fmt() << "(landscape ? " << hMode2 << " : " << hMode1 << ')';
@@ -140,6 +141,13 @@ void iosGetScaledImage(const UIWidget * wd, std::stringstream & ss, const UIImag
 		ss << "iosScaledImageWithCapInsets(" << imageObject << ", " << scaleMode << ", " << scaleMode << ", "
 			<< image->left << ", " << image->top << ", " << image->right << ", " << image->bottom << ')';
 	}
+}
+
+void iosGetScaledImage(const UIWidget * wd, std::stringstream & ss, const UIImagePtr & image,
+	const std::string & imageObject, bool keepAspectRatio)
+{
+	iosGetScaledImage(ss, image, imageObject, wd->widthScaleMode(), wd->heightScaleMode(),
+		wd->landscapeWidthScaleMode(), wd->landscapeHeightScaleMode(), keepAspectRatio);
 }
 
 void iosGenerateLayoutCode(const UIWidget * wd, const std::string & prefix, std::stringstream & ss, bool landscape)
@@ -585,7 +593,7 @@ void UIWebView::iosGenerateLayoutCode(const std::string & prefix, std::stringstr
 
 static void uiGenerateIOSInterface(std::stringstream & sh, const UIWidgetInfos & widgetInfos,
 	const std::string & className, const std::string & parentClass, const std::set<std::string> & stringIDs,
-	bool isViewController, bool isTableCell, bool isHeaderTableCell)
+	const std::set<std::string> & imageIDs, bool isViewController, bool isTableCell, bool isHeaderTableCell)
 {
 	if (isTableCell)
 	{
@@ -604,6 +612,11 @@ static void uiGenerateIOSInterface(std::stringstream & sh, const UIWidgetInfos &
 		const UIWidgetPtr & widget = (it.second.iphone.get() ? it.second.iphone : it.second.ipad);
 		sh << "@property (nonatomic, readonly, retain) " << widget->iosClassName()
 			<< " * " << it.first << ";\n";
+	}
+	for (const auto & it : imageIDs)
+	{
+		sh << "@property (nonatomic, readonly, copy) UIImage * " << it << ";\n";
+		sh << "@property (nonatomic, readonly, copy) UIImage * _" << it << "_original;\n";
 	}
 	for (const auto & it : stringIDs)
 		sh << "@property (nonatomic, readonly, copy) NSString * " << it << ";\n";
@@ -625,10 +638,11 @@ static void uiGenerateIOSInterface(std::stringstream & sh, const UIWidgetInfos &
 }
 
 static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetInfos & widgetInfos,
-	const std::string & className, const std::set<std::string> & stringIDs, const UILayoutPtr & iphoneLayout,
-	const UILayoutPtr & ipadLayout, const ProjectPtr & project, const std::string & rootView,
-	bool isViewController, bool isTableCell, const UIColor * iphoneBackgroundColor,
-	const UIColor * ipadBackgroundColor, bool isHeaderTableCell, bool hasTableViews)
+	const std::string & className, const std::set<std::string> & stringIDs,
+	const std::set<std::string> & imageIDs, const UILayoutPtr & iphoneLayout, const UILayoutPtr & ipadLayout,
+	const ProjectPtr & project, const std::string & rootView, bool isViewController, bool isTableCell,
+	const UIColor * iphoneBackgroundColor, const UIColor * ipadBackgroundColor, bool isHeaderTableCell,
+	bool hasTableViews)
 {
 	bool hasIPhone = iphoneLayout.get() != nullptr;
 	bool hasIPad = ipadLayout.get() != nullptr;
@@ -641,6 +655,11 @@ static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetIn
 	sm << '\n';
 	for (const auto & it : widgetInfos)
 		sm << "@synthesize " << it.first << ";\n";
+	for (const auto & it : imageIDs)
+	{
+		sm << "@synthesize " << it << ";\n";
+		sm << "@synthesize _" << it << "_original;\n";
+	}
 	for (const auto & it : stringIDs)
 		sm << "@synthesize " << it << ";\n";
 	sm << '\n';
@@ -679,6 +698,13 @@ static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetIn
 			iosChooseTranslation(project, "\t\t\t", sm, it.second);
 			sm << ";\n";
 		}
+		for (const auto & it : iphoneLayout->images())
+		{
+			sm << "\t\t\t_" << it.first << "_original = [";
+			iosGetImage(sm, it.second.m_ImagePtr);
+			sm << " retain];\n";
+			sm << "\t\t\t" << it.first << " = [_" << it.first << "_original retain];\n";
+		}
 		for (const UIWidgetPtr & widget : iphoneLayout->widgets())
 		{
 			widget->iosGenerateInitCode(project, "\t\t\t", sm, isViewController);
@@ -701,6 +727,13 @@ static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetIn
 			iosChooseTranslation(project, "\t\t\t", sm, it.second);
 			sm << ";\n";
 		}
+		for (const auto & it : ipadLayout->images())
+		{
+			sm << "\t\t\t_" << it.first << "_original = [";
+			iosGetImage(sm, it.second.m_ImagePtr);
+			sm << " retain];\n";
+			sm << "\t\t\t" << it.first << " = [_" << it.first << "_original retain];\n";
+		}
 		for (const UIWidgetPtr & widget : ipadLayout->widgets())
 		{
 			widget->iosGenerateInitCode(project, "\t\t\t", sm, isViewController);
@@ -714,6 +747,13 @@ static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetIn
 	sm << '\n';
 	sm << "-(void)dealloc\n";
 	sm << "{\n";
+	for (const auto & it : imageIDs)
+	{
+		sm << "\t[" << it << " release];\n";
+		sm << "\t" << it << " = nil;\n";
+		sm << "\t[_" << it << "_original release];\n";
+		sm << "\t_" << it << "_original = nil;\n";
+	}
 	for (const auto & it : stringIDs)
 	{
 		sm << "\t[" << it << " release];\n";
@@ -792,6 +832,16 @@ static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetIn
 		sm << '\n';
 		sm << "\t\t(void)horzScale;\n";
 		sm << "\t\t(void)vertScale;\n";
+		for (const auto & it : iphoneLayout->images())
+		{
+			sm << '\n';
+			sm << "\t\t[" << it.first << " release];\n";
+			sm << "\t\t" << it.first << " = [";
+			iosGetScaledImage(sm, it.second.m_ImagePtr, '_' + it.first + "_original",
+				it.second.m_WidthScaleMode, it.second.m_HeightScaleMode, it.second.m_LandscapeWidthScaleMode,
+				it.second.m_LandscapeHeightScaleMode, false);
+			sm << " retain];\n";
+		}
 		for (const auto & it : widgetInfos)
 		{
 			const UIWidgetPtr & w = it.second.iphone;
@@ -822,6 +872,16 @@ static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetIn
 		sm << '\n';
 		sm << "\t\t(void)horzScale;\n";
 		sm << "\t\t(void)vertScale;\n";
+		for (const auto & it : ipadLayout->images())
+		{
+			sm << '\n';
+			sm << "\t\t[" << it.first << " release];\n";
+			sm << "\t\t" << it.first << " = [";
+			iosGetScaledImage(sm, it.second.m_ImagePtr, '_' + it.first + "_original",
+				it.second.m_WidthScaleMode, it.second.m_HeightScaleMode, it.second.m_LandscapeWidthScaleMode,
+				it.second.m_LandscapeHeightScaleMode, false);
+			sm << " retain];\n";
+		}
 		for (const auto & it : widgetInfos)
 		{
 			const UIWidgetPtr & w = it.second.ipad;
@@ -1000,6 +1060,18 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 				stringIDs.insert(it.first);
 		}
 
+		std::set<std::string> imageIDs;
+		if (iphoneLayout)
+		{
+			for (const auto & it : iphoneLayout->images())
+				imageIDs.insert(it.first);
+		}
+		if (ipadLayout)
+		{
+			for (const auto & it : ipadLayout->images())
+				imageIDs.insert(it.first);
+		}
+
 		std::set<std::string> iosImports;
 		if (iphoneLayout)
 		{
@@ -1062,9 +1134,9 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		for (const auto & it : cellClasses)
 		{
 			uiGenerateIOSInterface(sh, it.second.widgetInfos, it.second.cell->className,
-				it.second.cell->iosParentClass, emptySet, false, true, it.second.cell->isHeader);
+				it.second.cell->iosParentClass, emptySet, emptySet, false, true, it.second.cell->isHeader);
 		}
-		uiGenerateIOSInterface(sh, widgetInfos, cntrl.name, parentClass, stringIDs, true, false, false);
+		uiGenerateIOSInterface(sh, widgetInfos, cntrl.name, parentClass, stringIDs, imageIDs, true, false, false);
 
 		std::stringstream sm;
 		sm << "#import \"" << targetName << ".h\"\n";
@@ -1111,11 +1183,11 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		for (const auto & it : cellClasses)
 		{
 			uiGenerateIOSImplementation(sm, it.second.widgetInfos, it.second.cell->className, emptySet,
-				it.second.iphoneLayout, it.second.ipadLayout, project, "self.contentView", false, true,
+				emptySet, it.second.iphoneLayout, it.second.ipadLayout, project, "self.contentView", false, true,
 				&it.second.cell->backgroundColor, &it.second.cell->backgroundColor, it.second.cell->isHeader,
 				false);
 		}
-		uiGenerateIOSImplementation(sm, widgetInfos, cntrl.name, stringIDs, iphoneLayout, ipadLayout,
+		uiGenerateIOSImplementation(sm, widgetInfos, cntrl.name, stringIDs, imageIDs, iphoneLayout, ipadLayout,
 			project, "self.view", true, false, &iphoneLayout->backgroundColor(), &ipadLayout->backgroundColor(),
 			false, hasTableViews);
 

@@ -25,6 +25,7 @@
 
 #include "../project/project.h"
 #include "attributes/ui_font.h"
+#include "attributes/ui_text_alignment.h"
 #include "attributes/ui_scale_mode.h"
 #include "parse_util.h"
 #include "ui_layout.h"
@@ -35,10 +36,17 @@
 class UIWidget;
 
 std::string iosScaleFunc(UIScaleMode mode, bool horz);
+std::string iosTextAlignment(UITextAlignment align);
 void iosChooseTranslation(const ProjectPtr & project, const std::string & prefix, std::stringstream & ss,
 	const std::string & text);
 void iosGetFont(std::stringstream & ss, const UIFontPtr & font, UIScaleMode scaleMode,
 	UIScaleMode landscapeScaleMode);
+void iosGetImage(std::stringstream & ss, const UIImagePtr & image);
+void iosGetScaledImage(std::stringstream & ss, const UIImagePtr & image,
+	const std::string & imageObject, UIScaleMode widthScaleMode, UIScaleMode heightScaleMode,
+	UIScaleMode landscapeWidthScaleMode, UIScaleMode landscapeHeightScaleMode, bool keepAspectRatio);
+void iosGetScaledImage(const UIWidget * wd, std::stringstream & ss, const UIImagePtr & image,
+	const std::string & imageObject, bool keepAspectRatio);
 void iosGenerateLayoutCode(const UIWidget * wd, const std::string & prefix, std::stringstream & ss, bool landscape);
 
 void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & project,
