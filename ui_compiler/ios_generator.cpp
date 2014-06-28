@@ -806,6 +806,9 @@ static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetIn
 		sm << "\t[super viewWillLayoutSubviews];\n";
 	}
 	sm << '\n';
+	sm << "\t(void)YIP::KEY_IMAGE; /* Prevent compiler warning. */\n";
+	sm << "\t(void)YIP::KEY_IMAGE_2; /* Prevent compiler warning. */\n";
+	sm << '\n';
 	sm << "\tBOOL landscape = UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation);\n";
 	sm << "\tCGRect frame = " << rootView << ".bounds;\n";
 	if (isViewController)
@@ -1153,9 +1156,6 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sm << "\t\tfloat w, float h, float xScale, float yScale, float wScale, float hScale, float horzScale, \n";
 		sm << "\t\tfloat vertScale)\n";
 		sm << "\t{\n";
-		sm << "\t\t(void)KEY_IMAGE; /* Prevent compiler warning. */\n";
-		sm << "\t\t(void)KEY_IMAGE_2; /* Prevent compiler warning. */\n";
-		sm << '\n';
 		sm << "\t\tfloat widgetW = w * wScale;\n";
 		sm << "\t\tfloat widgetH = h * hScale;\n";
 		sm << '\n';
