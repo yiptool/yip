@@ -156,8 +156,10 @@ void iosGenerateLayoutCode(const UIWidget * wd, const std::string & prefix, std:
 	std::string wMode = iosScaleFunc(!landscape ? wd->widthScaleMode() : wd->landscapeWidthScaleMode(), true);
 	std::string hMode = iosScaleFunc(!landscape ? wd->heightScaleMode() : wd->landscapeHeightScaleMode(), false);
 
-	ss << prefix << wd->id() << ".frame = YIP::iosLayoutRect<" << alignment << ">(" << x << ", " << y << ", "
-		<< w << ", " << h << ", " << xMode << ", " << yMode << ", " << wMode << ", " << hMode
+	std::string origin = (wd->parentGroup() ? "0.0f, 0.0f" : "frame.origin.x, frame.origin.y");
+
+	ss << prefix << wd->id() << ".frame = YIP::iosLayoutRect<" << alignment << ">(" << origin << ", " << x << ", " 
+		<< y << ", " << w << ", " << h << ", " << xMode << ", " << yMode << ", " << wMode << ", " << hMode
 		<< ", horzScale, vertScale);\n";
 }
 
@@ -583,7 +585,7 @@ void UIWebView::iosGenerateLayoutCode(const std::string & prefix, std::stringstr
 
 static void uiGenerateIOSInterface(std::stringstream & sh, const UIWidgetInfos & widgetInfos,
 	const std::string & className, const std::string & parentClass, const std::set<std::string> & stringIDs,
-	bool isTableCell, bool isHeaderTableCell)
+	bool isViewController, bool isTableCell, bool isHeaderTableCell)
 {
 	if (isTableCell)
 	{
@@ -595,6 +597,8 @@ static void uiGenerateIOSInterface(std::stringstream & sh, const UIWidgetInfos &
 	}
 	sh << '\n';
 	sh << "@interface " << className << " : " << parentClass << "\n";
+	if (isViewController)
+		sh << "@property (nonatomic, assign) BOOL excludeStatusBarFromLayout;\n";
 	for (const auto & it : widgetInfos)
 	{
 		const UIWidgetPtr & widget = (it.second.iphone.get() ? it.second.iphone : it.second.ipad);
@@ -631,6 +635,9 @@ static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetIn
 
 	sm << '\n';
 	sm << "@implementation " << className << '\n';
+	sm << "{\n";
+	sm << "\tBOOL excludeStatusBarFromLayout;\n";
+	sm << "}\n";
 	sm << '\n';
 	for (const auto & it : widgetInfos)
 		sm << "@synthesize " << it.first << ";\n";
@@ -722,6 +729,17 @@ static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetIn
 	}
 	else
 	{
+		sm << "-(BOOL)excludeStatusBarFromLayout\n";
+		sm << "{\n";
+		sm << "\treturn excludeStatusBarFromLayout;\n";
+		sm << "}\n";
+		sm << '\n';
+		sm << "-(void)setExcludeStatusBarFromLayout:(BOOL)flag\n";
+		sm << "{\n";
+		sm << "\texcludeStatusBarFromLayout = flag;\n";
+		sm << "\t[self.view setNeedsLayout];\n";
+		sm << "}\n";
+		sm << '\n';
 		sm << "-(void)viewWillAppear:(BOOL)animated\n";
 		sm << "{\n";
 		sm << "\t[super viewWillAppear:animated];\n";
@@ -742,11 +760,20 @@ static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetIn
 		sm << "\t[super viewWillLayoutSubviews];\n";
 	}
 	sm << '\n';
-	sm << "\tCGRect frame = " << rootView << ".bounds;\n";
 	sm << "\tBOOL landscape = UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation);\n";
+	sm << "\tCGRect frame = " << rootView << ".bounds;\n";
+	if (isViewController)
+	{
+		sm << '\n';
+		sm << "\tif (iosIsVersion7() && excludeStatusBarFromLayout)\n";
+		sm << "\t{\n";
+		sm << "\t\tframe.origin.y += self.topLayoutGuide.length;\n";
+		sm << "\t\tframe.size.height -= self.topLayoutGuide.length;\n";
+		sm << "\t}\n";
+	}
 	sm << '\n';
-	sm << "\t(void)frame;\n";
 	sm << "\t(void)landscape;\n";
+	sm << "\t(void)frame;\n";
 	if (hasIPhone)
 	{
 		sm << '\n';
@@ -1010,6 +1037,7 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sh << "#import <UIKit/UIKit.h>\n";
 		sh << "#import <yip-imports/ios/NZSwitchControl.h>\n";
 		sh << "#import <yip-imports/ios/image.h>\n";
+		sh << "#import <yip-imports/ios/util.h>\n";
 		sh << "#import <yip-imports/TPKeyboardAvoiding/TPKeyboardAvoidingScrollView.h>\n";
 		sh << "#import <yip-imports/ios/NSNotificationCenter+ExtraMethods.h>\n";
 		sh << "#import <yip-imports/ios/UIButton+ExtraMethods.h>\n";
@@ -1028,9 +1056,9 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		for (const auto & it : cellClasses)
 		{
 			uiGenerateIOSInterface(sh, it.second.widgetInfos, it.second.cell->className,
-				it.second.cell->iosParentClass, emptySet, true, it.second.cell->isHeader);
+				it.second.cell->iosParentClass, emptySet, false, true, it.second.cell->isHeader);
 		}
-		uiGenerateIOSInterface(sh, widgetInfos, cntrl.name, parentClass, stringIDs, false, false);
+		uiGenerateIOSInterface(sh, widgetInfos, cntrl.name, parentClass, stringIDs, true, false, false);
 
 		std::stringstream sm;
 		sm << "#import \"" << targetName << ".h\"\n";
@@ -1043,8 +1071,9 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sm << "\tstatic char KEY_IMAGE;\n";
 		sm << "\tstatic char KEY_IMAGE_2;\n";
 		sm << '\n';
-		sm << "\ttemplate <unsigned char ALIGN> CGRect iosLayoutRect(float x, float y, float w, float h,\n";
-		sm << "\t\tfloat xScale, float yScale, float wScale, float hScale, float horzScale, float vertScale)\n";
+		sm << "\ttemplate <unsigned char ALIGN> CGRect iosLayoutRect(float origX, float origY, float x, float y, \n";
+		sm << "\t\tfloat w, float h, float xScale, float yScale, float wScale, float hScale, float horzScale, \n";
+		sm << "\t\tfloat vertScale)\n";
 		sm << "\t{\n";
 		sm << "\t\t(void)KEY_IMAGE; /* Prevent compiler warning. */\n";
 		sm << "\t\t(void)KEY_IMAGE_2; /* Prevent compiler warning. */\n";
@@ -1070,7 +1099,7 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		sm << "\t\tcase " << UIAlignBottom << ": widgetY = y * vertScale + (h * vertScale - widgetH); break;\n";
 		sm << "\t\t}\n";
 		sm << '\n';
-		sm << "\t\treturn CGRectMake(widgetX, widgetY, widgetW, widgetH);\n";
+		sm << "\t\treturn CGRectMake(origX + widgetX, origY + widgetY, widgetW, widgetH);\n";
 		sm << "\t}\n";
 		sm << "}\n";
 		for (const auto & it : cellClasses)
