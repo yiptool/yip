@@ -1018,6 +1018,36 @@ void Gen::writeImageAssets()
 		ss2 << "      \"extent\" : \"full-screen\",\n";
 		IOS_LAUNCHIMAGE(Project::IMAGESIZE_LAUNCH_IPAD_PORTRAIT_RETINA)
 		ss2 << "      \"scale\" : \"2x\"\n";
+		ss2 << "    },\n";
+		ss2 << "    {\n";
+		ss2 << "      \"orientation\" : \"landscape\",\n";
+		ss2 << "      \"idiom\" : \"ipad\",\n";
+		ss2 << "      \"extent\" : \"full-screen\",\n";
+		ss2 << "      \"minimum-system-version\" : \"7.0\",\n";
+		IOS_LAUNCHIMAGE(Project::IMAGESIZE_LAUNCH_IPAD_LANDSCAPE)
+		ss2 << "      \"scale\" : \"1x\"\n";
+		ss2 << "    },\n";
+		ss2 << "    {\n";
+		ss2 << "      \"orientation\" : \"landscape\",\n";
+		ss2 << "      \"idiom\" : \"ipad\",\n";
+		ss2 << "      \"extent\" : \"full-screen\",\n";
+		IOS_LAUNCHIMAGE(Project::IMAGESIZE_LAUNCH_IPAD_LANDSCAPE)
+		ss2 << "      \"scale\" : \"1x\"\n";
+		ss2 << "    },\n";
+		ss2 << "    {\n";
+		ss2 << "      \"orientation\" : \"landscape\",\n";
+		ss2 << "      \"idiom\" : \"ipad\",\n";
+		ss2 << "      \"extent\" : \"full-screen\",\n";
+		ss2 << "      \"minimum-system-version\" : \"7.0\",\n";
+		IOS_LAUNCHIMAGE(Project::IMAGESIZE_LAUNCH_IPAD_LANDSCAPE_RETINA)
+		ss2 << "      \"scale\" : \"2x\"\n";
+		ss2 << "    },\n";
+		ss2 << "    {\n";
+		ss2 << "      \"orientation\" : \"landscape\",\n";
+		ss2 << "      \"idiom\" : \"ipad\",\n";
+		ss2 << "      \"extent\" : \"full-screen\",\n";
+		IOS_LAUNCHIMAGE(Project::IMAGESIZE_LAUNCH_IPAD_LANDSCAPE_RETINA)
+		ss2 << "      \"scale\" : \"2x\"\n";
 		ss2 << "    }\n";
 		ss2 << "  ],\n";
 		ss2 << "  \"info\" : {\n";
