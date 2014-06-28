@@ -53,6 +53,8 @@ public:
 
 	inline bool hasTableViews() const { return m_HasTableViews; }
 
+	inline const UIColor & backgroundColor() const { return m_BackgroundColor; }
+
 	inline const std::vector<UIWidgetPtr> & widgets() const { return m_Widgets; }
 	inline const std::unordered_map<std::string, UIWidgetPtr> & widgetMap() const { return m_WidgetMap; }
 	UIWidgetPtr widgetForID(const std::string & id) const;
@@ -82,6 +84,7 @@ private:
 	bool m_AllowPortraitTablet;
 	bool m_AllowLandscapeTablet;
 	bool m_HasTableViews;
+	UIColor m_BackgroundColor;
 
 	void parseWidgetList(const TiXmlElement * element, bool allowStrings);
 

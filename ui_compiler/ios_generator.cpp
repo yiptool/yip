@@ -627,8 +627,8 @@ static void uiGenerateIOSInterface(std::stringstream & sh, const UIWidgetInfos &
 static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetInfos & widgetInfos,
 	const std::string & className, const std::set<std::string> & stringIDs, const UILayoutPtr & iphoneLayout,
 	const UILayoutPtr & ipadLayout, const ProjectPtr & project, const std::string & rootView,
-	bool isViewController, bool isTableCell, const UIColor * backgroundColor, bool isHeaderTableCell,
-	bool hasTableViews)
+	bool isViewController, bool isTableCell, const UIColor * iphoneBackgroundColor,
+	const UIColor * ipadBackgroundColor, bool isHeaderTableCell, bool hasTableViews)
 {
 	bool hasIPhone = iphoneLayout.get() != nullptr;
 	bool hasIPad = ipadLayout.get() != nullptr;
@@ -664,13 +664,15 @@ static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetIn
 	}
 	sm << "\tif (self)\n";
 	sm << "\t{\n";
-	if (isTableCell)
-		sm << "\t\tself.contentView.backgroundColor = " << backgroundColor->iosValue() << ";\n";
 	if (hasIPhone)
 	{
 		sm << '\n';
 		sm << "\t\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)\n";
 		sm << "\t\t{\n";
+		if (isTableCell)
+			sm << "\t\tself.contentView.backgroundColor = " << iphoneBackgroundColor->iosValue() << ";\n";
+		else if (isViewController)
+			sm << "\t\tself.view.backgroundColor = " << iphoneBackgroundColor->iosValue() << ";\n";
 		for (const auto & it : iphoneLayout->strings())
 		{
 			sm << "\t\t\t" << it.first << " = ";
@@ -689,6 +691,10 @@ static void uiGenerateIOSImplementation(std::stringstream & sm, const UIWidgetIn
 		sm << '\n';
 		sm << "\t\tif (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)\n";
 		sm << "\t\t{\n";
+		if (isTableCell)
+			sm << "\t\tself.contentView.backgroundColor = " << ipadBackgroundColor->iosValue() << ";\n";
+		else if (isViewController)
+			sm << "\t\tself.view.backgroundColor = " << ipadBackgroundColor->iosValue() << ";\n";
 		for (const auto & it : ipadLayout->strings())
 		{
 			sm << "\t\t\t" << it.first << " = ";
@@ -1106,10 +1112,12 @@ void uiGenerateIOSViewController(UILayoutMap & layouts, const ProjectPtr & proje
 		{
 			uiGenerateIOSImplementation(sm, it.second.widgetInfos, it.second.cell->className, emptySet,
 				it.second.iphoneLayout, it.second.ipadLayout, project, "self.contentView", false, true,
-				&it.second.cell->backgroundColor, it.second.cell->isHeader, false);
+				&it.second.cell->backgroundColor, &it.second.cell->backgroundColor, it.second.cell->isHeader,
+				false);
 		}
 		uiGenerateIOSImplementation(sm, widgetInfos, cntrl.name, stringIDs, iphoneLayout, ipadLayout,
-			project, "self.view", true, false, nullptr, false, hasTableViews);
+			project, "self.view", true, false, &iphoneLayout->backgroundColor(), &ipadLayout->backgroundColor(),
+			false, hasTableViews);
 
 		std::string generatedPathH = project->yipDirectory()->writeFile(targetPathH, sh.str());
 		sourceFileH = project->addSourceFile(targetPathH, generatedPathH);

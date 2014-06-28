@@ -35,7 +35,8 @@ UILayout::UILayout()
 	  m_AllowLandscape(false),
 	  m_AllowPortraitTablet(false),
 	  m_AllowLandscapeTablet(false),
-	  m_HasTableViews(false)
+	  m_HasTableViews(false),
+	  m_BackgroundColor(UIColor::white)
 {
 }
 
@@ -64,6 +65,8 @@ void UILayout::parse(const TiXmlDocument * doc)
 			uiBoolPairFromAttr(attr, &m_AllowPortrait, &m_AllowPortraitTablet);
 		else if (name == "landscape")
 			uiBoolPairFromAttr(attr, &m_AllowLandscape, &m_AllowLandscapeTablet);
+		else if (name == "bgcolor")
+			m_BackgroundColor = UIColor::fromAttr(attr);
 		else
 			throw std::runtime_error(xmlError(attr, fmt() << "unknown attribute '" << name << "'."));
 	}
