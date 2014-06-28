@@ -176,7 +176,7 @@ void UILayout::parseWidgetList(const TiXmlElement * element, bool allowStrings)
 			continue;
 		}
 
-		if (allowStrings && child->ValueStr() == "image")
+		if (allowStrings && child->ValueStr() == "rawImage")
 		{
 			bool hasWidthScale = false, hasHeightScale = false;
 			const TiXmlAttribute * id = nullptr;
