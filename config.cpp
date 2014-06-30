@@ -48,14 +48,19 @@ ConfigPtr g_Config;
 Config::Config()
 	: projectFileName(PROJECT_FILE_NAME)
 {
+	repos.insert(std::make_pair("amazon-aws-runtime", "https://github.com/bin-forks/amazon-aws-runtime.git"));
+	repos.insert(std::make_pair("amazon-aws-s3", "https://github.com/bin-forks/amazon-aws-s3.git"));
+	repos.insert(std::make_pair("facebook-sdk", "https://github.com/bin-forks/facebook-sdk.git"));
+	repos.insert(std::make_pair("font-opensans-bold", "https://github.com/bin-forks/font-opensans-bold.git"));
+	repos.insert(std::make_pair("font-opensans-light", "https://github.com/bin-forks/font-opensans-light.git"));
+	repos.insert(std::make_pair("font-opensans-regular", "https://github.com/bin-forks/font-opensans-regular.git"));
+	repos.insert(std::make_pair("font-opensans-semibold", "https://github.com/bin-forks/font-opensans-semibold.git"));
+	repos.insert(std::make_pair("font-opensans-semibolditalic", "https://github.com/bin-forks/font-opensans-semibolditalic.git"));
+	repos.insert(std::make_pair("parse-com", "https://github.com/bin-forks/parse-com.git"));
+
 	repos.insert(std::make_pair("box2d", "https://github.com/oss-forks/box2d.git"));
 	repos.insert(std::make_pair("dirent", "https://github.com/oss-forks/dirent.git"));
 	repos.insert(std::make_pair("glm", "https://github.com/oss-forks/glm.git"));
-	repos.insert(std::make_pair("font-opensans-bold", "https://github.com/oss-forks/font-opensans-bold.git"));
-	repos.insert(std::make_pair("font-opensans-light", "https://github.com/oss-forks/font-opensans-light.git"));
-	repos.insert(std::make_pair("font-opensans-regular", "https://github.com/oss-forks/font-opensans-regular.git"));
-	repos.insert(std::make_pair("font-opensans-semibold", "https://github.com/oss-forks/font-opensans-semibold.git"));
-	repos.insert(std::make_pair("font-opensans-semibolditalic", "https://github.com/oss-forks/font-opensans-semibolditalic.git"));
 	repos.insert(std::make_pair("imgui", "https://github.com/oss-forks/imgui.git"));
 	repos.insert(std::make_pair("inih", "https://github.com/oss-forks/inih.git"));
 	repos.insert(std::make_pair("ios-form-sheet-controller", "https://github.com/oss-forks/ios-form-sheet-controller.git"));
@@ -82,41 +87,32 @@ Config::Config()
 	repos.insert(std::make_pair("tremor", "https://github.com/oss-forks/tremor.git"));
 	repos.insert(std::make_pair("zlib", "https://github.com/oss-forks/zlib.git"));
 
-	repos.insert(std::make_pair("amazon-aws-runtime", "https://github.com/yiptool/amazon-aws-runtime.git"));
-	repos.insert(std::make_pair("amazon-aws-s3", "https://github.com/yiptool/amazon-aws-s3.git"));
 	repos.insert(std::make_pair("amazon-aws-s3-util", "https://github.com/yiptool/amazon-aws-s3-util.git"));
-	repos.insert(std::make_pair("android-jni-util", "https://github.com/yiptool/android-jni-util.git"));
 	repos.insert(std::make_pair("android-util", "https://github.com/yiptool/android-util.git"));
-	repos.insert(std::make_pair("box2d-debug-renderer", "https://github.com/yiptool/box2d-debug-renderer.git"));
 	repos.insert(std::make_pair("cxx-util", "https://github.com/yiptool/cxx-util.git"));
-	repos.insert(std::make_pair("facebook-sdk", "https://github.com/yiptool/facebook-sdk.git"));
+	repos.insert(std::make_pair("facebook-util", "https://github.com/yiptool/facebook-util.git"));
 	repos.insert(std::make_pair("game-main", "https://github.com/yiptool/game-main.git"));
 	repos.insert(std::make_pair("gles2", "https://github.com/yiptool/gles2.git"));
+	repos.insert(std::make_pair("gles2-box2d-debug-renderer", "https://github.com/yiptool/gles2-box2d-debug-renderer.git"));
 	repos.insert(std::make_pair("gles2-util", "https://github.com/yiptool/gles2-util.git"));
 	repos.insert(std::make_pair("ios-action-sheet", "https://github.com/yiptool/ios-action-sheet.git"));
 	repos.insert(std::make_pair("ios-airplay-util", "https://github.com/yiptool/ios-airplay-util.git"));
-	repos.insert(std::make_pair("ios-facebook-util", "https://github.com/yiptool/ios-facebook-util.git"));
 	repos.insert(std::make_pair("ios-opengl-view", "https://github.com/yiptool/ios-opengl-view.git"));
-	repos.insert(std::make_pair("ios-parse-facebook-util", "https://github.com/yiptool/ios-parse-facebook-util.git"));
-	repos.insert(std::make_pair("ios-parse-twitter-util", "https://github.com/yiptool/ios-parse-twitter-util.git"));
-	repos.insert(std::make_pair("ios-parse-util", "https://github.com/yiptool/ios-parse-util.git"));
-	repos.insert(std::make_pair("ios-parse-vk-util", "https://github.com/yiptool/ios-parse-vk-util.git"));
 	repos.insert(std::make_pair("ios-system-sound", "https://github.com/yiptool/ios-system-sound.git"));
-	repos.insert(std::make_pair("ios-twitter-util", "https://github.com/yiptool/ios-twitter-util.git"));
 	repos.insert(std::make_pair("ios-util", "https://github.com/yiptool/ios-util.git"));
-	repos.insert(std::make_pair("ios-vk-util", "https://github.com/yiptool/ios-vk-util.git"));
 	repos.insert(std::make_pair("jni-util", "https://github.com/yiptool/jni-util.git"));
-	repos.insert(std::make_pair("math", "https://github.com/yiptool/math.git"));
 	repos.insert(std::make_pair("ogg-vorbis-stream", "https://github.com/yiptool/ogg-vorbis-stream.git"));
-	repos.insert(std::make_pair("parse-com", "https://github.com/yiptool/parse-com.git"));
+	repos.insert(std::make_pair("parse-facebook-util", "https://github.com/yiptool/parse-facebook-util.git"));
+	repos.insert(std::make_pair("parse-twitter-util", "https://github.com/yiptool/parse-twitter-util.git"));
+	repos.insert(std::make_pair("parse-util", "https://github.com/yiptool/parse-util.git"));
+	repos.insert(std::make_pair("parse-vk-util", "https://github.com/yiptool/parse-vk-util.git"));
 	repos.insert(std::make_pair("resources", "https://github.com/yiptool/resources.git"));
-	repos.insert(std::make_pair("scenegraph", "https://github.com/yiptool/scenegraph.git"));
 	repos.insert(std::make_pair("sound", "https://github.com/yiptool/sound.git"));
 	repos.insert(std::make_pair("sqlite3-util", "https://github.com/yiptool/sqlite3-util.git"));
 	repos.insert(std::make_pair("stb_image_cxx", "https://github.com/yiptool/stb_image_cxx.git"));
 	repos.insert(std::make_pair("tinyxml-util", "https://github.com/yiptool/tinyxml-util.git"));
-
-	repos.insert(std::make_pair("audio", "https://github.com/friedcroc/yip-audio.git"));
+	repos.insert(std::make_pair("twitter-util", "https://github.com/yiptool/twitter-util.git"));
+	repos.insert(std::make_pair("vk-util", "https://github.com/yiptool/vk-util.git"));
 }
 
 struct Context
